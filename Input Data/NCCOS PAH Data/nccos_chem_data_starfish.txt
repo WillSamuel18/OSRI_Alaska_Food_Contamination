@@ -1,0 +1,310 @@
+Study	NST_Site	General_Location	Specific_Location	Sample_ID	Latitude	Longitude	Fiscal_Year	Collection_Date	Matrix	Scientific_Name	Method	Parameter	Value	Qualifier	Unit	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	1,6,7-Trimethylnaphthalene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	1-Methylnaphthalene	4.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	1-Methylphenanthrene	1.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	2,6-Dimethylnaphthalene	4.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	2-Methylnaphthalene	6.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Acenaphthene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Acenaphthylene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Anthracene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Benz[a]anthracene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Benzo[a]pyrene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Benzo[b]fluoranthene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Benzo[e]pyrene	0.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Benzo[g,h,i]perylene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Benzo[k]fluoranthene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Biphenyl	7.5		ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C1-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C1-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C1-Naphthalenes	11.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C1-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C2-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C2-Naphthalenes	11.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C2-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C3-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C3-Naphthalenes	18.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Chrysene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Dibenzo[a,h]anthracene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Dibenzothiophene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Fluoranthene	1.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Fluorene	1.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Indeno[1,2,3-c,d]pyrene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Naphthalene	11.3		ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Perylene	1.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Phenanthrene	4.5		ng/dry g	
+Bering Sea Study	BER_02N	Norton Sound	2N	SS1994BER_02NSTA	64.17	-163	1994		Starfish		GCMS	Pyrene	1.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	1,6,7-Trimethylnaphthalene	2.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	1-Methylnaphthalene	6.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	1-Methylphenanthrene	1.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	2,6-Dimethylnaphthalene	5.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	2-Methylnaphthalene	8.4		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Acenaphthene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Acenaphthylene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Anthracene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Benz[a]anthracene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Benzo[a]pyrene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Benzo[b]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Benzo[e]pyrene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Benzo[g,h,i]perylene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Benzo[k]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Biphenyl	14.3		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C1-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C1-Fluorenes	7.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C1-Naphthalenes	15.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C1-Phenanthrenes_Anthracenes	7.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C2-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C2-Naphthalenes	14.6		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C2-Phenanthrenes_Anthracenes	5.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C3-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C3-Naphthalenes	21.6		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Chrysene	1.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Dibenzo[a,h]anthracene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Dibenzothiophene	1.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Fluoranthene	1.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Fluorene	8.4		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Indeno[1,2,3-c,d]pyrene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Naphthalene	14.5		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Perylene	1.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Phenanthrene	7.2		ng/dry g	
+Bering Sea Study	BER_07N	Norton Sound	7N	SS1994BER_07NSHR	63.6	-169.17	1994		Shrimp		GCMS	Pyrene	1.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	1,6,7-Trimethylnaphthalene	1.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	1-Methylnaphthalene	6.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	1-Methylphenanthrene	1.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	2,6-Dimethylnaphthalene	5.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	2-Methylnaphthalene	8.9		ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Acenaphthene	0.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Acenaphthylene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Anthracene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Benz[a]anthracene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Benzo[a]pyrene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Benzo[b]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Benzo[e]pyrene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Benzo[g,h,i]perylene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Benzo[k]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Biphenyl	7.8		ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C1-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C1-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C1-Naphthalenes	15.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C1-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C2-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C2-Naphthalenes	13.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C2-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C3-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C3-Naphthalenes	17.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Chrysene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Dibenzo[a,h]anthracene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Dibenzothiophene	0.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Fluoranthene	2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Fluorene	1.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Indeno[1,2,3-c,d]pyrene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Naphthalene	15.6		ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Perylene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Phenanthrene	5.1		ng/dry g	
+Bering Sea Study	BER_08B	Bristol Bay	8B	SS1994BER_08BSTA	57	-163.5	1994		Starfish		GCMS	Pyrene	2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	1,6,7-Trimethylnaphthalene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	1-Methylnaphthalene	3.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	1-Methylphenanthrene	0.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	2,6-Dimethylnaphthalene	2.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	2-Methylnaphthalene	4.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Acenaphthene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Acenaphthylene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Anthracene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Benz[a]anthracene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Benzo[a]pyrene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Benzo[b]fluoranthene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Benzo[e]pyrene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Benzo[g,h,i]perylene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Benzo[k]fluoranthene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Biphenyl	3.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C1-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C1-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C1-Naphthalenes	7.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C1-Phenanthrenes_Anthracenes	3.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C2-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C2-Naphthalenes	6.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C2-Phenanthrenes_Anthracenes	4.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C3-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C3-Naphthalenes	10.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Chrysene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Dibenzo[a,h]anthracene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Dibenzothiophene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Fluoranthene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Fluorene	1.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Indeno[1,2,3-c,d]pyrene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Naphthalene	6.6		ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Perylene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Phenanthrene	2.6		ng/dry g	
+Bering Sea Study	BER_11B	Bristol Bay	11B	SS1994BER_11BSTA	58	-158.5	1994		Starfish		GCMS	Pyrene	1.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	1,6,7-Trimethylnaphthalene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	1-Methylnaphthalene	4.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	1-Methylphenanthrene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	2,6-Dimethylnaphthalene	3.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	2-Methylnaphthalene	3.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Acenaphthene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Acenaphthylene	1.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Anthracene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Benz[a]anthracene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Benzo[a]pyrene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Benzo[b]fluoranthene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Benzo[e]pyrene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Benzo[g,h,i]perylene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Benzo[k]fluoranthene	0.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Biphenyl	4.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C1-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C1-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C1-Naphthalenes	8.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C1-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C2-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C2-Naphthalenes	7.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C2-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C3-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C3-Naphthalenes	15.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Chrysene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Dibenzo[a,h]anthracene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Dibenzothiophene	0.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Fluoranthene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Fluorene	2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Indeno[1,2,3-c,d]pyrene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Naphthalene	11.5		ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Perylene	2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Phenanthrene	5		ng/dry g	
+Bering Sea Study	BER_11N	Norton Sound	11N	SS1994BER_11NSHR	64.53	-169.33	1994		Shrimp		GCMS	Pyrene	1.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	1,6,7-Trimethylnaphthalene	2.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	1-Methylnaphthalene	4.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	1-Methylphenanthrene	0.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	2,6-Dimethylnaphthalene	3.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	2-Methylnaphthalene	5.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Acenaphthene	1.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Acenaphthylene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Anthracene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Benz[a]anthracene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Benzo[a]pyrene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Benzo[b]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Benzo[e]pyrene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Benzo[g,h,i]perylene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Benzo[k]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Biphenyl	4.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C1-Dibenzothiophenes	2.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C1-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C1-Naphthalenes	9.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C1-Phenanthrenes_Anthracenes	5.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C2-Dibenzothiophenes	5.5		ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C2-Naphthalenes	7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C2-Phenanthrenes_Anthracenes	4.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C3-Dibenzothiophenes	7.2		ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C3-Naphthalenes	13.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Chrysene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Dibenzo[a,h]anthracene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Dibenzothiophene	0.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Fluoranthene	1.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Fluorene	1.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Indeno[1,2,3-c,d]pyrene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Naphthalene	8.9		ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Perylene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Phenanthrene	4.4		ng/dry g	
+Bering Sea Study	BER_15B	Bristol Bay	15B	SS1994BER_15BSTA	58.75	-162.25	1994		Starfish		GCMS	Pyrene	1.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	1,6,7-Trimethylnaphthalene	1.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	1-Methylnaphthalene	7.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	1-Methylphenanthrene	0.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	2,6-Dimethylnaphthalene	6.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	2-Methylnaphthalene	10.8		ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Acenaphthene	1.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Acenaphthylene	0.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Anthracene	0.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Benz[a]anthracene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Benzo[a]pyrene	0.3	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Benzo[b]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Benzo[e]pyrene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Benzo[g,h,i]perylene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Benzo[k]fluoranthene	0.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Biphenyl	7.8	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C1-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C1-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C1-Fluoranthenes_Pyrenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C1-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C1-Naphthalenes	18.1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C1-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C2-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C2-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C2-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C2-Naphthalenes	18.2		ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C2-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C3-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C3-Dibenzothiophenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C3-Fluorenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C3-Naphthalenes	21.9	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C3-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C4-Chrysenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C4-Naphthalenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	C4-Phenanthrenes_Anthracenes	0	Not detected	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Chrysene	1	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Dibenzo[a,h]anthracene	0.4	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Dibenzothiophene	1.2	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Fluoranthene	1.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Fluorene	3.5	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Indeno[1,2,3-c,d]pyrene	0.6	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Naphthalene	18.1		ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Perylene	1.7	Below the MDL	ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Phenanthrene	5.6		ng/dry g	
+Bering Sea Study	BER_16B	Bristol Bay	16B	SS1994BER_16B2STA	59.5	-163	1994		Starfish		GCMS	Pyrene	1.7	Below the MDL	ng/dry g	
+
