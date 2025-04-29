@@ -43,7 +43,8 @@ library(readxl)
 #Genus_latin        - Genus (from scientific name)
 #Species_latin      - Species (from scientific name)
 #Tissue_type        - The type of tissue which the sample was from
-#Sample_composition - E.g., a single individual vs a group of pooled individuals
+#Sample_composition - E.g., a single individual vs a group of pooled individuals (factor)
+#Number_in_composite- This is the number of animals included in the composite
 
 #Sex                - The sex of the animal that was sampled. May not be any data.
 #Analysis_method    - The method that was used to test the sample (e.g., method code)
@@ -91,6 +92,7 @@ df <- data.frame(Data_source = character(),
                   Species_latin = character(),
                   Tissue_type = character(),
                   Sample_composition = character(),
+                  Number_in_composite = numeric(),
                   Sex = character(),
                   Analysis_method = character(),
                   Chem_code = character(),
@@ -117,7 +119,7 @@ df <- data.frame(Data_source = character(),
 NCCOS_clam <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_clam.txt")      
 NCCOS_cockles <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_cockles.txt")      
 NCCOS_fish <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_fish.txt")      
-NCCOS_flatfsh <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_flatfish.txt")      
+NCCOS_flatfish <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_flatfish.txt")      
 NCCOS_mussel <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_mussel.txt")      
 NCCOS_shrimp <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_shrimp.txt")      
 NCCOS_starfish <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_starfish.txt")      
@@ -145,7 +147,7 @@ str(NCCOS_clam)
 
 
 
-###NCCOS clam data ------------------------------------------------------
+#### NCCOS clam data ------------------------------------------------------
 NCCOS_clam_processed <- data.frame(
   Data_source = rep("NCCOS", nrow(NCCOS_clam)),
   Study_name = NCCOS_clam$Study,
@@ -171,6 +173,7 @@ NCCOS_clam_processed <- data.frame(
   Species_latin = NA,
   Tissue_type = NA,
   Sample_composition = NA,
+  Number_in_composite = NA,
   Sex = NA,
   Analysis_method = NCCOS_clam$Method,
   Chem_code = NA,
@@ -217,7 +220,7 @@ NCCOS_clam_processed <- NCCOS_clam_processed %>%
            TRUE ~ NA_character_  # Default case if no match is found
          ),
          
-         Genus_latin = case_when(
+         Species_latin = case_when(
            Scientific_name == "Mya arenaria" ~ "arenaria",
            Scientific_name == "Siliqua arenaria" ~ "arenaria",
            Scientific_name == "Protothaca staminea" ~ "staminea",
@@ -228,51 +231,50 @@ str(NCCOS_clam_processed)
 
 
 
-### NCCOS cockles data -----------------------------------------------------
+#### NCCOS cockles data -----------------------------------------------------
+
+str(NCCOS_cockles)
+identical(names(NCCOS_clam), names(NCCOS_cockles)) #The columns are identical as clams
 
 
-
-### NCCOS fish data -----------------------------------------------------
-
-NEED TO UPDATE TO FISH
-
-NCCOS_clam_processed <- data.frame(
-  Data_source = rep("NCCOS", nrow(NCCOS_clam)),
-  Study_name = NCCOS_clam$Study,
-  Source_siteID = NCCOS_clam$NST_Site,
-  Source_sampleID = NCCOS_clam$Sample_ID,
+NCCOS_cockles_processed <- data.frame(
+  Data_source = rep("NCCOS", nrow(NCCOS_cockles)),
+  Study_name = NCCOS_cockles$Study,
+  Source_siteID = NCCOS_cockles$NST_Site,
+  Source_sampleID = NCCOS_cockles$Sample_ID,
   OSRI_siteID = NA,
   OSRI_sampleID = NA,
   Sample_motivation = NA,
-  General_location = NCCOS_clam$General_Location,
-  Specific_location = NCCOS_clam$Specific_Location,
-  Lat = NCCOS_clam$Latitude,
-  Long = NCCOS_clam$Longitude,
-  Year = NCCOS_clam$Fiscal_Year,
+  General_location = NCCOS_cockles$General_Location,
+  Specific_location = NCCOS_cockles$Specific_Location,
+  Lat = NCCOS_cockles$Latitude,
+  Long = NCCOS_cockles$Longitude,
+  Year = NCCOS_cockles$Fiscal_Year,
   Month = NA,
-  Collection_date =	NCCOS_clam$Collection_Date,
+  Collection_date =	NCCOS_cockles$Collection_Date,
   DOY = NA,
   Collection_time = NA,
   Collection_method = NA,
-  Species_complex = NCCOS_clam$Matrix,
+  Species_complex = NCCOS_cockles$Matrix,
   Common_name = NA,
-  Scientific_name = NCCOS_clam$Scientific_Name,
+  Scientific_name = NCCOS_cockles$Scientific_Name,
   Genus_latin = NA,
   Species_latin = NA,
   Tissue_type = NA,
   Sample_composition = NA,
+  Number_in_composite = NA,
   Sex = NA,
-  Analysis_method = NCCOS_clam$Method,
+  Analysis_method = NCCOS_cockles$Method,
   Chem_code = NA,
-  Parameter = NCCOS_clam$Parameter,
-  Value = NCCOS_clam$Value,
-  Units = NCCOS_clam$Unit,
+  Parameter = NCCOS_cockles$Parameter,
+  Value = NCCOS_cockles$Value,
+  Units = NCCOS_cockles$Unit,
   Value_standardized = NA,
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
   Lab_replicate = NA,
-  Qualifier_code = NCCOS_clam$Qualifier,
+  Qualifier_code = NCCOS_cockles$Qualifier,
   Lipid_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
@@ -282,53 +284,415 @@ NCCOS_clam_processed <- data.frame(
 
 
 
-NCCOS_clam_processed <- NCCOS_clam_processed %>% 
+unique(NCCOS_cockles_processed$Scientific_name)
+
+NCCOS_cockles_processed <- NCCOS_cockles_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date, label = TRUE),
          DOY = yday(Collection_date),
          
-         Scientific_name = case_when(
-           Scientific_name == "Mya Arenaria" ~ "Mya arenaria",
-           Scientific_name == "Siliqua Patula" ~ "Siliqua patula",
-           TRUE ~ NA_character_  # Default case if no match is found
-         ),
-         
          Common_name = case_when(
-           Scientific_name == "Mya arenaria" ~ "Soft-shell clam",
-           Scientific_name == "Siliqua patula" ~ "Pacific razor clam",
-           Scientific_name == "Protothaca staminea" ~ "Pacific littleneck clam",
+           Scientific_name == "Clinocardium nuttallii" ~ "cockle",
            TRUE ~ NA_character_  # Default case if no match is found
          ),
          
          Genus_latin = case_when(
-           Scientific_name == "Mya arenaria" ~ "Mya",
-           Scientific_name == "Siliqua patula" ~ "Siliqua",
-           Scientific_name == "Protothaca staminea" ~ "Protothaca",
+           Scientific_name == "Clinocardium nuttallii" ~ "Clinocardium",
            TRUE ~ NA_character_  # Default case if no match is found
          ),
          
-         Genus_latin = case_when(
-           Scientific_name == "Mya arenaria" ~ "arenaria",
-           Scientific_name == "Siliqua arenaria" ~ "arenaria",
-           Scientific_name == "Protothaca staminea" ~ "staminea",
+         Species_latin = case_when(
+           Scientific_name == "Clinocardium nuttallii" ~ "nuttallii",
            TRUE ~ NA_character_  # Default case if no match is found
          ))
 
-str(NCCOS_clam_processed)
+str(NCCOS_cockles_processed)
 
 
-### NCCOS flatfish data -----------------------------------------------------
+
+#### NCCOS fish data -----------------------------------------------------
+
+str(NCCOS_fish)
+identical(names(NCCOS_clam), names(NCCOS_fish)) #The columns are identical as clams
 
 
-### NCCOS mussel data -----------------------------------------------------
+NCCOS_fish_processed <- data.frame(
+  Data_source = rep("NCCOS", nrow(NCCOS_fish)),
+  Study_name = NCCOS_fish$Study,
+  Source_siteID = NCCOS_fish$NST_Site,
+  Source_sampleID = NCCOS_fish$Sample_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = NCCOS_fish$General_Location,
+  Specific_location = NCCOS_fish$Specific_Location,
+  Lat = NCCOS_fish$Latitude,
+  Long = NCCOS_fish$Longitude,
+  Year = NCCOS_fish$Fiscal_Year,
+  Month = NA,
+  Collection_date =	NCCOS_fish$Collection_Date,
+  DOY = NA,
+  Collection_time = NA,
+  Collection_method = NA,
+  Species_complex = NCCOS_fish$Matrix,
+  Common_name = NA,
+  Scientific_name = NCCOS_fish$Scientific_Name,
+  Genus_latin = NA,
+  Species_latin = NA,
+  Tissue_type = NA,
+  Sample_composition = NA,
+  Number_in_composite = NA,
+  Sex = NA,
+  Analysis_method = NCCOS_fish$Method,
+  Chem_code = NA,
+  Parameter = NCCOS_fish$Parameter,
+  Value = NCCOS_fish$Value,
+  Units = NCCOS_fish$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NCCOS_fish$Qualifier,
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA
+)
 
 
-### NCCOS shrimp data -----------------------------------------------------
+unique(NCCOS_fish_processed$Scientific_name)
 
 
-### NCCOS starfish data -----------------------------------------------------
+NCCOS_fish_processed <- NCCOS_fish_processed %>% 
+  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+         Month = month(Collection_date, label = TRUE),
+         DOY = yday(Collection_date),
+         
+         Common_name = case_when(
+           Scientific_name == "Pleuronectes glacialis" ~ "Arctic flounder",
+           Scientific_name == "Boreogadus saida" ~ "Artic cod",
+           Scientific_name == "Osmerus mordax" ~ "Rainbow smelt",
+           Scientific_name == "Platichthys stellatus" ~ "Starry flounder",
+           TRUE ~ NA_character_  # Default case if no match is found
+         ),
+         
+         Genus_latin = case_when(
+           Scientific_name == "Pleuronectes glacialis" ~ "Pleuronectes",
+           Scientific_name == "Boreogadus saida" ~ "Boreogadus",
+           Scientific_name == "Osmerus mordax" ~ "Osmerus",
+           Scientific_name == "Platichthys stellatus" ~ "Platichthys",
+           TRUE ~ NA_character_  # Default case if no match is found
+         ),
+         
+         Species_latin = case_when(
+           Scientific_name == "Pleuronectes glacialis" ~ "glacialis",
+           Scientific_name == "Boreogadus saida" ~ "saida",
+           Scientific_name == "Osmerus mordax" ~ "mordax",
+           Scientific_name == "Platichthys stellatus" ~ "stellatus",
+           TRUE ~ NA_character_  # Default case if no match is found
+         ))
+
+str(NCCOS_fish_processed)
 
 
+#### NCCOS flatfish data -----------------------------------------------------
+
+str(NCCOS_flatfish)
+identical(names(NCCOS_clam), names(NCCOS_flatfish)) #The columns are identical as clams
+
+
+NCCOS_flatfish_processed <- data.frame(
+  Data_source = rep("NCCOS", nrow(NCCOS_flatfish)),
+  Study_name = NCCOS_flatfish$Study,
+  Source_siteID = NCCOS_flatfish$NST_Site,
+  Source_sampleID = NCCOS_flatfish$Sample_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = NCCOS_flatfish$General_Location,
+  Specific_location = NCCOS_flatfish$Specific_Location,
+  Lat = NCCOS_flatfish$Latitude,
+  Long = NCCOS_flatfish$Longitude,
+  Year = NCCOS_flatfish$Fiscal_Year,
+  Month = NA,
+  Collection_date =	NCCOS_flatfish$Collection_Date,
+  DOY = NA,
+  Collection_time = NA,
+  Collection_method = NA,
+  Species_complex = NCCOS_flatfish$Matrix,
+  Common_name = NA,
+  Scientific_name = NCCOS_flatfish$Scientific_Name,
+  Genus_latin = NA,
+  Species_latin = NA,
+  Tissue_type = NA,
+  Sample_composition = NA,
+  Number_in_composite = NA,
+  Sex = NA,
+  Analysis_method = NCCOS_flatfish$Method,
+  Chem_code = NA,
+  Parameter = NCCOS_flatfish$Parameter,
+  Value = NCCOS_flatfish$Value,
+  Units = NCCOS_flatfish$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NCCOS_flatfish$Qualifier,
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA
+)
+
+
+
+unique(NCCOS_flatfish_processed$Scientific_name)
+
+
+NCCOS_flatfish_processed <- NCCOS_flatfish_processed %>% 
+  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+         Month = month(Collection_date, label = TRUE),
+         DOY = yday(Collection_date)
+          
+         #There are no scientific names available in this dataset
+         
+         )
+
+str(NCCOS_flatfish_processed)
+
+
+#### NCCOS mussel data -----------------------------------------------------
+
+str(NCCOS_mussel)
+identical(names(NCCOS_clam), names(NCCOS_mussel)) #The columns are identical as clams
+
+
+NCCOS_mussel_processed <- data.frame(
+  Data_source = rep("NCCOS", nrow(NCCOS_mussel)),
+  Study_name = NCCOS_mussel$Study,
+  Source_siteID = NCCOS_mussel$NST_Site,
+  Source_sampleID = NCCOS_mussel$Sample_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = NCCOS_mussel$General_Location,
+  Specific_location = NCCOS_mussel$Specific_Location,
+  Lat = NCCOS_mussel$Latitude,
+  Long = NCCOS_mussel$Longitude,
+  Year = NCCOS_mussel$Fiscal_Year,
+  Month = NA,
+  Collection_date =	NCCOS_mussel$Collection_Date,
+  DOY = NA,
+  Collection_time = NA,
+  Collection_method = NA,
+  Species_complex = NCCOS_mussel$Matrix,
+  Common_name = NA,
+  Scientific_name = NCCOS_mussel$Scientific_Name,
+  Genus_latin = NA,
+  Species_latin = NA,
+  Tissue_type = NA,
+  Sample_composition = NA,
+  Number_in_composite = NA,
+  Sex = NA,
+  Analysis_method = NCCOS_mussel$Method,
+  Chem_code = NA,
+  Parameter = NCCOS_mussel$Parameter,
+  Value = NCCOS_mussel$Value,
+  Units = NCCOS_mussel$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NCCOS_mussel$Qualifier,
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA
+)
+
+
+
+unique(NCCOS_mussel_processed$Scientific_name)
+
+
+NCCOS_mussel_processed <- NCCOS_mussel_processed %>% 
+  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+         Month = month(Collection_date, label = TRUE),
+         DOY = yday(Collection_date),
+         
+         Common_name = case_when(
+           Scientific_name == "Mytilus edulis" ~ "Blue mussel",
+           Scientific_name == "Mytilus" ~ "Mussel spp.",
+           TRUE ~ NA_character_  # Default case if no match is found
+         ),
+         
+         Genus_latin = case_when(
+           Scientific_name == "Mytilus edulis" ~ "Mytilus",
+           Scientific_name == "Mytilus" ~ "Mytilus",
+           TRUE ~ NA_character_  # Default case if no match is found
+         ),
+         
+         Species_latin = case_when(
+           Scientific_name == "Mytilus edulis" ~ "edulis",
+           Scientific_name == "Mytilus" ~ NA,
+           TRUE ~ NA_character_  # Default case if no match is found
+         ))
+
+str(NCCOS_mussel_processed)
+
+#### NCCOS shrimp data -----------------------------------------------------
+
+str(NCCOS_shrimp)
+identical(names(NCCOS_clam), names(NCCOS_shrimp)) #The columns are identical as clams
+
+
+NCCOS_shrimp_processed <- data.frame(
+  Data_source = rep("NCCOS", nrow(NCCOS_shrimp)),
+  Study_name = NCCOS_shrimp$Study,
+  Source_siteID = NCCOS_shrimp$NST_Site,
+  Source_sampleID = NCCOS_shrimp$Sample_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = NCCOS_shrimp$General_Location,
+  Specific_location = NCCOS_shrimp$Specific_Location,
+  Lat = NCCOS_shrimp$Latitude,
+  Long = NCCOS_shrimp$Longitude,
+  Year = NCCOS_shrimp$Fiscal_Year,
+  Month = NA,
+  Collection_date =	NCCOS_shrimp$Collection_Date,
+  DOY = NA,
+  Collection_time = NA,
+  Collection_method = NA,
+  Species_complex = NCCOS_shrimp$Matrix,
+  Common_name = NA,
+  Scientific_name = NCCOS_shrimp$Scientific_Name,
+  Genus_latin = NA,
+  Species_latin = NA,
+  Tissue_type = NA,
+  Sample_composition = NA,
+  Number_in_composite = NA,
+  Sex = NA,
+  Analysis_method = NCCOS_shrimp$Method,
+  Chem_code = NA,
+  Parameter = NCCOS_shrimp$Parameter,
+  Value = NCCOS_shrimp$Value,
+  Units = NCCOS_shrimp$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NCCOS_shrimp$Qualifier,
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA
+)
+
+
+
+unique(NCCOS_shrimp_processed$Scientific_name)
+
+
+
+NCCOS_shrimp_processed <- NCCOS_shrimp_processed %>% 
+  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+         Month = month(Collection_date, label = TRUE),
+         DOY = yday(Collection_date),
+         
+         #No species information available here
+         )
+
+str(NCCOS_shrimp_processed)
+
+
+#### NCCOS starfish data -----------------------------------------------------
+
+
+str(NCCOS_starfish)
+identical(names(NCCOS_clam), names(NCCOS_starfish)) #The columns are identical as clams
+
+
+NCCOS_starfish_processed <- data.frame(
+  Data_source = rep("NCCOS", nrow(NCCOS_starfish)),
+  Study_name = NCCOS_starfish$Study,
+  Source_siteID = NCCOS_starfish$NST_Site,
+  Source_sampleID = NCCOS_starfish$Sample_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = NCCOS_starfish$General_Location,
+  Specific_location = NCCOS_starfish$Specific_Location,
+  Lat = NCCOS_starfish$Latitude,
+  Long = NCCOS_starfish$Longitude,
+  Year = NCCOS_starfish$Fiscal_Year,
+  Month = NA,
+  Collection_date =	NCCOS_starfish$Collection_Date,
+  DOY = NA,
+  Collection_time = NA,
+  Collection_method = NA,
+  Species_complex = NCCOS_starfish$Matrix,
+  Common_name = NA,
+  Scientific_name = NCCOS_starfish$Scientific_Name,
+  Genus_latin = NA,
+  Species_latin = NA,
+  Tissue_type = NA,
+  Sample_composition = NA,
+  Number_in_composite = NA,
+  Sex = NA,
+  Analysis_method = NCCOS_starfish$Method,
+  Chem_code = NA,
+  Parameter = NCCOS_starfish$Parameter,
+  Value = NCCOS_starfish$Value,
+  Units = NCCOS_starfish$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NCCOS_starfish$Qualifier,
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA
+)
+
+
+
+unique(NCCOS_starfish_processed$Scientific_name)
+
+
+
+NCCOS_starfish_processed <- NCCOS_starfish_processed %>% 
+  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+         Month = month(Collection_date, label = TRUE),
+         DOY = yday(Collection_date),
+         
+         #No scientific names here
+         )
+
+
+
+str(NCCOS_starfish_processed)
+
+
+
+#### Combine the NCCOS data ----------------------------------------------
+
+NCCOS_data_processed <- rbind(NCCOS_clam_processed, NCCOS_cockles_processed, NCCOS_fish_processed,
+                    NCCOS_flatfish_processed, NCCOS_mussel_processed, NCCOS_shrimp_processed, 
+                    NCCOS_starfish_processed) 
+
+View(NCCOS_data_processed) #22,428 data points!!
 
 
 
@@ -451,7 +815,86 @@ str(Diver_data)
 
 
 
+Diver_processed <- data.frame(
+  Data_source = rep("Diver", nrow(Diver_data)),
+  Study_name = Diver_data$Study_Name,
+  Source_siteID = Diver_data$Site_ID,
+  Source_sampleID = Diver_data$Sample_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Diver_data$Station_Description,
+  Specific_location = Diver_data$Station,   #might need to adjust this one.... 
+  Lat = Diver_data$Start_Latitude,
+  Long = Diver_data$Start_Longitude,
+  Year = NA,                                #Need to generate this info
+  Month = NA,                               #Need to generate this info
+  Collection_date =	Diver_data$Date,
+  DOY = NA,                                 #Need to generate this info
+  Collection_time = NA,
+  Collection_method = Diver_data$Collection_Method, #Replace UNK with NA
+  Species_complex = Diver_data$Species_Group,
+  Common_name = Diver_data$Common_Name_Species,
+  Scientific_name = Diver_data$Latin_Name_Species,
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Diver_data$Tissue_Type,
+  Sample_composition = NA,                   #Need to calculate this from the column below
+  Number_in_composite = Diver_data$Number_in_Composite,
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = Diver_data$Analysis_Detail, #ORR this might be the analysis column
+  Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Value = Diver_data$Analysis_Result,
+  Units = Diver_data$Analysis_Result_Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = Diver_data$Detection_Limit,
+  Reporting_limit = Diver_data$Reporting_Limit,
+  Lab_replicate = Diver_data$Lab_Replicate,
+  Qualifier_code = Diver_data$Qualifier_Code,
+  Lipid_pct = Diver_data$Lipid_pct,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA
+)
 
+
+#Need to extract lat long from Location_Geom
+
+
+
+
+Diver_processed <- Diver_processed %>% 
+  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+         Year = year(Collection_date, label = TRUE),
+         Month = month(Collection_date, label = TRUE),
+         DOY = yday(Collection_date),
+         Collection_method = ifelse(Collection_method == "UNK", NA, Collection_method),
+         
+         separate(Scientific_name, into = c("Genus_latin", "Species_latin"), sep = " ", fill = "right"),
+         
+         Sample_composition = ifelse(Number_in_composite < 1, composite, Sample_composition),
+         Sample_composition = ifelse(Number_in_composite == -999 | Number_in_composite == -9, NA, Sample_composition),
+         )
+
+
+latlong <- data.frame(Diver_data$Location_Geom) 
+latlong <- latlong %>%   
+  mutate(Diver_data.Location_Geom = str_remove_all(Diver_data.Location_Geom, "POINT\\(|\\)")) %>% 
+  separate(Diver_data.Location_Geom, into = c("Lat", "Long"), sep = " ", convert = TRUE)
+head(latlong)
+
+
+
+Diver_processed <- Diver_processed %>% 
+  mutate(
+    Lat = latlong$Lat,
+    Long = latlong$Long
+    )
+
+
+
+str(Diver_processed)
 
 
 
@@ -550,9 +993,8 @@ str(Arnold_data)
 
 # Merge all the dataframes ------------------------------------------------
 
-NCCOS_clam_processed
-
-
+NCCOS_data_processed
+Diver_processed
 
 
 
