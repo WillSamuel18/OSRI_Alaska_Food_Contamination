@@ -110,6 +110,7 @@ df <- data.frame(Data_source = character(),
                   Total_LMWAHs = numeric(),
                   Total_HMWAHs = numeric(),
                   Lab_ID = character(),
+                  Notes = character(),
                  stringsAsFactors = FALSE)
 
 
@@ -190,7 +191,8 @@ NCCOS_clam_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
   )
 
   
@@ -279,7 +281,8 @@ NCCOS_cockles_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
@@ -358,7 +361,8 @@ NCCOS_fish_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
@@ -445,7 +449,8 @@ NCCOS_flatfish_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
@@ -513,7 +518,8 @@ NCCOS_mussel_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
@@ -594,7 +600,8 @@ NCCOS_shrimp_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
@@ -663,7 +670,8 @@ NCCOS_starfish_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
@@ -836,6 +844,7 @@ Diver_processed <- data.frame(
   Species_complex = Diver_data$Species_Group,
   Common_name = Diver_data$Common_Name_Species,
   Scientific_name = Diver_data$Latin_Name_Species,
+  Genus_latin = NA,                        #Need to calculate these below
   Species_latin = NA,                        #Need to calculate these below
   Tissue_type = Diver_data$Tissue_Type,
   Sample_composition = NA,                   #Need to calculate this from the column below
@@ -855,27 +864,42 @@ Diver_processed <- data.frame(
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
-  Lab_ID = NA
+  Lab_ID = NA,
+  Notes = NA
 )
 
 
 #Need to extract lat long from Location_Geom
 
 
+Diver_processed <- Diver_processed %>% select(-Genus_latin, -Species_latin)
 
 
-Diver_processed <- Diver_processed %>% 
-  mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Year = year(Collection_date, label = TRUE),
-         Month = month(Collection_date, label = TRUE),
-         DOY = yday(Collection_date),
-         Collection_method = ifelse(Collection_method == "UNK", NA, Collection_method),
-         
-         separate(Scientific_name, into = c("Genus_latin", "Species_latin"), sep = " ", fill = "right"),
-         
-         Sample_composition = ifelse(Number_in_composite < 1, composite, Sample_composition),
-         Sample_composition = ifelse(Number_in_composite == -999 | Number_in_composite == -9, NA, Sample_composition),
-         )
+Diver_processed <- Diver_processed %>%
+  mutate(
+    Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
+    Year = year(Collection_date),
+    Month = month(Collection_date, label = TRUE),
+    DOY = yday(Collection_date),
+    Collection_method = ifelse(Collection_method == "UNK", NA, Collection_method),
+    
+    Sample_composition = ifelse(Number_in_composite < 1, "composite", Sample_composition),
+    Sample_composition = ifelse(Number_in_composite %in% c(-999, -9), NA, Sample_composition),
+    
+    Scientific_name = str_trim(Scientific_name),
+    Scientific_name = ifelse(Scientific_name == "Clupea pallasii pallasiiÂ", "Clupea pallasii", Scientific_name),
+    Scientific_name = ifelse(Scientific_name == "Octopus", "Octopoda", Scientific_name)
+  ) %>%
+  separate_wider_delim(
+    Scientific_name,
+    delim = " ",
+    names = c("Genus_latin", "Species_latin"),
+    too_few = "align_start",
+    too_many = "drop",
+    cols_remove = FALSE
+  )
+
+
 
 
 latlong <- data.frame(Diver_data$Location_Geom) 
@@ -883,8 +907,6 @@ latlong <- latlong %>%
   mutate(Diver_data.Location_Geom = str_remove_all(Diver_data.Location_Geom, "POINT\\(|\\)")) %>% 
   separate(Diver_data.Location_Geom, into = c("Lat", "Long"), sep = " ", convert = TRUE)
 head(latlong)
-
-
 
 Diver_processed <- Diver_processed %>% 
   mutate(
@@ -895,17 +917,18 @@ Diver_processed <- Diver_processed %>%
 
 
 str(Diver_processed)
+head(Diver_processed) #115,046 data points!
 
 
 
 
 # Wetzel Data -------------------------------------------------------------
 
-
+#Looks like I will need to assign better location data to this data
 Wetzel_fish <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Fish")      
-Wetzel_Crustaceans <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Crustaceans")      
-Wetzel_Pinnipeds <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Pinnipeds")      
-Wetzel_Whale <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Whale")      
+Wetzel_crustaceans <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Crustaceans")      
+Wetzel_pinnipeds <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Pinnipeds")      
+Wetzel_whale <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Whale")      
 
 View(Wetzel_fish)
 str(Wetzel_fish)
@@ -920,7 +943,370 @@ str(Wetzel_fish)
 
 
 
+### Wetzel fish data ----------------------------------------------------
 
+Wetzel_fish_processed <- data.frame(
+  Data_source = rep("Wetzel", nrow(Wetzel_fish)),
+  Study_name = NA,                         #Is there actually no study info?
+  Source_siteID = Wetzel_fish$Site,
+  Source_sampleID = Wetzel_fish$Sample,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Wetzel_fish$Site,
+  Specific_location = NA,   
+  Lat = NA,
+  Long = NA,
+  Year = Wetzel_fish$Year,                                
+  Month = NA,                               
+  Collection_date =	NA,
+  DOY = NA,                                
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = rep("fish", nrow(Wetzel_fish)),
+  Common_name = Wetzel_fish$Species,         
+  Scientific_name = NA,    #Need to generate this
+  Genus_latin = NA,                        #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Wetzel_fish$Matrix,
+  Sample_composition = NA,                   #Need to calculate this from the column below
+  Number_in_composite = NA,
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = NA, #ORR this might be the analysis column
+  Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Value = Wetzel_fish$"SPAH ug/g",
+  Units = rep("ug/g", nrow(Wetzel_fish)),
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = ifelse(Wetzel_fish$"SPAH ug/g" == "BDL", "BDL", NA),
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA,
+  Notes = NA
+)
+
+
+
+unique(Wetzel_fish_processed$Common_name)
+
+
+
+# Create a lookup table
+fish_lookup <- tibble(
+  Common_name = c(
+    "Arctic Cisco", "Broad Whitefish", "Burbot", "Butter Sole", "Dover Sole",
+    "Eulachon (hooligan)", "Flathead Sole", "Grayling", "King Salmon", "Lake Trout",
+    "Least Cisco", "Pacific Cod", "Pacific Sandfish", "Pacific Tom Cod", "Pink Salmon",
+    "Pink Salmon?", "Round Whitefish", "Sandfish", "Sculpin", "Silver Salmon",
+    "Longfin Smelt", "Snailfish", "SnailFish", "Sockeye Salmon", "Starry Flounder",
+    "Walleye Pollock"
+  ),
+  Scientific_name = c(
+    "Coregonus autumnalis", "Coregonus nasus", "Lota lota", "Isopsetta isolepis", "Microstomus pacificus",
+    "Thaleichthys pacificus", "Hippoglossoides elassodon", "Thymallus arcticus", "Oncorhynchus tshawytscha", "Salvelinus namaycush",
+    "Coregonus sardinella", "Gadus macrocephalus", "Trichodon trichodon", "Microgadus proximus", "Oncorhynchus gorbuscha",
+    "Oncorhynchus gorbuscha", "Prosopium cylindraceum", "Trichodon trichodon", "Cottidae", "Oncorhynchus kisutch",
+    "Spirinchus thaleichthys", "Liparidae", "Liparidae", "Oncorhynchus nerka", "Platichthys stellatus",
+    "Gadus chalcogrammus"
+  )
+) %>%
+  mutate(
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name)
+  )
+
+
+
+# Join to your main data and replace NA in the matching columns
+Wetzel_fish_processed <- Wetzel_fish_processed %>%
+  left_join(fish_lookup, by = "Common_name") #%>%
+
+Wetzel_fish_processed <- Wetzel_fish_processed %>%
+  mutate(
+    Scientific_name.x = Scientific_name.y,
+    Genus_latin.x = Genus_latin.y,
+    Species_latin.x = Species_latin.y
+  ) %>%
+  select(-Scientific_name.y, -Genus_latin.y, -Species_latin.y) %>% #
+  rename(Scientific_name = Scientific_name.x,
+         Genus_latin = Genus_latin.x,
+         Species_latin = Species_latin.x)
+
+
+Wetzel_fish_processed <- Wetzel_fish_processed %>%
+  mutate(Common_name = ifelse(Common_name == "SnailFish", "Snailfish", Common_name))
+
+
+str(Wetzel_fish_processed)
+
+
+### Wetzel crustaceans data ----------------------------------------------------
+
+identical(names(Wetzel_fish), names(Wetzel_crustaceans)) #The columns are NOT identical as fish
+str(Wetzel_crustaceans)
+
+Wetzel_crustaceans_processed <- data.frame(
+  Data_source = rep("Wetzel", nrow(Wetzel_crustaceans)),
+  Study_name = NA,                         #Is there actually no study info?
+  Source_siteID = Wetzel_crustaceans$Site,
+  Source_sampleID = Wetzel_crustaceans$Sample,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Wetzel_crustaceans$Site,
+  Specific_location = NA,   
+  Lat = NA,
+  Long = NA,
+  Year = Wetzel_crustaceans$Year,                                
+  Month = NA,                               
+  Collection_date =	NA,
+  DOY = NA,                                
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = rep("crustaceans", nrow(Wetzel_crustaceans)),
+  Common_name = Wetzel_crustaceans$Species,         
+  Scientific_name = NA,    #Need to generate this
+  Genus_latin = NA,                        #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Wetzel_crustaceans$Matrix,
+  Sample_composition = NA,                   #Need to calculate this from the column below
+  Number_in_composite = NA,
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = NA, #ORR this might be the analysis column
+  Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Value = Wetzel_crustaceans$"SPAH ug/g",
+  Units = rep("ug/g", nrow(Wetzel_crustaceans)),
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = ifelse(Wetzel_crustaceans$"SPAH ug/g" == "BDL", "BDL", NA),
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA,
+  Notes = NA
+)
+
+
+
+unique(Wetzel_crustaceans_processed$Common_name)
+
+
+
+Wetzel_crustaceans_processed <- Wetzel_crustaceans_processed %>%
+  mutate(Scientific_name = "Crangon septemspinosa",
+         Genus_latin = "septemspinosa",
+         Species_latin = "septemspinosa")
+           
+           
+          
+
+str(Wetzel_crustaceans_processed)
+
+
+### Wetzel pinnipeds data ----------------------------------------------------
+
+identical(names(Wetzel_fish), names(Wetzel_pinnipeds)) #The columns are identical as fish
+str(Wetzel_pinnipeds)
+
+Wetzel_pinnipeds_processed <- data.frame(
+  Data_source = rep("Wetzel", nrow(Wetzel_pinnipeds)),
+  Study_name = NA,                         #Is there actually no study info?
+  Source_siteID = Wetzel_pinnipeds$Site,
+  Source_sampleID = Wetzel_pinnipeds$Sample,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Wetzel_pinnipeds$Site,
+  Specific_location = NA,   
+  Lat = NA,
+  Long = NA,
+  Year = Wetzel_pinnipeds$Year,                                
+  Month = NA,                               
+  Collection_date =	NA,
+  DOY = NA,                                
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = rep("fish", nrow(Wetzel_pinnipeds)),
+  Common_name = Wetzel_pinnipeds$Species,         
+  Scientific_name = NA,                     #Need to generate this
+  Genus_latin = NA,                        #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Wetzel_pinnipeds$Matrix,
+  Sample_composition = NA,                   #Need to calculate this from the column below
+  Number_in_composite = NA,
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = NA, #ORR this might be the analysis column
+  Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Value = Wetzel_pinnipeds$"SPAH ug/g",
+  Units = rep("ug/g", nrow(Wetzel_pinnipeds)),
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = ifelse(Wetzel_pinnipeds$"SPAH ug/g" == "BDL", "BDL", NA),
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA,
+  Notes = NA
+)
+
+
+
+unique(Wetzel_pinnipeds_processed$Common_name)
+
+
+
+# Create a lookup table
+pinniped_lookup <- tibble(
+  Common_name = c(
+    "Walrus", "Unknown Seal", "Spotted Seal", "Ringed Seal", "Bearded Seal"),
+  Scientific_name = c(
+    "Odobenus rosmarus", "Phocidae spp.", "Phoca largha", "Pusa hispida", "Erignathus barbatus")
+) %>%
+  mutate(
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name),
+    Species_latin = ifelse(Species_latin == "spp.", NA, Species_latin)
+  )
+
+
+
+# Join to your main data and replace NA in the matching columns
+Wetzel_pinnipeds_processed <- Wetzel_pinnipeds_processed %>%
+  left_join(pinniped_lookup, by = "Common_name") #%>%
+
+Wetzel_pinnipeds_processed <- Wetzel_pinnipeds_processed %>%
+  mutate(
+    Scientific_name.x = Scientific_name.y,
+    Genus_latin.x = Genus_latin.y,
+    Species_latin.x = Species_latin.y
+  ) %>%
+  select(-Scientific_name.y, -Genus_latin.y, -Species_latin.y) %>% #
+  rename(Scientific_name = Scientific_name.x,
+         Genus_latin = Genus_latin.x,
+         Species_latin = Species_latin.x)
+
+
+
+
+str(Wetzel_pinnipeds_processed)
+
+
+
+
+
+### Wetzel whale data ----------------------------------------------------
+
+identical(names(Wetzel_fish), names(Wetzel_whale)) #The columns are NOT identical as fish
+str(Wetzel_whale)
+
+Wetzel_whale_processed <- data.frame(
+  Data_source = rep("Wetzel", nrow(Wetzel_whale)),
+  Study_name = NA,                         #Is there actually no study info?
+  Source_siteID = Wetzel_whale$Site,
+  Source_sampleID = Wetzel_whale$Sample,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Wetzel_whale$Site,
+  Specific_location = NA,   
+  Lat = NA,
+  Long = NA,
+  Year = Wetzel_whale$Year,                                
+  Month = NA,                               
+  Collection_date =	NA,
+  DOY = NA,                                
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = rep("fish", nrow(Wetzel_whale)),
+  Common_name = Wetzel_whale$Species,         
+  Scientific_name = NA,                     #Need to generate this
+  Genus_latin = NA,                        #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Wetzel_whale$Matrix,
+  Sample_composition = NA,                   #Need to calculate this from the column below
+  Number_in_composite = NA,
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = NA, #ORR this might be the analysis column
+  Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Value = Wetzel_whale$"SPAH ug/g",
+  Units = rep("ug/g", nrow(Wetzel_whale)),
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = ifelse(Wetzel_whale$"SPAH ug/g" == "BDL", "BDL", NA),
+  Lipid_pct = NA,
+  Total_PAHs = NA,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA,
+  Notes = Wetzel_whale$MML
+)
+
+
+
+unique(Wetzel_whale_processed$Common_name)
+
+
+
+# Create a lookup table
+whale_lookup <- tibble(
+  Common_name = c(
+    "Beluga", "Bowhead", "Grey"),
+  Scientific_name = c(
+    "Delphinapterus leucas", "Balaena mysticetus", "Eschrichtius robustus")
+) %>%
+  mutate(
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name)
+  )
+
+
+
+# Join to your main data and replace NA in the matching columns
+Wetzel_whale_processed <- Wetzel_whale_processed %>%
+  left_join(whale_lookup, by = "Common_name") #%>%
+
+Wetzel_whale_processed <- Wetzel_whale_processed %>%
+  mutate(
+    Scientific_name.x = Scientific_name.y,
+    Genus_latin.x = Genus_latin.y,
+    Species_latin.x = Species_latin.y
+  ) %>%
+  select(-Scientific_name.y, -Genus_latin.y, -Species_latin.y) %>% #
+  rename(Scientific_name = Scientific_name.x,
+         Genus_latin = Genus_latin.x,
+         Species_latin = Species_latin.x)
+
+
+
+
+str(Wetzel_whale_processed)
+
+
+
+
+
+#### Combine the Wetzel data ----------------------------------------------
+
+Wetzel_data_processed <- rbind(Wetzel_fish_processed, Wetzel_crustaceans_processed, Wetzel_pinnipeds_processed,
+                              Wetzel_whale_processed) 
+
+View(Wetzel_data_processed) #887 data points
 
 
 
