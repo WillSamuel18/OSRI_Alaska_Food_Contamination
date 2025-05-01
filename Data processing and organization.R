@@ -19,7 +19,9 @@ library(readxl)
 
 
 
-#Target dataframe structure:
+
+# #Target dataframe structure: --------------------------------------------
+
 #Data_source        - This is the source of the data
 #Study_name         - This is the study that collected the data
 #Source_siteID      - This is the Site ID as given by the original study/dataset
@@ -66,6 +68,8 @@ library(readxl)
 #Lab_ID             - The analytical lab where the samples were tested
 
 
+
+###Might need to add unit basis, e.g., wet weight vs dry weight
 
 
 df <- data.frame(Data_source = character(),
@@ -115,7 +119,7 @@ df <- data.frame(Data_source = character(),
 
 
 
-# NCCOS Data --------------------------------------------------------------
+# NCCOS Data # --------------------------------------------------------------
 
 NCCOS_clam <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_clam.txt")      
 NCCOS_cockles <- read.delim("Input Data/NCCOS PAH Data/nccos_chem_data_cockles.txt")      
@@ -199,7 +203,7 @@ NCCOS_clam_processed <- data.frame(
 
 NCCOS_clam_processed <- NCCOS_clam_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date),
            
          Scientific_name = case_when(
@@ -291,7 +295,7 @@ unique(NCCOS_cockles_processed$Scientific_name)
 
 NCCOS_cockles_processed <- NCCOS_cockles_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date),
          
          Common_name = case_when(
@@ -371,7 +375,7 @@ unique(NCCOS_fish_processed$Scientific_name)
 
 NCCOS_fish_processed <- NCCOS_fish_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date),
          
          Common_name = case_when(
@@ -460,7 +464,7 @@ unique(NCCOS_flatfish_processed$Scientific_name)
 
 NCCOS_flatfish_processed <- NCCOS_flatfish_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date)
           
          #There are no scientific names available in this dataset
@@ -529,7 +533,7 @@ unique(NCCOS_mussel_processed$Scientific_name)
 
 NCCOS_mussel_processed <- NCCOS_mussel_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date),
          
          Common_name = case_when(
@@ -612,7 +616,7 @@ unique(NCCOS_shrimp_processed$Scientific_name)
 
 NCCOS_shrimp_processed <- NCCOS_shrimp_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date),
          
          #No species information available here
@@ -682,7 +686,7 @@ unique(NCCOS_starfish_processed$Scientific_name)
 
 NCCOS_starfish_processed <- NCCOS_starfish_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
-         Month = month(Collection_date, label = TRUE),
+         Month = month(Collection_date),
          DOY = yday(Collection_date),
          
          #No scientific names here
@@ -704,7 +708,7 @@ View(NCCOS_data_processed) #22,428 data points!!
 
 
 
-# Diver Data --------------------------------------------------------------
+# Diver Data # --------------------------------------------------------------
 #The DIVER_Explorer_2025_03_19_points_ExportTable is only from the geospatial data, it is not the complete dataset
 #Diver_data_points <- read.csv("Input Data/DIVER_Explorer_2025_03_19_points/DIVER_Explorer_2025_03_19_points_ExportTable.csv")      
 Diver_data <- read.csv("Input Data/DIVER_Explorer_2025_03_19_points/DIVER_Alaska_Tissue_PAH_2025_03_20_Samples.csv")      
@@ -879,11 +883,11 @@ Diver_processed <- Diver_processed %>%
   mutate(
     Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
     Year = year(Collection_date),
-    Month = month(Collection_date, label = TRUE),
+    Month = month(Collection_date),
     DOY = yday(Collection_date),
     Collection_method = ifelse(Collection_method == "UNK", NA, Collection_method),
     
-    Sample_composition = ifelse(Number_in_composite < 1, "composite", Sample_composition),
+    Sample_composition = ifelse(Number_in_composite < 1, "composite", "individual"),
     Sample_composition = ifelse(Number_in_composite %in% c(-999, -9), NA, Sample_composition),
     
     Scientific_name = str_trim(Scientific_name),
@@ -922,7 +926,7 @@ head(Diver_processed) #115,046 data points!
 
 
 
-# Wetzel Data -------------------------------------------------------------
+# Wetzel Data # -------------------------------------------------------------
 
 #Looks like I will need to assign better location data to this data
 Wetzel_fish <- read_excel("Input Data/Wetzel Lab_PAHinAKTissues_3_25_25 copy.xlsx", sheet = "Fish")      
@@ -1135,7 +1139,7 @@ Wetzel_pinnipeds_processed <- data.frame(
   DOY = NA,                                
   Collection_time = NA,
   Collection_method = NA, 
-  Species_complex = rep("fish", nrow(Wetzel_pinnipeds)),
+  Species_complex = rep("pinnipeds", nrow(Wetzel_pinnipeds)),
   Common_name = Wetzel_pinnipeds$Species,         
   Scientific_name = NA,                     #Need to generate this
   Genus_latin = NA,                        #Need to calculate these below
@@ -1230,7 +1234,7 @@ Wetzel_whale_processed <- data.frame(
   DOY = NA,                                
   Collection_time = NA,
   Collection_method = NA, 
-  Species_complex = rep("fish", nrow(Wetzel_whale)),
+  Species_complex = rep("whale", nrow(Wetzel_whale)),
   Common_name = Wetzel_whale$Species,         
   Scientific_name = NA,                     #Need to generate this
   Genus_latin = NA,                        #Need to calculate these below
@@ -1301,7 +1305,7 @@ str(Wetzel_whale_processed)
 
 
 
-#### Combine the Wetzel data ----------------------------------------------
+### Combine the Wetzel data ----------------------------------------------
 
 Wetzel_data_processed <- rbind(Wetzel_fish_processed, Wetzel_crustaceans_processed, Wetzel_pinnipeds_processed,
                               Wetzel_whale_processed) 
@@ -1310,17 +1314,31 @@ View(Wetzel_data_processed) #887 data points
 
 
 
-# Stimmelmayr Data --------------------------------------------------------
+# Stimmelmayr Data # --------------------------------------------------------
 
 Stimmelmayr_data <- read_excel("Input Data/Stimmelmayr et al 2018_Seal_MinedTable4.xlsx")      
 
+#Need to read the dates in properly
+Stimmelmayr_data <- Stimmelmayr_data %>%
+  mutate(
+    `Collection date` = case_when(
+      str_detect(`Collection date`, "^[0-9]+$") ~ as.character(as.Date(as.numeric(`Collection date`), origin = "1899-12-30")),
+      TRUE ~ `Collection date`
+    )
+  )
+
+Stimmelmayr_data <- Stimmelmayr_data[-c(31:33),] #remove useless rows
+
+
 str(Stimmelmayr_data)
+
+
 #tibble [33 x 20] (S3: tbl_df/tbl/data.frame)
 #$ Tissue                   : chr [1:33] "Blubber" "Blubber" "Blubber" "Blubber" ...
 #$ Species                  : chr [1:33] "Spotted seal" "Spotted seal" "Ringed seal" "Ringed seal" ...
 #$ Field identication number: chr [1:33] "N52-2012" "2012-166" "N55-2012" "N55-2012" ...
 #$ Collection site          : chr [1:33] "Shishmaref" "Gambell" "Gambell" "Gambell" ...
-#$ Collection date          : chr [1:33] "41157" "41198" "41225" "41225" ...
+#$ Collection date          : chr [1:33] "2012-09-05" "2012-10-16" "2012-11-12" "2012-11-12" ...
 #$ Collection Method        : chr [1:33] "Subsistence harvest" "Subsistence harvest" "Subsistence harvest" "Subsistence harvest" ...
 #$ Sample Motivation        : chr [1:33] "oiling observed" "oiling observed" "oiling observed" "oiling observed" ...
 #$ Sample n                 : num [1:33] 1 1 1 1 3 1 1 1 1 1 ...
@@ -1330,13 +1348,126 @@ str(Stimmelmayr_data)
 #$ SUMHMWAHS                : chr [1:33] "0.6" "0.4" "< LOQ" "< LOQ" ...
 #$ SumPAHs                  : chr [1:33] "36" "48" "12" "25" ...
 #$ Unit                     : chr [1:33] "ng/g" "ng/g" "ng/g" "ng/g" ...
+
 #$ Basis                    : chr [1:33] "wet weight" "wet weight" "wet weight" "wet weight" ...
+###WE DROP THIS COLUMN BECAUSE IT DOESN'T SEEM THAT IMPORTANT
+
 #$ Comments                 : chr [1:33] NA NA "Sample collected from a non-visibly oiled area of seal carcass." "Sample collected from a visibly oiled area of seal carcass." ...
 #$ Analysis method          : chr [1:33] "GC/MS" "GC/MS" "GC/MS" "GC/MS" ...
 #$ QA/QC measures           : chr [1:33] "met" "met" "met" "met" ...
 #$ Lab                      : chr [1:33] "National Marine Fisheries\r\nServices's Northwest Fisheries Science Center in Seattle, Washington" "National Marine Fisheries\r\nServices's Northwest Fisheries Science Center in Seattle, Washington" "National Marine Fisheries\r\nServices's Northwest Fisheries Science Center in Seattle, Washington" "National Marine Fisheries\r\nServices's Northwest Fisheries Science Center in Seattle, Washington" ...
 #$ Source                   : chr [1:33] "Stimmelmayr et al 2018" "Stimmelmayr et al 2018" "Stimmelmayr et al 2018" "Stimmelmayr et al 2018" ...
 
+
+Stimmelmayr_data_processed <- data.frame(
+  Data_source = rep("Stimmelmayr", nrow(Stimmelmayr_data)),
+  Study_name = Stimmelmayr_data$Source,                         
+  Source_siteID = Stimmelmayr_data$"Collection site",
+  Source_sampleID = Stimmelmayr_data$"Field identication number",
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = Stimmelmayr_data$"Sample Motivation",
+  General_location = Stimmelmayr_data$"Collection site",
+  Specific_location = NA,   
+  Lat = NA,
+  Long = NA,
+  Year = NA,                                #Need to calculate
+  Month = NA,                               #Need to calculate
+  Collection_date =	Stimmelmayr_data$"Collection date",          #THIS MIGHT BE IN A FAILED FORMAT FROM EXCEL
+  DOY = NA,                                 #Need to calculate
+  Collection_time = NA,
+  Collection_method = Stimmelmayr_data$"Collection Method", 
+  Species_complex = rep("pinnipeds", nrow(Stimmelmayr_data)),
+  Common_name = Stimmelmayr_data$Species,         
+  Scientific_name = NA,                     #Need to generate this
+  Genus_latin = NA,                         #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Stimmelmayr_data$Tissue,
+  Sample_composition = NA,                   #Need to calculate this from the column below
+  Number_in_composite = Stimmelmayr_data$"Sample n",
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = Stimmelmayr_data$"Analysis method", 
+  Chem_code = NA,                           
+  Value = Stimmelmayr_data$SumPAHs,
+  Units = Stimmelmayr_data$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = Stimmelmayr_data$LOQ,
+  Reporting_limit = NA,
+  Lab_replicate = NA,
+  Qualifier_code = Stimmelmayr_data$"QA/QC measures",
+  Lipid_pct = Stimmelmayr_data$"Percent lipid",
+  Total_PAHs = Stimmelmayr_data$SumPAHs,
+  Total_LMWAHs = Stimmelmayr_data$"SUM LMWAHs",
+  Total_HMWAHs = Stimmelmayr_data$SUMHMWAHS,
+  Lab_ID = Stimmelmayr_data$Lab,
+  Notes = Stimmelmayr_data$Comments
+)
+
+
+
+unique(Stimmelmayr_data_processed$Common_name)
+
+
+
+
+
+#Add scientific Names
+# Create a lookup table
+Stimmelmayr_lookup <- tibble(
+  Common_name = c(
+    "Spotted seal", "Ringed seal", "Unoiled ringed seals"),
+  Scientific_name = c(
+    "Phoca largha", "Pusa hispida", "Pusa hispida")
+) %>%
+  mutate(
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name),
+    Species_latin = ifelse(Species_latin == "spp.", NA, Species_latin)
+  )
+
+# Join to your main data and replace NA in the matching columns
+Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
+  left_join(Stimmelmayr_lookup, by = "Common_name") #%>%
+
+Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
+  mutate(
+    Scientific_name.x = Scientific_name.y,
+    Genus_latin.x = Genus_latin.y,
+    Species_latin.x = Species_latin.y
+  ) %>%
+  select(-Scientific_name.y, -Genus_latin.y, -Species_latin.y) %>% #
+  rename(Scientific_name = Scientific_name.x,
+         Genus_latin = Genus_latin.x,
+         Species_latin = Species_latin.x)
+
+
+
+
+Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
+  mutate(
+    Year = case_when(
+      # Year range (e.g., "2012-2013" or "2012-2014")
+      str_detect(Collection_date, "^\\d{4}\\s*[--]\\s*\\d{4}$") ~ str_replace_all(Collection_date, "\\s*", ""),
+      
+      # Standard date format (YYYY-MM-DD)
+      str_detect(Collection_date, "^\\d{4}-\\d{2}-\\d{2}$") ~ str_sub(Collection_date, 1, 4),
+      
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  mutate(
+    # Only convert to Date where it's in standard format
+    Collection_date = suppressWarnings(as.Date(Collection_date, format = "%Y-%m-%d")),
+    Month = month(Collection_date),
+    DOY = yday(Collection_date),
+    
+    Sample_composition = ifelse(Number_in_composite < 1, "composite", "individual"),
+    Value = ifelse(Value == "< LOQ", "BLD", Value)
+  )
+
+
+str(Stimmelmayr_data_processed)
 
 
 
@@ -1346,6 +1477,12 @@ str(Stimmelmayr_data)
 
 
 Arnold_data <- read_excel("Input Data/Arnold 2006_SelendangAYU_AKDeptHealth_MinedTable4.xlsx")      
+
+#calculate sample composites
+Arnold_data <- Arnold_data %>% 
+  mutate("Number_in_composite" = ifelse("Sample Composition" == "individual", 1, "10-20"),
+         "Sample_composition" = ifelse("Sample Composition" == "individual", "individual", "composite"))
+
 
 str(Arnold_data)
 #tibble [67 x 15] (S3: tbl_df/tbl/data.frame)
@@ -1358,12 +1495,129 @@ str(Arnold_data)
 #$ Sample Composition: chr [1:67] "10-20 individuals pooled" "10-20 individuals pooled" "10-20 individuals pooled" "10-20 individuals pooled" ...
 #$ Total PAHs        : num [1:67] 36 836 791 1882 13.8 ...
 #$ Unit              : chr [1:67] "µg/kg" "µg/kg" "µg/kg" "µg/kg" ...
+
 #$ Basis             : logi [1:67] NA NA NA NA NA NA ...
+#WE DROP THIS BECAUSE ITS EMPTY
+
 #$ LOQ               : logi [1:67] NA NA NA NA NA NA ...
 #$ Lab               : chr [1:67] "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" ...
 #$ Analysis Method   : chr [1:67] "USEPA8270c" "USEPA8270c" "USEPA8270c" "USEPA8270c" ...
 #$ Comments          : chr [1:67] "Samples from Unalaska Bay" "Samples from Unalaska Bay" "Samples from Unalaska Bay" "Samples from Unalaska Bay" ...
 #$ Source            : chr [1:67] "Arnold 2006- Public Health Evaluation of Subsistence\r\nResources Collected During 2005\r\n" "Arnold 2006- Public Health Evaluation of Subsistence\r\nResources Collected During 2005\r\n" "Arnold 2006- Public Health Evaluation of Subsistence\r\nResources Collected During 2005\r\n" "Arnold 2006- Public Health Evaluation of Subsistence\r\nResources Collected During 2005\r\n" ...
+#$ Number_in_composite: chr [1:67] "10-20" "10-20" "10-20" "10-20" ...
+#$ Sample_composition : chr [1:67] "composite" "composite" "composite" "composite" ...
+
+
+Arnold_data_processed <- data.frame(
+  Data_source = rep("Arnold", nrow(Arnold_data)),
+  Study_name = Arnold_data$Source,                         
+  Source_siteID = Arnold_data$"Location ID",
+  Source_sampleID = Arnold_data$"Sample ID",
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = Arnold_data$"Sample Motivation",
+  General_location = Arnold_data$"Location ID",
+  Specific_location = NA,   
+  Lat = NA,
+  Long = NA,
+  Year = NA,                                #Need to calculate
+  Month = NA,                               #Need to calculate
+  Collection_date =	Arnold_data$"Collection Date",          
+  DOY = NA,                                 #Need to calculate
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = NA,                     #Need to calculate
+  Common_name = Arnold_data$Species,         
+  Scientific_name = NA,                     #Need to generate this
+  Genus_latin = NA,                         #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = NA,                          #can calulate this with a few samples
+  Sample_composition = Arnold_data$Sample_composition,                   #Calculated above
+  Number_in_composite = Arnold_data$Number_in_composite,
+  Sex = NA,                                  #No data in this dataset
+  Analysis_method = Arnold_data$"Analysis Method", 
+  Chem_code = NA,                           
+  Value = Arnold_data$"Total PAHs",
+  Units = Arnold_data$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = Arnold_data$LOQ,
+  Reporting_limit = NA,
+  Lab_replicate = Arnold_data$Replicate,
+  Qualifier_code = NA,
+  Lipid_pct = NA,
+  Total_PAHs = Arnold_data$"Total PAHs",
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = Arnold_data$Lab,
+  Notes = Arnold_data$Comments
+)
+
+
+
+unique(Arnold_data_processed$Common_name)
+
+
+
+
+
+#Add scientific Names
+# Create a lookup table
+Arnold_lookup <- tibble(
+  Common_name = c(
+    "black chitons", "blue mussels", "green sea urchin roe", 
+    "harbor seal blubber", "pink salmon","Pacific cod"),
+  Scientific_name = c(
+    "Katharina tunicata", "Mytilus edulis", "Strongylocentrotus droebachiensis", 
+    "Phoca vitulina", "Oncorhynchus gorbuscha", "Gadus macrocephalus")
+) %>%
+  mutate(
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name),
+    Species_latin = ifelse(Species_latin == "spp.", NA, Species_latin)
+  )
+
+# Join to your main data and replace NA in the matching columns
+Arnold_data_processed <- Arnold_data_processed %>%
+  left_join(Arnold_lookup, by = "Common_name") #%>%
+
+Arnold_data_processed <- Arnold_data_processed %>%
+  mutate(
+    Scientific_name.x = Scientific_name.y,
+    Genus_latin.x = Genus_latin.y,
+    Species_latin.x = Species_latin.y
+  ) %>%
+  select(-Scientific_name.y, -Genus_latin.y, -Species_latin.y) %>% #
+  rename(Scientific_name = Scientific_name.x,
+         Genus_latin = Genus_latin.x,
+         Species_latin = Species_latin.x)
+
+
+
+
+Arnold_data_processed <- Arnold_data_processed %>%
+  mutate(
+    Collection_date = suppressWarnings(as.Date(Collection_date, format = "%Y-%m-%d")),
+    Year = year(Collection_date),
+    Month = month(Collection_date),
+    DOY = yday(Collection_date),
+    
+    Tissue_type = ifelse(Common_name == "green sea urchin roe", "roe", Tissue_type), #Get the tissue types
+    Tissue_type = ifelse(Common_name == "harbor seal blubber", "blubber", Tissue_type),
+    Common_name = ifelse(Common_name == "green sea urchin roe", "green sea urchin", Common_name), #and them remove them from the species names
+    Common_name = ifelse(Common_name == "harbor seal blubber", "harbor seal", Common_name),
+    
+    Species_complex = ifelse(Common_name == "black chitons", "tunicate", Species_complex),
+    Species_complex = ifelse(Common_name == "blue mussels", "mussel", Species_complex),
+    Species_complex = ifelse(Common_name == "green sea urchin", "urchin", Species_complex),
+    Species_complex = ifelse(Common_name == "harbor seal", "pinnipeds", Species_complex),
+    Species_complex = ifelse(Common_name == "pink salmon", "fish", Species_complex),
+    Species_complex = ifelse(Common_name == "Pacific cod", "fish", Species_complex),
+    
+  )
+
+
+str(Arnold_data_processed)
 
 
 
@@ -1371,6 +1625,64 @@ str(Arnold_data)
 
 
 
+# LTEMP data # ------------------------------------------------------------
+LTEMP_data <- read.csv("Input Data/LTEMPDataForOSRI.csv")      
+
+str(LTEMP_data)
+
+#'data.frame':	109209 obs. of  23 variables:
+#  $ X            : int  1 2 3 4 5 6 7 8 9 10 ...
+#$ DOMAIN       : chr  "LTEMP2002" "LTEMP2002" "LTEMP2002" "LTEMP2002" ...
+#$ Coll_date    : chr  "2002-07-13" "2002-07-13" "2002-07-13" "2002-07-13" ...
+#$ MATRIX_Lab   : chr  "Tissue" "Tissue" "Tissue" "Tissue" ...
+#$ LAB          : chr  "ABL" "ABL" "ABL" "ABL" ...
+#$ SAMPID       : chr  "AIB-B-02-2-1" "AIB-B-02-2-1" "AIB-B-02-2-1" "AIB-B-02-2-1" ...
+#$ Location     : chr  "AIB" "AIB" "AIB" "AIB" ...
+#$ Replicate    : int  1 1 1 1 1 1 1 1 1 1 ...
+#$ PCT_MOIST    : num  NA NA NA NA NA NA NA NA NA NA ...
+#$ ANALYTE      : chr  "Wet Weight" "Dry weight" "d26-Dodecane" "d34-Hexadecane" ...
+#$ ANALMETH     : chr  NA NA NA NA ...
+#$ RESULT_Lab   : num  6.06 0.59 58.09 68.23 79.28 ...
+#$ LAB_FLAG     : chr  NA NA NA NA ...
+#$ Detection    : chr  NA NA NA NA ...
+#$ RESULT_UNITS : chr  "g" "g" "%" "%" ...
+#$ UnitBasis    : chr  "wet" "DRY" "DRY" "DRY" ...
+#$ RDL          : num  NA NA NA NA NA NA NA NA NA NA ...
+#$ MDL          : num  NA NA NA NA NA NA NA NA NA NA ...
+#$ YEAR         : int  2002 2002 2002 2002 2002 2002 2002 2002 2002 2002 ...
+#$ Month        : int  7 7 7 7 7 7 7 7 7 7 ...
+#$ Location_Full: chr  "Aialik Bay" "Aialik Bay" "Aialik Bay" "Aialik Bay" ...
+#$ Lat_DD       : chr  "59.87917" "59.87917" "59.87917" "59.87917" ...
+#$ Long_DD      : chr  "-149.6569" "-149.6569" "-149.6569" "-149.6569" ...
+
+
+
+
+
+
+
+
+
+# Ma data # ---------------------------------------------------------------
+
+Ma_data <- read_excel("Input Data/MA 2020 MinedDataTable.xlsx", sheet = "Data")      
+#We will need to estimate the lat long from the figure in the "Station map" tab..... 
+
+str(Ma_data)
+
+#tibble [228 x 12] (S3: tbl_df/tbl/data.frame)
+#$ Sample ID   : chr [1:228] "Whelk" "Crab" "Starfish" "Fish-adult" ...
+#$ Station ID  : chr [1:228] "NB02" "NB02" "NB02" "CDOI" ...
+#$ Region      : chr [1:228] "Northern Bering Sea" "Northern Bering Sea" "Northern Bering Sea" "Northern Bering Sea" ...
+#$ Species Name: chr [1:228] "Neptunea heros" "Hyas sp." "Ctenodiscus crispatus" "Boreogadus saida" ...
+#$ Analyte     : chr [1:228] "naphthalene" "naphthalene" "naphthalene" "naphthalene" ...
+#$ Result      : chr [1:228] "1.76" "10.81" "8.07" "8.0299999999999994" ...
+#$ Unite       : chr [1:228] "ng/g" "ng/g" "ng/g" "ng/g" ...
+#$ Basis       : chr [1:228] "Dry" "Dry" "Dry" "Dry" ...
+#$ MDL         : num [1:228] 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 ...
+#$ Study       : chr [1:228] "CHINARE 2014" "CHINARE 2014" "CHINARE 2014" "CHINARE 2014" ...
+#$ LAT         : chr [1:228] "Mine from Station Map on next Sheet" NA NA NA ...
+#$ LONG        : logi [1:228] NA NA NA NA NA NA ...
 
 
 
@@ -1383,7 +1695,7 @@ NCCOS_data_processed
 Diver_processed
 
 
-
+#Will need to clean the species and correct for capitalization and slight misspellings
 
 
 
