@@ -59,6 +59,7 @@ library(readxl)
 #Units_standardized - In case we need to transform the units
 #Detection_limit    - The value for which the test can detect the target parameter
 #Reporting_limit    - ...
+#Basis              - Weight weight vs dry weight
 #Lab_replicate      - Lab replicates of individual samples
 #Qualifier_code     - A lab flag for potential errors, or describing how the value was calculated (if estimated)
 #Lipid_pct          - Percent of lipids within the sample, used to standardize and compare samples properly
@@ -107,6 +108,7 @@ df <- data.frame(Data_source = character(),
                   Units_standardized = character(),
                   Detection_limit = numeric(),
                   Reporting_limit = numeric(),
+                  Basis = character(),
                   Lab_replicate = numeric(),
                   Qualifier_code = character(),
                   Lipid_pct = numeric(),
@@ -189,6 +191,7 @@ NCCOS_clam_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_clam$Qualifier,
   Lipid_pct = NA,
@@ -205,6 +208,8 @@ NCCOS_clam_processed <- NCCOS_clam_processed %>%
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
          DOY = yday(Collection_date),
+         
+         Basis = "Dry",
            
          Scientific_name = case_when(
            Scientific_name == "Mya Arenaria" ~ "Mya arenaria",
@@ -279,6 +284,7 @@ NCCOS_cockles_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_cockles$Qualifier,
   Lipid_pct = NA,
@@ -297,6 +303,8 @@ NCCOS_cockles_processed <- NCCOS_cockles_processed %>%
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
          DOY = yday(Collection_date),
+         
+         Basis = "Dry",
          
          Common_name = case_when(
            Scientific_name == "Clinocardium nuttallii" ~ "cockle",
@@ -359,6 +367,7 @@ NCCOS_fish_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_fish$Qualifier,
   Lipid_pct = NA,
@@ -377,6 +386,8 @@ NCCOS_fish_processed <- NCCOS_fish_processed %>%
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
          DOY = yday(Collection_date),
+         
+         Basis = "Dry",
          
          Common_name = case_when(
            Scientific_name == "Pleuronectes glacialis" ~ "Arctic flounder",
@@ -447,6 +458,7 @@ NCCOS_flatfish_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_flatfish$Qualifier,
   Lipid_pct = NA,
@@ -460,13 +472,16 @@ NCCOS_flatfish_processed <- data.frame(
 
 
 unique(NCCOS_flatfish_processed$Scientific_name)
+unique(NCCOS_flatfish_processed$Common_name)
 
 
 NCCOS_flatfish_processed <- NCCOS_flatfish_processed %>% 
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
-         DOY = yday(Collection_date)
-          
+         DOY = yday(Collection_date),
+        
+         Basis = "Dry"
+         
          #There are no scientific names available in this dataset
          
          )
@@ -516,6 +531,7 @@ NCCOS_mussel_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_mussel$Qualifier,
   Lipid_pct = NA,
@@ -535,6 +551,8 @@ NCCOS_mussel_processed <- NCCOS_mussel_processed %>%
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
          DOY = yday(Collection_date),
+         
+         Basis = "Dry",
          
          Common_name = case_when(
            Scientific_name == "Mytilus edulis" ~ "Blue mussel",
@@ -598,6 +616,7 @@ NCCOS_shrimp_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_shrimp$Qualifier,
   Lipid_pct = NA,
@@ -618,6 +637,8 @@ NCCOS_shrimp_processed <- NCCOS_shrimp_processed %>%
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
          DOY = yday(Collection_date),
+         
+         Basis = "Dry"
          
          #No species information available here
          )
@@ -668,6 +689,7 @@ NCCOS_starfish_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = NCCOS_starfish$Qualifier,
   Lipid_pct = NA,
@@ -688,6 +710,8 @@ NCCOS_starfish_processed <- NCCOS_starfish_processed %>%
   mutate(Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),  
          Month = month(Collection_date),
          DOY = yday(Collection_date),
+         
+         Basis = "Dry"
          
          #No scientific names here
          )
@@ -862,6 +886,7 @@ Diver_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = Diver_data$Detection_Limit,
   Reporting_limit = Diver_data$Reporting_Limit,
+  Basis = Diver_data$Measurement_Basis,
   Lab_replicate = Diver_data$Lab_Replicate,
   Qualifier_code = Diver_data$Qualifier_Code,
   Lipid_pct = Diver_data$Lipid_pct,
@@ -984,6 +1009,7 @@ Wetzel_fish_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_fish$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
@@ -1089,6 +1115,7 @@ Wetzel_crustaceans_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_crustaceans$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
@@ -1156,6 +1183,7 @@ Wetzel_pinnipeds_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_pinnipeds$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
@@ -1251,6 +1279,7 @@ Wetzel_whale_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = NA,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_whale$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
@@ -1348,10 +1377,7 @@ str(Stimmelmayr_data)
 #$ SUMHMWAHS                : chr [1:33] "0.6" "0.4" "< LOQ" "< LOQ" ...
 #$ SumPAHs                  : chr [1:33] "36" "48" "12" "25" ...
 #$ Unit                     : chr [1:33] "ng/g" "ng/g" "ng/g" "ng/g" ...
-
 #$ Basis                    : chr [1:33] "wet weight" "wet weight" "wet weight" "wet weight" ...
-###WE DROP THIS COLUMN BECAUSE IT DOESN'T SEEM THAT IMPORTANT
-
 #$ Comments                 : chr [1:33] NA NA "Sample collected from a non-visibly oiled area of seal carcass." "Sample collected from a visibly oiled area of seal carcass." ...
 #$ Analysis method          : chr [1:33] "GC/MS" "GC/MS" "GC/MS" "GC/MS" ...
 #$ QA/QC measures           : chr [1:33] "met" "met" "met" "met" ...
@@ -1394,6 +1420,7 @@ Stimmelmayr_data_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = Stimmelmayr_data$LOQ,
   Reporting_limit = NA,
+  Basis = Stimmelmayr_data$Basis,
   Lab_replicate = NA,
   Qualifier_code = Stimmelmayr_data$"QA/QC measures",
   Lipid_pct = Stimmelmayr_data$"Percent lipid",
@@ -1495,10 +1522,7 @@ str(Arnold_data)
 #$ Sample Composition: chr [1:67] "10-20 individuals pooled" "10-20 individuals pooled" "10-20 individuals pooled" "10-20 individuals pooled" ...
 #$ Total PAHs        : num [1:67] 36 836 791 1882 13.8 ...
 #$ Unit              : chr [1:67] "µg/kg" "µg/kg" "µg/kg" "µg/kg" ...
-
 #$ Basis             : logi [1:67] NA NA NA NA NA NA ...
-#WE DROP THIS BECAUSE ITS EMPTY
-
 #$ LOQ               : logi [1:67] NA NA NA NA NA NA ...
 #$ Lab               : chr [1:67] "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" ...
 #$ Analysis Method   : chr [1:67] "USEPA8270c" "USEPA8270c" "USEPA8270c" "USEPA8270c" ...
@@ -1531,7 +1555,7 @@ Arnold_data_processed <- data.frame(
   Scientific_name = NA,                     #Need to generate this
   Genus_latin = NA,                         #Need to calculate these below
   Species_latin = NA,                        #Need to calculate these below
-  Tissue_type = NA,                          #can calulate this with a few samples
+  Tissue_type = NA,                          #can calculate this with a few samples
   Sample_composition = Arnold_data$Sample_composition,                   #Calculated above
   Number_in_composite = Arnold_data$Number_in_composite,
   Sex = NA,                                  #No data in this dataset
@@ -1543,6 +1567,7 @@ Arnold_data_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = Arnold_data$LOQ,
   Reporting_limit = NA,
+  Basis = Arnold_data$Basis,
   Lab_replicate = Arnold_data$Replicate,
   Qualifier_code = NA,
   Lipid_pct = NA,
@@ -1659,6 +1684,65 @@ str(LTEMP_data)
 
 
 
+LTEMP_data_processed <- data.frame(
+  Data_source = rep("LTEMP", nrow(LTEMP_data)),
+  Study_name = LTEMP_data$DOMAIN,                         
+  Source_siteID = LTEMP_data$Location_Full,
+  Source_sampleID = LTEMP_data$SAMPID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = LTEMP_data$Location,
+  Specific_location = LTEMP_data$Location_Full,   
+  Lat = LTEMP_data$Lat_DD,
+  Long = LTEMP_data$Long_DD,
+  Year = LTEMP_data$YEAR,                                
+  Month = LTEMP_data$Month,                               
+  Collection_date =	LTEMP_data$Coll_date,          
+  DOY = NA,                                 #Need to calculate
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = NA,                      
+  Common_name = NA,         
+  Scientific_name = NA,                     #No info available
+  Genus_latin = NA,                         #No info available
+  Species_latin = NA,                        #No info available
+  Tissue_type = LTEMP_data$MATRIX_Lab,                          
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                 
+  Analysis_method = LTEMP_data$ANALYTE, 
+  Chem_code = NA,                           
+  Value = LTEMP_data$RESULT_Lab,
+  Units = LTEMP_data$RESULT_UNITS,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = LTEMP_data$MDL,
+  Reporting_limit = LTEMP_data$RDL,
+  Basis = LTEMP_data$UnitBasis,
+  Lab_replicate = LTEMP_data$Replicate,
+  Qualifier_code = LTEMP_data$LAB_FLAG,
+  Lipid_pct = NA,
+  Total_PAHs = NA,                                  #might be able to calculate this later
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = LTEMP_data$LAB,
+  Notes = LTEMP_data$UnitBasis
+)
+
+
+
+LTEMP_data_processed <- LTEMP_data_processed %>%
+  mutate(
+    Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),
+ 
+    DOY = yday(Collection_date),
+    
+  )
+
+
+str(LTEMP_data_processed)
+
 
 
 
@@ -1688,11 +1772,68 @@ str(Ma_data)
 
 
 
+# Harvey data # ---------------------------------------------------------------
+
+Harvey_data <- read_excel("Input Data/Harvey 2014 Chukchi Whelk data.xlsx")      
+
+str(Harvey_data)
+#tibble [111 x 14] (S3: tbl_df/tbl/data.frame)
+#$ Species               : chr [1:111] "Neptunea heros" "Neptunea heros" "Neptunea heros" "Neptunea heros" ...
+#$ Organism              : chr [1:111] "Northern Neptune Whelk" "Northern Neptune Whelk" "Northern Neptune Whelk" "Northern Neptune Whelk" ...
+#$ Analyte               : chr [1:111] "2-Methylnapthalene" "1 -Methylnapthalene" "Biphenyl" "2,7-Dimethylnapthalene" ...
+#$ Collection Date       : chr [1:111] "Summer 2009" "Summer 2009" "Summer 2009" "Summer 2009" ...
+#$ Region                : chr [1:111] "Chukchi Sea" "Chukchi Sea" "Chukchi Sea" "Chukchi Sea" ...
+#$ Tissue                : chr [1:111] "muscle" "muscle" "muscle" "muscle" ...
+#$ Size class (cm length): chr [1:111] "< 5" "< 5" "< 5" "< 5" ...
+#$ Result                : num [1:111] 1.43 0.68 0.52 0 0 0.72 0.65 0.49 0 0.23 ...
+#$ Unit                  : chr [1:111] "ng/g" "ng/g" "ng/g" "ng/g" ...
+#$ Basis                 : chr [1:111] "wet" "wet" "wet" "wet" ...
+#$ Latitude              : chr [1:111] "70°28.122'" "70°28.122'" "70°28.122'" "70°28.122'" ...
+#$ Longitude             : chr [1:111] "166°05.168'" "166°05.168'" "166°05.168'" "166°05.168'" ...
+#$ data quality          : chr [1:111] "Blank Corrected" "Blank Corrected" "Blank Corrected" "Blank Corrected" ...
+#$ Study                 : chr [1:111] "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" ...
+
+
+
+
+# ERM data # ---------------------------------------------------------------
+
+ERM_data <- read_excel("Input Data/ERM NorthSlope Fish PAH Data.xlsx")      
+
+str(ERM_data)
+
+#tibble [2,900 x 16] (S3: tbl_df/tbl/data.frame)
+# $ Sample ID          : chr [1:2900] "BDWF-2014-01" "BDWF-2014-01" "BDWF-2014-01" "BDWF-2014-01" ...
+# $ Sample Date        : POSIXct[1:2900], format: "2014-07-13" "2014-07-13" "2014-07-13" "2014-07-13" ...
+# $ Region             : chr [1:2900] "North Slope" "North Slope" "North Slope" "North Slope" ...
+# $ Location           : chr [1:2900] "Nigliq Channel" "Nigliq Channel" "Nigliq Channel" "Nigliq Channel" ...
+# $ Species            : chr [1:2900] "Board Whitefish" "Board Whitefish" "Board Whitefish" "Board Whitefish" ...
+# $ Tissue             : chr [1:2900] "Wholebody" "Wholebody" "Wholebody" "Wholebody" ...
+# $ Method             : chr [1:2900] "SW8270D-SIM" "SW8270D-SIM" "SW8270D-SIM" "SW8270D-SIM" ...
+# $ Compound           : chr [1:2900] "2-Methylnaphthalene" "Acenaphthene" "Acenaphthylene" "Anthracene" ...
+# $ Units              : chr [1:2900] "µg/kg" "µg/kg" "µg/kg" "µg/kg" ...
+# $ Result             : chr [1:2900] "ND" "ND" "ND" "ND" ...
+# $ MDL                : num [1:2900] 1.2 0.45 0.53 0.36 0.36 0.94 0.63 0.9 0.54 0.53 ...
+# $ MRL                : num [1:2900] 4.8 4.8 4.8 4.8 4.8 4.8 4.8 4.8 4.8 4.8 ...
+# $ Basis              : chr [1:2900] "Wet" "Wet" "Wet" "Wet" ...
+# $ Sampling Motivation: chr [1:2900] "Subsistence harvest, biomonitoring" "Subsistence harvest, biomonitoring" "Subsistence harvest, biomonitoring" "Subsistence harvest, biomonitoring" ...
+# $ Lab                : chr [1:2900] "ALS Environmental, Inc in Kelso Washington" "ALS Environmental, Inc in Kelso Washington" "ALS Environmental, Inc in Kelso Washington" "ALS Environmental, Inc in Kelso Washington" ...
+# $ Study              : chr [1:2900] "ERM NorthSlope Subsistence Study 2014 2015" "ERM NorthSlope Subsistence Study 2014 2015" "ERM NorthSlope Subsistence Study 2014 2015" "ERM NorthSlope Subsistence Study 2014 2015" ...
+
+
+
+
+
+
 
 # Merge all the dataframes ------------------------------------------------
 
 NCCOS_data_processed
 Diver_processed
+Wetzel_data_processed
+Stimmelmayr_data_processed
+Arnold_data_processed
+
 
 
 #Will need to clean the species and correct for capitalization and slight misspellings
@@ -1743,7 +1884,6 @@ NCCOS_clam_processed <- df %>% rename (
     Total_LMWAHs = 
     Total_HMWAHs = 
     Lab_ID =
-    
 )
 
 
