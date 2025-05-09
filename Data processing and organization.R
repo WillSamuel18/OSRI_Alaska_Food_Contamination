@@ -63,6 +63,7 @@ library(readxl)
 #Lab_replicate      - Lab replicates of individual samples
 #Qualifier_code     - A lab flag for potential errors, or describing how the value was calculated (if estimated)
 #Lipid_pct          - Percent of lipids within the sample, used to standardize and compare samples properly
+#Moisture_pct       - Percent of moisture
 #Total_PAHs         - Total amount of Polycyclic Aromatic Hydrocarbons (PAHs) 
 #Total_LMWAHs       - The total low molecular-weight aromatic hydrocarbons
 #Total_HMWAHs       - The total high molecular-weight aromatic hydrocarbons
@@ -112,6 +113,7 @@ df <- data.frame(Data_source = character(),
                   Lab_replicate = numeric(),
                   Qualifier_code = character(),
                   Lipid_pct = numeric(),
+                  Moisture_pct = numeric(),
                   Total_PAHs = numeric(),
                   Total_LMWAHs = numeric(),
                   Total_HMWAHs = numeric(),
@@ -195,6 +197,7 @@ NCCOS_clam_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_clam$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -288,6 +291,7 @@ NCCOS_cockles_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_cockles$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -371,6 +375,7 @@ NCCOS_fish_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_fish$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -462,6 +467,7 @@ NCCOS_flatfish_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_flatfish$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -535,6 +541,7 @@ NCCOS_mussel_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_mussel$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -620,6 +627,7 @@ NCCOS_shrimp_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_shrimp$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -693,6 +701,7 @@ NCCOS_starfish_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = NCCOS_starfish$Qualifier,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -890,6 +899,7 @@ Diver_processed <- data.frame(
   Lab_replicate = Diver_data$Lab_Replicate,
   Qualifier_code = Diver_data$Qualifier_Code,
   Lipid_pct = Diver_data$Lipid_pct,
+  Moisture_pct = LTEMP_data$PCT_MOIST,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -1013,6 +1023,7 @@ Wetzel_fish_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_fish$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -1119,6 +1130,7 @@ Wetzel_crustaceans_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_crustaceans$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -1187,6 +1199,7 @@ Wetzel_pinnipeds_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_pinnipeds$"SPAH ug/g" == "BDL", "BDL", NA),
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -1282,6 +1295,7 @@ Wetzel_whale_processed <- data.frame(
   Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = ifelse(Wetzel_whale$"SPAH ug/g" == "BDL", "BDL", NA),
+  Moisture_pct = NA,
   Lipid_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
@@ -1424,6 +1438,7 @@ Stimmelmayr_data_processed <- data.frame(
   Lab_replicate = NA,
   Qualifier_code = Stimmelmayr_data$"QA/QC measures",
   Lipid_pct = Stimmelmayr_data$"Percent lipid",
+  Moisture_pct = NA,
   Total_PAHs = Stimmelmayr_data$SumPAHs,
   Total_LMWAHs = Stimmelmayr_data$"SUM LMWAHs",
   Total_HMWAHs = Stimmelmayr_data$SUMHMWAHS,
@@ -1571,6 +1586,7 @@ Arnold_data_processed <- data.frame(
   Lab_replicate = Arnold_data$Replicate,
   Qualifier_code = NA,
   Lipid_pct = NA,
+  Moisture_pct = NA,
   Total_PAHs = Arnold_data$"Total PAHs",
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -1723,6 +1739,7 @@ LTEMP_data_processed <- data.frame(
   Lab_replicate = LTEMP_data$Replicate,
   Qualifier_code = LTEMP_data$LAB_FLAG,
   Lipid_pct = NA,
+  Moisture_pct = LTEMP_data$PCT_MOIST,
   Total_PAHs = NA,                                  #might be able to calculate this later
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
@@ -1738,6 +1755,11 @@ LTEMP_data_processed <- LTEMP_data_processed %>%
  
     DOY = yday(Collection_date),
     
+    Common_name = "Blue mussels",
+    Scientific_name = "Mytilus trossulus",
+    Genus_latin = "mytilus",
+    Species_latin = "trossulus",
+    Species_complex = "mussels"
   )
 
 
@@ -1770,6 +1792,123 @@ str(Ma_data)
 
 
 
+
+Ma_data_processed <- data.frame(
+  Data_source = rep("Ma", nrow(Ma_data)),
+  Study_name = Ma_data$Study,                         
+  Source_siteID = Ma_data$'Station ID',
+  Source_sampleID = Ma_data$'Sample ID',
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Ma_data$Region,
+  Specific_location = Ma_data$'Station ID',   
+  Lat = NA,                                #Need to calculate from figure
+  Long = NA,                               #Need to calculate from figure
+  Year = NA,                                
+  Month = NA,                               
+  Collection_date =	NA,          
+  DOY = NA,                                 
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = Ma_data$'Sample ID',                    #Need to calculate  
+  Common_name = NA,                        #Need to calculate
+  Scientific_name = Ma_data$"Species Name",                     
+  Genus_latin = NA,                         #No info available
+  Species_latin = NA,                        #No info available
+  Tissue_type = NA,                          
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                 
+  Analysis_method = Ma_data$Analyte, 
+  Chem_code = NA,                           
+  Value = Ma_data$Result,
+  Units = Ma_data$Unite,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = Ma_data$MDL,
+  Reporting_limit = NA,
+  Basis = Ma_data$Basis,
+  Lab_replicate = NA,
+  Qualifier_code = NA,
+  Lipid_pct = NA,
+  Moisture_pct = NA,
+  Total_PAHs = NA,                                  #might be able to calculate this later
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA,
+  Notes = NA
+)
+
+
+
+unique(Ma_data_processed$Scientific_name)
+
+# Create a lookup table (corrected: scientific names and common names swapped)
+Ma_lookup <- tibble(
+  Scientific_name = c(
+    "Neptunea heros", "Hyas sp.", "Ctenodiscus crispatus",
+    "Boreogadus saida", "Delectopecten randolphi", "Lepidepecreum sp."),
+  Common_name = c(
+    "Heros neptune", "Crab", "Cookie-cutter Sea Star", 
+    "Arctic cod", "Randolph's Scallop", "Crustacean")
+) %>%
+  mutate(
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name),
+    Species_latin = ifelse(Species_latin == "sp." | Species_latin == "spp.", NA, Species_latin)
+  )
+
+# Join on Scientific_name and update missing fields
+Ma_data_processed <- Ma_data_processed %>%
+  left_join(Ma_lookup, by = "Scientific_name") %>%
+  mutate(
+    Common_name = coalesce(Common_name.x, Common_name.y),
+    Genus_latin = coalesce(Genus_latin.x, Genus_latin.y),
+    Species_latin = coalesce(Species_latin.x, Species_latin.y)
+  ) %>%
+  select(-Common_name.x, -Common_name.y,
+         -Genus_latin.x, -Genus_latin.y,
+         -Species_latin.x, -Species_latin.y)
+
+
+
+
+
+unique(Ma_data_processed$Source_siteID)
+
+Ma_lookup_lat <- tibble(
+  Source_siteID = c(
+    "NB02", "CDOI", "AF7",  "cc07", "COI",  "R07"),
+  Lat = c(
+    "61.000", "62.500", "64.000", "68.200", "69.200", "74.000")
+)
+
+
+Ma_lookup_long <- tibble(
+  Source_siteID = c(
+    "NB02", "CDOI", "AF7",  "cc07", "COI",  "R07"),
+  Long = c(
+    "175.000", "174.000", "171.000", "168.000", "169.000", "169.500")
+)
+
+Ma_data_processed <- Ma_data_processed %>%
+  left_join(Ma_lookup_lat, by = "Source_siteID") %>%
+  left_join(Ma_lookup_long, by = "Source_siteID") #%>%
+  
+
+Ma_data_processed <- Ma_data_processed %>%
+  left_join(Ma_lookup_lat, by = "Source_siteID") %>%
+  left_join(Ma_lookup_long, by = "Source_siteID") %>%
+  mutate(
+    Lat = as.numeric(Lat.y),
+    Long = as.numeric(Long.y)
+  ) %>%
+  select(-Lat.y, -Long.y)
+
+
+
+str(Ma_data_processed)
 
 
 # Harvey data # ---------------------------------------------------------------
@@ -1833,10 +1972,16 @@ Diver_processed
 Wetzel_data_processed
 Stimmelmayr_data_processed
 Arnold_data_processed
+LTEMP_data_processed
+
 
 
 
 #Will need to clean the species and correct for capitalization and slight misspellings
+#add lat long and make a consistent location
+#make sure units are standard
+#Maybe calculate total PAHs
+#
 
 
 
