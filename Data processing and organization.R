@@ -1933,6 +1933,73 @@ str(Harvey_data)
 #$ Study                 : chr [1:111] "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" ...
 
 
+Harvey_data_processed <- data.frame(
+  Data_source = rep("Harvey", nrow(Harvey_data)),
+  Study_name = Harvey_data$Study,                         
+  Source_siteID = NA,
+  Source_sampleID = NA,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Harvey_data$Region,
+  Specific_location = NA,   
+  Lat = Harvey_data$Latitude,                                
+  Long = Harvey_data$Longitude,                              
+  Year = NA,                                #Need to calculate
+  Month = NA,                               
+  Collection_date =	Harvey_data$'Collection Date',          
+  DOY = NA,                                 
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = NA,                    #Need to calculate         
+  Common_name = Harvey_data$Organism,                        
+  Scientific_name = Harvey_data$Species,                     
+  Genus_latin = NA,                         #Need to calculate
+  Species_latin = NA,                        #Need to calculate
+  Tissue_type = Harvey_data$Tissue,                          
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                 
+  Analysis_method = Harvey_data$Analyte, 
+  Chem_code = NA,                           
+  Value = Harvey_data$Result,
+  Units = Harvey_data$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Basis = Harvey_data$Basis,
+  Lab_replicate = NA,
+  Qualifier_code = Harvey_data$'data quality',
+  Lipid_pct = NA,
+  Moisture_pct = NA,
+  Total_PAHs = NA,                                  #might be able to calculate this later
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = NA,
+  Notes = Harvey_data$'Size class (cm length)'
+)
+
+
+
+unique(Harvey_data_processed$Scientific_name)
+
+
+
+
+Harvey_data_processed <- Harvey_data_processed %>%
+  mutate(
+    Year = 2009,
+    
+    Species_complex = "Mollusk",
+    
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name)
+  )
+
+
+
+
 
 
 # ERM data # ---------------------------------------------------------------
@@ -1961,8 +2028,181 @@ str(ERM_data)
 
 
 
+ERM_data_processed <- data.frame(
+  Data_source = rep("ERM", nrow(ERM_data)),
+  Study_name = ERM_data$Study,                         
+  Source_siteID = NA,
+  Source_sampleID = ERM_data$'Sample ID',
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,                  #Need to calculate
+  General_location = ERM_data$Region,
+  Specific_location = ERM_data$Location,   
+  Lat = NA,                                
+  Long = NA,                              
+  Year = NA,                                #Need to calculate
+  Month = NA,                               #Need to calculate
+  Collection_date =	ERM_data$'Sample Date',          
+  DOY = NA,                                 #Need to calculate
+  Collection_time = NA,
+  Collection_method = NA,                  #Need to calculate
+  Species_complex = NA,                    #Need to calculate         
+  Common_name = ERM_data$Species,          #Need to correct misspellings              
+  Scientific_name = ERM_data$Species,                     
+  Genus_latin = NA,                         #Need to calculate
+  Species_latin = NA,                        #Need to calculate
+  Tissue_type = ERM_data$Tissue,                          
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                 
+  Analysis_method = ERM_data$Compound, 
+  Chem_code = ERM_data$Method,                           
+  Value = ERM_data$Result,
+  Units = ERM_data$Units,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = ERM_data$MDL,
+  Reporting_limit = ERM_data$MRL,
+  Basis = ERM_data$Basis,
+  Lab_replicate = NA,
+  Qualifier_code = NA,
+  Lipid_pct = NA,
+  Moisture_pct = NA,
+  Total_PAHs = NA,                                  #might be able to calculate this later
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = ERM_data$Lab,
+  Notes = NA
+)
 
 
+
+unique(ERM_data_processed$Scientific_name)
+unique(ERM_data$`Sampling Motivation`)
+
+
+
+
+ERM_data_processed <- ERM_data_processed %>%
+  mutate(
+    Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),
+    Year = year(Collection_date),
+    Month = month(Collection_date),
+    DOY = yday(Collection_date),
+    
+    Collection_method = "Subsistence harvest",
+    Sample_motivation = "Biomonitoring",
+    
+    Species_complex = "fish",
+    
+    Common_name = ifelse(Common_name == "Board Whitefish", "Broad whitefish", Common_name), #fix misspelling
+    Scientific_name = ifelse(Common_name == "Broad whitefish", "Coregonus nasus", Scientific_name),
+    Scientific_name = ifelse(Common_name == "Arctic Cisco", "Coregonus autumnalis", Scientific_name),
+    
+    Genus_latin = sub(" .*", "", Scientific_name),
+    Species_latin = sub(".* ", "", Scientific_name)
+    
+    )
+
+
+
+
+# Selendang data ----------------------------------------------------------
+
+Selendang_data <- read_excel("Input Data/2003 Selendang AYU study.xlsx")      
+
+str(Selendang_data)
+#tibble [1,922 x 17] (S3: tbl_df/tbl/data.frame)
+#$ Client ID        : chr [1:1922] "ML-SMB10-7-20-05" "ML-SMB10-7-20-05" "ML-SMB10-7-20-05" "ML-SMB10-7-20-05" ...
+#$ Lab ID           : chr [1:1922] "0507100-01" "0507100-01" "0507100-01" "0507100-01" ...
+#$ Matrix           : chr [1:1922] "Tissue" "Tissue" "Tissue" "Tissue" ...
+#$ Reference Method : chr [1:1922] "Modified 8270C" "Modified 8270C" "Modified 8270C" "Modified 8270C" ...
+#$ Batch ID         : chr [1:1922] "ST072705B05" "ST072705B05" "ST072705B05" "ST072705B05" ...
+#$ Date Collected   : POSIXct[1:1922], format: "2005-07-20" "2005-07-20" "2005-07-20" "2005-07-20" ...
+#$ Date Received    : POSIXct[1:1922], format: "2005-07-25" "2005-07-25" "2005-07-25" "2005-07-25" ...
+#$ Date Prepped     : POSIXct[1:1922], format: "2005-07-27" "2005-07-27" "2005-07-27" "2005-07-27" ...
+#$ Date Analyzed    : POSIXct[1:1922], format: "2005-08-10" "2005-08-10" "2005-08-10" "2005-08-10" ...
+#$ Sample Size (wet): num [1:1922] 15.3 15.3 15.3 15.3 15.3 ...
+#$ % Solid          : num [1:1922] 100 100 100 100 100 100 100 100 100 100 ...    WE DROP THIS SINCE IT'S ALL THE SAME
+#$ File ID          : chr [1:1922] "P14865.D" "P14865.D" "P14865.D" "P14865.D" ...
+#$ Units            : chr [1:1922] "µg/Kg" "µg/Kg" "µg/Kg" "µg/Kg" ...
+#$ Analytes         : chr [1:1922] "cis/trans-Decalin" "C1-Decalins" "C2-Decalins" "C3-Decalins" ...
+#$ Result           : num [1:1922] 0.62 NA NA NA NA NA NA NA NA NA ...
+#$ Lab Flag         : chr [1:1922] "J" "U" "U" "U" ...
+#$ Reporting Limit  : num [1:1922] 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
+
+
+
+Selendang_data_processed <- data.frame(
+  Data_source = rep("Selendang", nrow(Selendang_data)),
+  Study_name = rep("Selendang", nrow(Selendang_data)),                         
+  Source_siteID = NA,
+  Source_sampleID = Selendang_data$'Client ID',
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,                  
+  General_location = NA,
+  Specific_location = NA,   
+  Lat = NA,                                
+  Long = NA,                              
+  Year = NA,                                #Need to calculate 
+  Month = NA,                               #Need to calculate
+  Collection_date =	Selendang_data$'Date Collected',          
+  DOY = NA,                                 #Need to calculate
+  Collection_time = NA,
+  Collection_method = NA,                 
+  Species_complex = NA,                    #Need to calculate         
+  Common_name = NA,                        #Need to calculate  
+  Scientific_name = NA,                     #Need to calculate
+  Genus_latin = NA,                         #Need to calculate
+  Species_latin = NA,                       #Need to calculate
+  Tissue_type = Selendang_data$Matrix,                          
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                 
+  Analysis_method = Selendang_data$Analytes, 
+  Chem_code = NA,                           
+  Value = Selendang_data$Result,
+  Units = Selendang_data$Units,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = Selendang_data$'Reporting Limit',
+  Basis = Selendang_data$Basis,
+  Lab_replicate = NA,
+  Qualifier_code = Selendang_data$'Lab Flag',
+  Lipid_pct = NA,
+  Moisture_pct = NA,
+  Total_PAHs = NA,                                  #might be able to calculate this later
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = Selendang_data$'Lab ID',
+  Notes = NA
+)
+
+
+
+
+
+Selendang_data <- Selendang_data %>%
+  mutate(
+    Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),
+    Year = year(Collection_date),
+    Month = month(Collection_date),
+    DOY = yday(Collection_date),
+    
+    #Collection_method = "Subsistence harvest",
+    #Sample_motivation = "Biomonitoring",
+    
+    #Species_complex = "fish",
+    
+    #Common_name = _________, 
+    #Scientific_name = ________________,
+
+    #Genus_latin = sub(" .*", "", Scientific_name),
+    #Species_latin = sub(".* ", "", Scientific_name)
+    
+  )
 
 
 # Merge all the dataframes ------------------------------------------------
@@ -1973,8 +2213,10 @@ Wetzel_data_processed
 Stimmelmayr_data_processed
 Arnold_data_processed
 LTEMP_data_processed
-
-
+Ma_data_processed
+Harvey_data_processed
+ERM_data_processed
+Selendang_data_processed
 
 
 #Will need to clean the species and correct for capitalization and slight misspellings
