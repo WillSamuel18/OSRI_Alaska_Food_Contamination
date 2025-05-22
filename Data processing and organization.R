@@ -887,8 +887,9 @@ Diver_processed <- data.frame(
   Sample_composition = NA,                   #Need to calculate this from the column below
   Number_in_composite = Diver_data$Number_in_Composite,
   Sex = NA,                                  #No data in this dataset
-  Analysis_method = Diver_data$Analysis_Detail, #ORR this might be the analysis column
-  Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Analysis_method = Diver_data$Analysis_Method, 
+  Chem_code = NA,                           
+  Parameter = Diver_data$Analysis,
   Value = Diver_data$Analysis_Result,
   Units = Diver_data$Analysis_Result_Unit,
   Value_standardized = NA,
@@ -958,6 +959,246 @@ Diver_processed <- Diver_processed %>%
 str(Diver_processed)
 head(Diver_processed) #115,046 data points!
 
+
+
+
+
+# Nationwide PAHs (supplement to NCCOS and Diver) -------------------------
+
+#PAH Data 
+Nationwide_data <- read.csv("Input Data/Nationwide Tissue PAHs.csv")      
+#PAH sum data
+Nationwide_sum <- read.csv("Input Data/Nationwide Tissue PAHs Sums.csv")      
+
+#Filter just to Alaska samples
+Nationwide_data <- Nationwide_data %>% filter(State == "Alaska")
+Nationwide_sum <- Nationwide_sum %>% filter(State == "Alaska")
+
+
+str(Nationwide_data)
+#'data.frame':	3328 obs. of  23 variables:
+#  $ Site_ID                         : chr  "UISB" "KTMP" "CIHS" "PVMC" ...
+#$ Study                           : chr  "Mussel Watch" "Mussel Watch" "Mussel Watch" "Mussel Watch" ...
+#$ General_Location                : chr  "Unakwit Inlet" "Ketchikan" "Cook Inlet" "Port Valdez" ...
+#$ Specific_Location               : chr  "Siwash Bay" "Mountain Point" "Homer Spit" "Mineral Creek Flats" ...
+#$ State                           : chr  "Alaska" "Alaska" "Alaska" "Alaska" ...
+#$ Region                          : chr  "Pacific Coast" "Pacific Coast" "Pacific Coast" "Pacific Coast" ...
+#$ Latitude                        : num  61 55.3 59.6 61.1 61 ...
+#$ Longitude                       : num  -148 -132 -151 -146 -148 ...
+#$ Collaborator                    : chr  "" "" "" "" ...
+#$ Matrix                          : chr  "Mussel" "Mussel" "Mussel" "Mussel" ...
+#$ Scientific_Name                 : chr  "Mytilus species" "Mytilus edulis" "Mytilus species" "Mytilus species" ...
+#$ Calendar_Year                   : int  2003 2009 2007 2007 2001 1995 1999 1999 1992 1995 ...
+#$ Parameter_Code                  : chr  "ACENTHE" "ACENTHE" "ACENTHE" "ACENTHE" ...
+#$ Parameter                       : chr  "Acenaphthene" "Acenaphthene" "Acenaphthene" "Acenaphthene" ...
+#$ Unit                            : chr  "ng/dry g" "ng/dry g" "ng/dry g" "ng/dry g" ...
+#$ Method                          : chr  "PAH-2002" "PAH-2002" "PAH-2002" "PAH-2002" ...
+#$ Laboratory                      : chr  "" "" "" "" ...
+#$ Previous_MWP_Group              : chr  "PAHlmw" "PAHlmw" "PAHlmw" "PAHlmw" ...
+#$ TechMemo_Group                  : chr  "Total PAHs" "Total PAHs" "Total PAHs" "Total PAHs" ...
+#$ TechMemo_Group_withPPCPSubgroups: chr  "Total PAHs" "Total PAHs" "Total PAHs" "Total PAHs" ...
+#$ Value                           : num  6.1 17.8 0 0 0.7 ...
+#$ Detection_Limit                 : num  NA NA NA NA NA NA NA NA NA NA ...
+#$ PresAbs                         : int  1 1 0 0 1 0 0 1 0 1 ...
+
+str(Nationwide_sum)
+#'data.frame':	65 obs. of  17 variables:
+#  $ Site_ID          : chr  "UISB" "KTMP" "CIHS" "PVMC" ...
+#$ Study            : chr  "Mussel Watch" "Mussel Watch" "Mussel Watch" "Mussel Watch" ...
+#$ General_Location : chr  "Unakwit Inlet" "Ketchikan" "Cook Inlet" "Port Valdez" ...
+#$ Specific_Location: chr  "Siwash Bay" "Mountain Point" "Homer Spit" "Mineral Creek Flats" ...
+#$ State            : chr  "Alaska" "Alaska" "Alaska" "Alaska" ...
+#$ Region           : chr  "Pacific Coast" "Pacific Coast" "Pacific Coast" "Pacific Coast" ...
+#$ Latitude         : num  61 55.3 59.6 61.1 61 ...
+#$ Longitude        : num  -148 -132 -151 -146 -148 ...
+#$ Collaborator     : chr  "" "" "" "" ...
+#$ Matrix           : chr  "Mussel" "Mussel" "Mussel" "Mussel" ...
+#$ Scientific_Name  : chr  "Mytilus species" "Mytilus edulis" "Mytilus species" "Mytilus species" ...
+#$ Calendar_Year    : int  2003 2009 2007 2007 2001 1995 1999 1999 1995 1995 ...
+#$ Unit             : chr  "ng/dry g" "ng/dry g" "ng/dry g" "ng/dry g" ...
+#$ Laboratory       : chr  "" "" "" "" ...
+#$ TechMemo_Group   : chr  "Total PAHs" "Total PAHs" "Total PAHs" "Total PAHs" ...
+#$ Sum              : num  436.8 127.1 224 194.7 24.2 ...
+#$ Count            : int  39 39 39 39 39 39 39 39 39 39 ...
+
+
+
+
+#Pick identifying columns (adjust as needed)
+id_cols <- c("Site_ID", "Scientific_Name", "Calendar_Year", "Specific_Location")
+
+# Check overlap
+overlap <- inner_join(Nationwide_data, Nationwide_sum, by = id_cols)
+
+# Show how many are duplicated
+nrow(overlap)
+
+# Alternatively: show just the overlapping IDs
+overlapping_ids <- semi_join(Nationwide_data, Nationwide_sum, by = id_cols)
+distinct(overlapping_ids, across(all_of(id_cols)))
+#All of the PAH sum columns match the full dataset, so I'll join them
+
+# Join the non-redundant columns from Nationwide_sum into Nationwide_data
+Nationwide_data <- Nationwide_data %>%
+  left_join(
+    Nationwide_sum %>% select(all_of(id_cols), Sum, Count),
+    by = id_cols
+  )
+
+
+
+
+
+#Now proccess it
+str(Nationwide_data)
+
+
+Nationwide_data_processed <- data.frame(
+  Data_source = rep("Nationwide", nrow(Nationwide_data)),
+  Study_name = Nationwide_data$Study,
+  Source_siteID = Nationwide_data$Site_ID,
+  Source_sampleID = Nationwide_data$Site_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Nationwide_data$General_Location,
+  Specific_location = Nationwide_data$Specific_Location,   
+  Lat = Nationwide_data$Latitude,
+  Long = Nationwide_data$Longitude,
+  Year = Nationwide_data$Calendar_Year,
+  Month = NA,                               
+  Collection_date =	NA,
+  DOY = NA,                                 
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = NA,                 #Need to calculate
+  Common_name = NA,                     #Need to calculate
+  Scientific_name = Nationwide_data$Scientific_Name,
+  Genus_latin = NA,                        #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Nationwide_data$Matrix,
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                  
+  Analysis_method = Nationwide_data$Method, 
+  Chem_code = Nationwide_data$Parameter_Code,
+  Parameter = Nationwide_data$Parameter,
+  Value = Nationwide_data$Value,
+  Units = Nationwide_data$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = Nationwide_data$Detection_Limit,
+  Reporting_limit = NA,
+  Basis = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NA,
+  Lipid_pct = NA,
+  Moisture_pct = NA,
+  Total_PAHs = Nationwide_data$Sum,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = Nationwide_data$Laboratory,
+  Notes = Nationwide_data$Method
+)
+
+
+
+
+
+
+Nationwide_data_processed <- Nationwide_data_processed %>%
+  mutate(
+    Scientific_name = case_when(
+      Scientific_name == "Mytilus species" ~ "Mytilus spp.",
+      Scientific_name == "Siliqua Patula" ~ "Siliqua patula",
+    ),
+    
+    Common_name = case_when(
+      Scientific_name == "Mytilus edulis" ~ "Blue mussel",
+      Scientific_name == "Siliqua patula" ~ "Pacific razor clam",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ),
+    
+    Genus_latin = case_when(
+      Scientific_name == "Mytilus species" ~ "Mytilus",
+      Scientific_name == "Mytilus edulis" ~ "Mytilus",
+      Scientific_name == "Siliqua patula" ~ "Siliqua",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ),
+    
+    Species_latin = case_when(
+      Scientific_name == "Mytilus species" ~ NA,
+      Scientific_name == "Mytilus edulis" ~ "edulis",
+      Scientific_name == "Siliqua patula" ~ "patula",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ),
+      
+      Species_complex = case_when(
+      Scientific_name == "Mytilus species" ~ "Mussel",
+      Scientific_name == "Mytilus edulis" ~ "Mussel",
+      Scientific_name == "Siliqua patula" ~ "Clam",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ))
+    
+    
+    
+
+str(Nationwide_data_processed)
+head(Nationwide_data_processed) 
+
+
+
+### Check for redundancy between NCCOS and Diver datasets -------------------
+
+# Define identifying columns for overlap
+id_cols <- c("Source_sampleID", "Source_siteID", "Scientific_name", "Year", "Parameter", "Value", "Units")
+
+# Ensure matching column types
+NCCOS_data_processed <- NCCOS_data_processed %>%
+  mutate(across(all_of(id_cols), as.character))
+
+Nationwide_data_processed <- Nationwide_data_processed %>%
+  mutate(across(all_of(id_cols), as.character))
+
+# Identify overlapping rows
+overlap <- inner_join(NCCOS_data_processed, Nationwide_data_processed, by = id_cols)
+
+# Filter out overlapping rows from NCCOS
+NCCOS_unique <- NCCOS_data_processed %>%
+  anti_join(Nationwide_data_processed, by = id_cols)
+
+# Optional: print how many rows overlap and how many remain
+cat("Overlapping rows:", nrow(overlap), "\n")
+cat("Remaining unique NCCOS rows:", nrow(NCCOS_unique), "\n")
+
+
+
+
+#Check the diver data
+# Step 1: Define only existing, shared identifying columns
+id_cols <- c("Source_sampleID", "Source_siteID", "Scientific_name", "Year", "Value", "Units")
+
+# Step 2: Standardize column types
+Nationwide_data_processed <- Nationwide_data_processed %>%
+  mutate(across(all_of(id_cols), as.character))
+
+Diver_processed <- Diver_processed %>%
+  mutate(across(all_of(id_cols), as.character))
+
+# Step 3: Find overlapping rows (identical samples)
+overlap <- inner_join(Nationwide_data_processed, Diver_processed, by = id_cols)
+
+# Step 4: Remove overlapping rows from Nationwide
+Nationwide_unique <- Nationwide_data_processed %>%
+  anti_join(Diver_processed, by = id_cols)
+
+# Step 5: Output summary
+cat("Overlapping rows removed from Nationwide:", nrow(overlap), "\n")
+cat("Remaining unique Nationwide rows:", nrow(Nationwide_unique), "\n")
+
+
+
+#No overlapping data in either of them
 
 
 
@@ -2168,7 +2409,7 @@ Selendang_data_processed <- data.frame(
   Units_standardized = NA,
   Detection_limit = NA,
   Reporting_limit = Selendang_data$'Reporting Limit',
-  Basis = Selendang_data$Basis,
+  Basis = NA,
   Lab_replicate = NA,
   Qualifier_code = Selendang_data$'Lab Flag',
   Lipid_pct = NA,
@@ -2183,13 +2424,27 @@ Selendang_data_processed <- data.frame(
 
 
 
+#Add species names
+Selendang_data_processed <- Selendang_data_processed %>%
+  mutate(Species = case_when(
+    str_detect(Source_sampleID, "CH") ~ "Black chiton",
+    str_detect(Source_sampleID, "UR") ~ "Green sea urchin",
+    str_detect(Source_sampleID, "MU") ~ "Blue mussel",
+    str_detect(Source_sampleID, "ML") ~ "Blue mussel",
+    str_detect(Source_sampleID, "PNK") ~ "Pink salmon",
+    str_detect(Source_sampleID, "SL") ~ "Harbor seal",
+    str_detect(Source_sampleID, "CD") ~ "Pacific cod",
+    TRUE ~ NA_character_
+  ))
 
-Selendang_data <- Selendang_data %>%
+
+#Now add the rest
+Selendang_data_processed <- Selendang_data_processed %>%
   mutate(
     Collection_date = as.Date(Collection_date, format = "%Y-%m-%d"),
     Year = year(Collection_date),
     Month = month(Collection_date),
-    DOY = yday(Collection_date),
+    DOY = yday(Collection_date)
     
     #Collection_method = "Subsistence harvest",
     #Sample_motivation = "Biomonitoring",
@@ -2205,10 +2460,205 @@ Selendang_data <- Selendang_data %>%
   )
 
 
+
+
+
+# Shigenaka Data ----------------------------------------------------------
+
+
+Shigenaka_data <- read_excel("Input Data/Shigenaka Little Clam 2007 Data.xlsx")      
+
+
+str(Shigenaka_data)
+#tibble [968 x 15] (S3: tbl_df/tbl/data.frame)
+#$ Laboratory ID   : chr [1:968] "2N7226-15" "2N7226-15" "2N7226-15" "2N7226-15" ...
+#$ Field ID        : chr [1:968] "TC17" "TC17" "TC17" "TC17" ...
+#$ Site ID         : chr [1:968] "Block QI" "Block QI" "Block QI" "Block QI" ...
+#$ Moisture (%)    : num [1:968] 14.6 14.6 14.6 14.6 14.6 14.6 14.6 14.6 14.6 14.6 ...
+#$ Analytes        : chr [1:968] "Naphthalene" "C-l Naphthalene" "C-2 Naphthalene" "C-3 Naphthalene" ...
+#$ Result          : chr [1:968] "ND" "2.0999999999999999E-3" "1.6000000000000001E-3" "1.6000000000000001E-3" ...
+#$ Unit Basis      : chr [1:968] "dry" "dry" "dry" "dry" ...
+#$ Unit            : chr [1:968] "ng/mg" "ng/mg" "ng/mg" "ng/mg" ...
+#$ Collection      : POSIXct[1:968], format: "2007-07-01" "2007-07-01" "2007-07-01" "2007-07-01" ...
+#$ Study           : chr [1:968] "Shigenaka 2008, Exxon Valdez Intertidal monitoring" "Shigenaka 2008, Exxon Valdez Intertidal monitoring" "Shigenaka 2008, Exxon Valdez Intertidal monitoring" "Shigenaka 2008, Exxon Valdez Intertidal monitoring" ...
+#$ Species         : chr [1:968] "Littleneck clam" "Littleneck clam" "Littleneck clam" "Littleneck clam" ...
+#$ Tissue          : chr [1:968] "Wholebody" "Wholebody" "Wholebody" "Wholebody" ...
+#$ Latin           : chr [1:968] "Leukoma staminea" "Leukoma staminea" "Leukoma staminea" "Leukoma staminea" ...
+#$ Lab             : chr [1:968] "Louisana State University, Baton Rouge LA" "Louisana State University, Baton Rouge LA" "Louisana State University, Baton Rouge LA" "Louisana State University, Baton Rouge LA" ...
+#$ Sampling purpose: chr [1:968] "Long term monitoring post spill" "Long term monitoring post spill" "Long term monitoring post spill" "Long term monitoring post spill" ...
+
+
+Shigenaka_sites <- read_excel("Input Data/Shigenaka Little Clam 2007 Data.xlsx", sheet = "Sites")      
+str(Shigenaka_sites)
+#tibble [11 x 4] (S3: tbl_df/tbl/data.frame)
+#$ Oiling Category: chr [1:11] NA "Unoiled" "Unoiled" "Unoiled" ...
+#$ Site           : chr [1:11] NA "Bainbridge Bight" "Sheep Bay" "Outside Bay" ...
+#$ Coordinates    : chr [1:11] "Latitude" "60°06'59\"N" "60°41 '06\"N" "60°38'17\"N" ...
+#$ ...4           : chr [1:11] "Longitude" "148° 14' 48\"W" "145°56'22\"W" "147°27'02\"W" ...
+
+Shigenaka_data_processed <- data.frame(
+  Data_source = rep("Shigenaka", nrow(Shigenaka_data)),
+  Study_name = Shigenaka_data$Study,                         
+  Source_siteID = Shigenaka_data$'Site ID',
+  Source_sampleID = Shigenaka_data$"Field ID",
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = NA,                   
+  Specific_location = NA,                 #Need to calculate
+  Lat = NA,                                #Need to calculate
+  Long = NA,                               #Need to calculate
+  Year = NA,                               #Need to calculate
+  Month = NA,                              #Need to calculate
+  Collection_date =	Shigenaka_data$Collection,          
+  DOY = NA,                                #Need to calculate
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = NA,                     #Need to calculate
+  Common_name = Shigenaka_data$Species,         
+  Scientific_name = NA,                     #Need to generate this
+  Genus_latin = NA,                         #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Shigenaka_data$Tissue,                          
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                  
+  Analysis_method = Shigenaka_data$Analytes, 
+  Chem_code = Shigenaka_data$Analytes,                           
+  Value = Shigenaka_data$Result,
+  Units = Shigenaka_data$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Basis = Shigenaka_data$'Unit Basis',
+  Lab_replicate = NA,
+  Qualifier_code = NA,
+  Lipid_pct = NA,
+  Moisture_pct = Shigenaka_data$'Moisture (%)',
+  Total_PAHs = NA,                              #might be able to calculate this later
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = Shigenaka_data$Lab,
+  Notes = NA
+)
+
+
+
+unique(Shigenaka_data_processed$Common_name)
+
+site_lookup1 <- tibble(
+  `Site ID` = c(
+    "Block QI", "Block Q2", "Block Q3", "Block Q4", "Block Q5 &Q6",
+    "Mussel Q3", "Mussel Q4", "Mussel Q5 & Q6",
+    "Snug",
+    "Bainbridge",
+    "Sheep QI", "Sheep Q2", "Sheep Q3", "Sheep Q5",
+    "NW Bay"
+  ),
+  Specific_location = c(
+    "Block Island", "Block Island", "Block Island", "Block Island", "Block Island",
+    "Mussel Beach", "Mussel Beach", "Mussel Beach",
+    "Snug Harbor",
+    "Bainbridge Bight",
+    "Sheep Bay", "Sheep Bay", "Sheep Bay", "Sheep Bay",
+    "Northwest Bay West Arm"
+  )
+)
+
+
+site_lookup2 <- tibble(
+  `Site ID` = c(
+    "Block QI", "Block Q2", "Block Q3", "Block Q4", "Block Q5 &Q6",
+    "Mussel Q3", "Mussel Q4", "Mussel Q5 & Q6",
+    "Snug",
+    "Bainbridge",
+    "Sheep QI", "Sheep Q2", "Sheep Q3", "Sheep Q5",
+    "NW Bay"
+  ),
+  Lat = c(
+    "60.53", "60.53", "60.53", "60.53", "60.53",
+    "60.536111", "60.536111", "60.536111",
+    "60.261944",
+    "60.116389",
+    "60.685", "60.685", "60.685", "60.685",
+    "60.543889"
+  )
+)
+
+
+
+site_lookup3 <- tibble(
+  `Site ID` = c(
+    "Block QI", "Block Q2", "Block Q3", "Block Q4", "Block Q5 &Q6",
+    "Mussel Q3", "Mussel Q4", "Mussel Q5 & Q6",
+    "Snug",
+    "Bainbridge",
+    "Sheep QI", "Sheep Q2", "Sheep Q3", "Sheep Q5",
+    "NW Bay"
+  ),
+  Long = c(
+    "-147.606667", "-147.606667", "-147.606667", "-147.606667", "-147.606667",
+    "147.615556", "147.615556", "147.615556",
+    "-147.765833",
+    "-148.246667",
+    "-145.939444", "-145.939444", "-145.939444", "-145.939444",
+    "-147.6025"
+  )
+)
+
+#Join to Shigenaka_data
+Shigenaka_data_processed <- Shigenaka_data_processed %>%
+  left_join(site_lookup1, by = c("Source_siteID" = "Site ID")) %>%
+  left_join(site_lookup2, by = c("Source_siteID" = "Site ID")) %>%
+  left_join(site_lookup3, by = c("Source_siteID" = "Site ID"))
+
+
+Shigenaka_data_processed <- Shigenaka_data_processed %>%
+  mutate(
+    Specific_location.x = Specific_location.y,
+    Lat.x = Lat.y,
+    Long.x = Long.y
+  ) %>%
+  select(-Specific_location.y, -Lat.y, -Long.y) %>% #
+  rename(Specific_location = General_location.x,
+         Lat = Lat.x,
+         Long = Long.x)
+
+
+
+
+
+
+
+Shigenaka_data_processed <- Shigenaka_data_processed %>% 
+  mutate(Sample_motivation = "Exxon Valdez Intertidal long term monitoring",
+         Species_complex = "Clam",  #might just group this in the moullusca mussels later
+         Scientific_name = "Leukoma staminea",
+         Genus_latin = "Leukoma",
+         Species_latin = "staminea",
+         
+         Collection_date = suppressWarnings(as.Date(Collection_date, format = "%Y-%m-%d")),
+         Year = year(Collection_date),
+         Month = month(Collection_date),
+         DOY = yday(Collection_date)
+          
+         )
+
+
+
+
+
+str(Shigenaka_data_processed)
+
+
+
+
 # Merge all the dataframes ------------------------------------------------
 
 NCCOS_data_processed
 Diver_processed
+Nationwide_data_processed
 Wetzel_data_processed
 Stimmelmayr_data_processed
 Arnold_data_processed
@@ -2217,6 +2667,8 @@ Ma_data_processed
 Harvey_data_processed
 ERM_data_processed
 Selendang_data_processed
+Shigenaka_data_processed
+
 
 
 #Will need to clean the species and correct for capitalization and slight misspellings
