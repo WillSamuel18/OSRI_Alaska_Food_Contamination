@@ -16,6 +16,30 @@
 
 library(tidyverse)
 library(readxl)
+library(lubridate)
+library(stringr)
+library(dplyr)
+library(tibble)
+
+
+# Function to compare column names between NCCOS and another dataset
+compare_column_names <- function(other_df) {
+  nccos_cols <- names(NCCOS_data_processed)
+  other_cols <- names(other_df)
+  other_name <- deparse(substitute(other_df))
+  
+  only_in_nccos <- setdiff(nccos_cols, other_cols)
+  only_in_other <- setdiff(other_cols, nccos_cols)
+  
+  list(
+    only_in_NCCOS = only_in_nccos,
+    only_in_other_dataset = only_in_other,
+    summary = paste0(
+      "Non-matched columns only in NCCOS: ", length(only_in_nccos), 
+      "; Non-matched columns only in ", other_name, ": ", length(only_in_other)
+    )
+  )
+}
 
 
 
@@ -778,7 +802,7 @@ str(Diver_data_points)
 
 
 
-View(Diver_data)
+#View(Diver_data)
 str(Diver_data)
 #'data.frame':	115046 obs. of  76 variables:
 #$ Date                    : chr  "1989-04-29" "1989-04-29" "1989-04-29" "1989-04-29" ...
@@ -900,13 +924,12 @@ Diver_processed <- data.frame(
   Lab_replicate = Diver_data$Lab_Replicate,
   Qualifier_code = Diver_data$Qualifier_Code,
   Lipid_pct = Diver_data$Lipid_pct,
-  Moisture_pct = LTEMP_data$PCT_MOIST,
+  Moisture_pct = NA,
   Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
   Lab_ID = NA,
-  Notes = NA
-)
+  Notes = as.character(NA))
 
 
 #Need to extract lat long from Location_Geom
@@ -959,6 +982,9 @@ Diver_processed <- Diver_processed %>%
 str(Diver_processed)
 head(Diver_processed) #115,046 data points!
 
+
+
+compare_column_names(Diver_processed)
 
 
 
@@ -1254,6 +1280,7 @@ Wetzel_fish_processed <- data.frame(
   Sex = NA,                                  #No data in this dataset
   Analysis_method = NA, #ORR this might be the analysis column
   Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Parameter = NA,
   Value = Wetzel_fish$"SPAH ug/g",
   Units = rep("ug/g", nrow(Wetzel_fish)),
   Value_standardized = NA,
@@ -1275,6 +1302,7 @@ Wetzel_fish_processed <- data.frame(
 
 
 unique(Wetzel_fish_processed$Common_name)
+
 
 
 
@@ -1361,6 +1389,7 @@ Wetzel_crustaceans_processed <- data.frame(
   Sex = NA,                                  #No data in this dataset
   Analysis_method = NA, #ORR this might be the analysis column
   Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Parameter = NA,
   Value = Wetzel_crustaceans$"SPAH ug/g",
   Units = rep("ug/g", nrow(Wetzel_crustaceans)),
   Value_standardized = NA,
@@ -1430,6 +1459,7 @@ Wetzel_pinnipeds_processed <- data.frame(
   Sex = NA,                                  #No data in this dataset
   Analysis_method = NA, #ORR this might be the analysis column
   Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Parameter = NA,
   Value = Wetzel_pinnipeds$"SPAH ug/g",
   Units = rep("ug/g", nrow(Wetzel_pinnipeds)),
   Value_standardized = NA,
@@ -1527,6 +1557,7 @@ Wetzel_whale_processed <- data.frame(
   Sex = NA,                                  #No data in this dataset
   Analysis_method = NA, #ORR this might be the analysis column
   Chem_code = NA,                           #might be able to get this from Analysis_method??
+  Parameter = NA,
   Value = Wetzel_whale$"SPAH ug/g",
   Units = rep("ug/g", nrow(Wetzel_whale)),
   Value_standardized = NA,
@@ -1591,10 +1622,90 @@ str(Wetzel_whale_processed)
 
 ### Combine the Wetzel data ----------------------------------------------
 
+
 Wetzel_data_processed <- rbind(Wetzel_fish_processed, Wetzel_crustaceans_processed, Wetzel_pinnipeds_processed,
                               Wetzel_whale_processed) 
 
-View(Wetzel_data_processed) #887 data points
+#View(Wetzel_data_processed) #887 data points
+
+
+
+
+#Add lat long
+unique(Wetzel_data_processed$General_location)
+
+
+
+wetzel_coords <- tibble::tribble(
+  ~General_location,           ~Lat,       ~Long,
+  "Nigliq Channel, AK",         70.4333,   -150.4333,
+  "Meade River JN Site",        NA,        NA,
+  "Meade River FN Site",        NA,        NA,
+  "Nuiqsut, AK",                70.2163,   -151.0057,
+  "Puvisuk",                    NA,        NA,
+  "Uyagagvik Nigliq",           70.3300,   -150.7500,
+  "Wood's Camp",                70.4333,   -150.4333,
+  "CD2 loc 1",                  70.3421,   -150.9304,
+  "TL003",                      NA,        NA,
+  "Ikpikpuk DL Camp",           70.8236,   -154.3025,
+  "TL005",                      NA,        NA,
+  "TLSB2",                      NA,        NA,
+  "Ruth Nukapigak Site",        NA,        NA,
+  "S.Ikpikpuk",                 NA,        NA,
+  "Trib 3",                     NA,        NA,
+  "Teshekpuk Lake Site 1",      70.5714,   -153.5142,
+  "Joe Station",                69.0500,   -140.4500,
+  "Joe Creek",                  69.0500,   -140.4500,
+  "Moses Nayakik Site",         NA,        NA,
+  "DANLE",                      NA,        NA,
+  "Cook Inlet, AK",             60.3378,   -151.8750,
+  "Big Su River/East Fork",     61.2706,   -150.5758,
+  "Little Su River",            61.2508,   -150.2880,
+  "Kuk Site",                   70.6081,   -160.1111,
+  "Mouth of Eagle River",       61.3461,   -149.7317,
+  "Eagle River",                61.3293,   -149.5681,
+  "Little Su",                  61.2508,   -150.2880,
+  "Eagle",                      61.3461,   -149.7317,
+  "POA",                        61.2403,   -149.8861,
+  "Ship Cr",                    61.2261,   -149.8925,
+  "Ship Creek",                 61.2261,   -149.8925,
+  "Tesh Offshore Camp",         NA,        NA,
+  "T602",                       NA,        NA,
+  "T600",                       NA,        NA,
+  "T611",                       NA,        NA,
+  "Ship",                       61.2261,   -149.8925,
+  "Wai Inlet",                  70.6000,   -160.1300,
+  "Ship Cr or N. Port Exp",     NA,        NA,
+  "Port",                       61.2403,   -149.8861,
+  "Nome, AK",                   64.5039,   -165.3994,
+  "Gambell, AK",                63.7761,   -171.7008,
+  "Nome",                       64.5039,   -165.3994,
+  "Nome, Cape Nome",            64.4370,   -165.0100,
+  "Norton Sound, AK",           64.5000,   -162.5000,
+  "Barrow",                     71.2906,   -156.7886,
+  "Sledge Island, Nome",        64.4850,   -166.2033,
+  "Barrow, AK",                 71.2906,   -156.7886,
+  "Norton Bay/Norton Sound",    64.6981,   -161.4331,
+  "Pt. Lay, AK",                69.7411,   -162.8656,
+  "Tyonek, AK",                 61.0681,   -151.1370
+)
+
+
+Wetzel_data_processed <- Wetzel_data_processed %>%
+  left_join(wetzel_coords, by = "General_location") %>% 
+  mutate(
+    Lat = Lat.y,
+    Long = Long.y
+  ) %>%
+  select(-Lat.x, -Lat.y, -Long.x, -Long.y)
+
+
+
+
+str(Wetzel_data_processed) #887 data points
+
+
+
 
 
 
@@ -1669,6 +1780,7 @@ Stimmelmayr_data_processed <- data.frame(
   Sex = NA,                                  #No data in this dataset
   Analysis_method = Stimmelmayr_data$"Analysis method", 
   Chem_code = NA,                           
+  Parameter = NA,
   Value = Stimmelmayr_data$SumPAHs,
   Units = Stimmelmayr_data$Unit,
   Value_standardized = NA,
@@ -1691,6 +1803,7 @@ Stimmelmayr_data_processed <- data.frame(
 
 unique(Stimmelmayr_data_processed$Common_name)
 
+unique(Stimmelmayr_data_processed$General_location)
 
 
 
@@ -1737,7 +1850,19 @@ Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
       str_detect(Collection_date, "^\\d{4}-\\d{2}-\\d{2}$") ~ str_sub(Collection_date, 1, 4),
       
       TRUE ~ NA_character_
-    )
+    ),
+
+      Lat = case_when(
+        str_detect(General_location, "Shishmaref") ~ 66.25674,
+        str_detect(General_location, "Gambell") ~ 63.77836,
+        str_detect(General_location, "Utqiagvik") ~ 71.29088, 
+    ),  
+    
+      Long = case_when(
+        str_detect(General_location, "Shishmaref") ~ -166.06247,
+        str_detect(General_location, "Gambell") ~ -171.72921,
+        str_detect(General_location, "Utqiagvik") ~ -156.78864
+      )
   ) %>%
   mutate(
     # Only convert to Date where it's in standard format
@@ -1817,6 +1942,7 @@ Arnold_data_processed <- data.frame(
   Sex = NA,                                  #No data in this dataset
   Analysis_method = Arnold_data$"Analysis Method", 
   Chem_code = NA,                           
+  Parameter = NA,
   Value = Arnold_data$"Total PAHs",
   Units = Arnold_data$Unit,
   Value_standardized = NA,
@@ -1838,6 +1964,46 @@ Arnold_data_processed <- data.frame(
 
 
 unique(Arnold_data_processed$Common_name)
+
+
+unique(Arnold_data_processed$General_location)
+
+
+#Add lat long
+Arnold_coords <- tibble::tribble(
+  ~Site_Name,        ~Lat,        ~Long,
+  "Captains Bay",     53.8602778, -166.5780556,
+  "Humpy Cove 1",     53.919583,  -166.434158,
+  "Humpy Cove 2",     53.919583,  -166.434158,
+  "Iliuliuk Bay 1",   53.8927778, -166.5102778,
+  "Iliuliuk Bay 2",   53.8927778, -166.5102778,
+  "Morris Cove",      53.9138889, -166.4347222,
+  "Summer Bay 1",     53.9119444, -166.4547222,
+  "Summer Bay 2",     53.9119444, -166.4547222,
+  "Wide Bay",         53.9494444, -166.6158333,
+  "Humpy Cove 3",     53.919583,  -166.434158,
+  "Anderson Bay 2",   53.6838889, -166.8469444,
+  "Kismaliuk Bay 2",  53.4566667, -167.3066667,
+  "Kismaliuk Bay 3",  53.4566667, -167.3066667,
+  "Skan Bay S. 1",    53.6100,    -167.0450,
+  "Skan Bay S. 3",    53.6100,    -167.0450,
+  "Anderson Bay 1",   53.6838889, -166.8469444,
+  "Cannery Bay",      53.7002778, -166.7852778,
+  "Kashega Bay",      53.4667,    -167.1667,
+  "Kismaliuk Bay 1",  53.4566667, -167.3066667,
+  "Makushin Bay",     53.7358333, -166.9611111,
+  "Skan Bay N.",      53.6458333, -167.0561111,
+  "Skan Bay N. 2",    53.6458333, -167.0561111,
+  "Skan Bay S.",      53.6100,    -167.0450,
+  "Skan Bay S. 4",    53.6100,    -167.0450,
+  "Skan Bay S. 2",    53.6100,    -167.0450,
+  "Naginak Cove",     53.6511111, -166.8497222,
+  "Skan Bay N. 1",    53.6458333, -167.0561111
+)
+
+
+Arnold_data_processed <- Arnold_data_processed %>%
+  left_join(Arnold_coords, by = c("General_location" = "Site_Name"))
 
 
 
@@ -1970,6 +2136,7 @@ LTEMP_data_processed <- data.frame(
   Sex = NA,                                 
   Analysis_method = LTEMP_data$ANALYTE, 
   Chem_code = NA,                           
+  Parameter = NA,
   Value = LTEMP_data$RESULT_Lab,
   Units = LTEMP_data$RESULT_UNITS,
   Value_standardized = NA,
@@ -2063,6 +2230,7 @@ Ma_data_processed <- data.frame(
   Sex = NA,                                 
   Analysis_method = Ma_data$Analyte, 
   Chem_code = NA,                           
+  Parameter = NA,
   Value = Ma_data$Result,
   Units = Ma_data$Unite,
   Value_standardized = NA,
@@ -2130,7 +2298,7 @@ Ma_lookup_long <- tibble(
   Source_siteID = c(
     "NB02", "CDOI", "AF7",  "cc07", "COI",  "R07"),
   Long = c(
-    "175.000", "174.000", "171.000", "168.000", "169.000", "169.500")
+    "-175.000", "-174.000", "-171.000", "-168.000", "-169.000", "-169.500")
 )
 
 Ma_data_processed <- Ma_data_processed %>%
@@ -2145,9 +2313,7 @@ Ma_data_processed <- Ma_data_processed %>%
     Lat = as.numeric(Lat.y),
     Long = as.numeric(Long.y)
   ) %>%
-  select(-Lat.y, -Long.y)
-
-
+  select(-Lat.x, -Long.x, -Lat.y, -Long.y)
 
 str(Ma_data_processed)
 
@@ -2203,6 +2369,7 @@ Harvey_data_processed <- data.frame(
   Sex = NA,                                 
   Analysis_method = Harvey_data$Analyte, 
   Chem_code = NA,                           
+  Parameter = NA,
   Value = Harvey_data$Result,
   Units = Harvey_data$Unit,
   Value_standardized = NA,
@@ -2224,6 +2391,8 @@ Harvey_data_processed <- data.frame(
 
 
 unique(Harvey_data_processed$Scientific_name)
+unique(Harvey_data_processed$Lat)
+unique(Harvey_data_processed$Long)
 
 
 
@@ -2235,7 +2404,10 @@ Harvey_data_processed <- Harvey_data_processed %>%
     Species_complex = "Mollusk",
     
     Genus_latin = sub(" .*", "", Scientific_name),
-    Species_latin = sub(".* ", "", Scientific_name)
+    Species_latin = sub(".* ", "", Scientific_name),
+    
+    Lat = 70.4687,
+    Long = -166.0861
   )
 
 
@@ -2298,6 +2470,7 @@ ERM_data_processed <- data.frame(
   Sex = NA,                                 
   Analysis_method = ERM_data$Compound, 
   Chem_code = ERM_data$Method,                           
+  Parameter = NA,
   Value = ERM_data$Result,
   Units = ERM_data$Units,
   Value_standardized = NA,
@@ -2321,6 +2494,8 @@ ERM_data_processed <- data.frame(
 unique(ERM_data_processed$Scientific_name)
 unique(ERM_data$`Sampling Motivation`)
 
+unique(ERM_data_processed$General_location)
+unique(ERM_data_processed$Specific_location)
 
 
 
@@ -2341,7 +2516,10 @@ ERM_data_processed <- ERM_data_processed %>%
     Scientific_name = ifelse(Common_name == "Arctic Cisco", "Coregonus autumnalis", Scientific_name),
     
     Genus_latin = sub(" .*", "", Scientific_name),
-    Species_latin = sub(".* ", "", Scientific_name)
+    Species_latin = sub(".* ", "", Scientific_name),
+    
+    Lat = 70.47815,
+    Long = -150.77848
     
     )
 
@@ -2403,6 +2581,7 @@ Selendang_data_processed <- data.frame(
   Sex = NA,                                 
   Analysis_method = Selendang_data$Analytes, 
   Chem_code = NA,                           
+  Parameter = NA,
   Value = Selendang_data$Result,
   Units = Selendang_data$Units,
   Value_standardized = NA,
@@ -2423,10 +2602,9 @@ Selendang_data_processed <- data.frame(
 
 
 
-
 #Add species names
 Selendang_data_processed <- Selendang_data_processed %>%
-  mutate(Species = case_when(
+  mutate(Common_name = case_when(
     str_detect(Source_sampleID, "CH") ~ "Black chiton",
     str_detect(Source_sampleID, "UR") ~ "Green sea urchin",
     str_detect(Source_sampleID, "MU") ~ "Blue mussel",
@@ -2525,6 +2703,7 @@ Shigenaka_data_processed <- data.frame(
   Sex = NA,                                  
   Analysis_method = Shigenaka_data$Analytes, 
   Chem_code = Shigenaka_data$Analytes,                           
+  Parameter = Shigenaka_data$Analytes,
   Value = Shigenaka_data$Result,
   Units = Shigenaka_data$Unit,
   Value_standardized = NA,
@@ -2614,18 +2793,17 @@ Shigenaka_data_processed <- Shigenaka_data_processed %>%
   left_join(site_lookup3, by = c("Source_siteID" = "Site ID"))
 
 
+
+
+
+
 Shigenaka_data_processed <- Shigenaka_data_processed %>%
   mutate(
-    Specific_location.x = Specific_location.y,
-    Lat.x = Lat.y,
-    Long.x = Long.y
+    Specific_location = Specific_location.y,
+    Lat = as.numeric(Lat.y),
+    Long = as.numeric(Long.y)
   ) %>%
-  select(-Specific_location.y, -Lat.y, -Long.y) %>% #
-  rename(Specific_location = General_location.x,
-         Lat = Lat.x,
-         Long = Long.x)
-
-
+  select(-Specific_location.x, -Specific_location.y, -Lat.x, -Lat.y, -Long.x, -Long.y)
 
 
 
@@ -2659,16 +2837,15 @@ str(Shigenaka_data_processed)
 NCCOS_data_processed
 Diver_processed
 Nationwide_data_processed
-Wetzel_data_processed
-Stimmelmayr_data_processed
-Arnold_data_processed
+Wetzel_data_processed           #No lat long, need to add that --- Resolved
+Stimmelmayr_data_processed      #No lat long, need to add that --- Resolved
+Arnold_data_processed           #No lat long, need to add that --- Resolved
 LTEMP_data_processed
 Ma_data_processed
 Harvey_data_processed
-ERM_data_processed
-Selendang_data_processed
+ERM_data_processed              #No lat long, need to add that --- Resolved
+Selendang_data_processed        #No location data at all 
 Shigenaka_data_processed
-
 
 
 #Will need to clean the species and correct for capitalization and slight misspellings
@@ -2676,6 +2853,173 @@ Shigenaka_data_processed
 #make sure units are standard
 #Maybe calculate total PAHs
 #
+
+
+
+
+#Check to make sure all column names match (I used this to QA/QC the code)
+datasets <- list(
+  NCCOS_data_processed,
+  Diver_processed,
+  Nationwide_data_processed, 
+  Wetzel_data_processed, 
+  Stimmelmayr_data_processed,
+  Arnold_data_processed,
+  LTEMP_data_processed, 
+  Ma_data_processed,
+  Harvey_data_processed,
+  ERM_data_processed,
+  Selendang_data_processed,
+  Shigenaka_data_processed,
+  Nationwide_data_processed
+)
+
+
+# Extract names for each
+colnames_list <- lapply(datasets, names)
+
+# Get all unique column names across all datasets
+all_names <- unique(unlist(colnames_list))
+
+# Create a presence/absence matrix
+colname_matrix <- sapply(colnames_list, function(x) all_names %in% x)
+rownames(colname_matrix) <- all_names
+
+# Find inconsistent columns (not present in all datasets)
+inconsistent_columns <- rownames(colname_matrix)[!apply(colname_matrix, 1, all)]
+
+# View which columns are missing where
+colname_matrix[!apply(colname_matrix, 1, all), , drop = FALSE] %>%
+  as.data.frame() %>%
+  rownames_to_column("Column_Name")
+#They all look good
+
+
+
+#Fix different column formats
+# Add all known numeric columns
+columns_to_numeric <- c(
+  "Detection_limit", "Reporting_limit", "DOY", "Lipid_pct", "Moisture_pct", "Value",
+  "Total_PAHs", "Total_LMWAHs", "Total_HMWAHs", "Year", "Month", "Number_in_composite",
+  "Lat", "Long"
+)
+
+datasets_fixed <- lapply(seq_along(datasets), function(i) {
+  df <- datasets[[i]]
+  dataset_name <- paste0("Dataset ", i)
+  
+  # Fix Collection_date
+  if ("Collection_date" %in% names(df)) {
+    if (!is.character(df$Collection_date)) {
+      df$Collection_date <- as.character(df$Collection_date)
+    }
+    
+    df$Collection_date <- na_if(df$Collection_date, "")
+    df$Collection_date <- na_if(df$Collection_date, "Not Available")
+    df$Collection_date <- na_if(df$Collection_date, "NA")
+    
+    looks_like_ymd <- grepl("^\\d{4}-\\d{2}-\\d{2}$", df$Collection_date)
+    parsed_date <- rep(NA, length(df$Collection_date))
+    
+    parsed_date[looks_like_ymd] <- as.Date(df$Collection_date[looks_like_ymd])
+    
+    needs_fallback <- !looks_like_ymd & !is.na(df$Collection_date)
+    if (any(needs_fallback)) {
+      message(dataset_name, ": Using fallback parser for some Collection_date values")
+      fallback <- suppressWarnings(
+        parse_date_time(df$Collection_date[needs_fallback], orders = c("ymd", "mdy", "dmy", "Ymd"))
+      )
+      parsed_date[needs_fallback] <- as.Date(fallback)
+    }
+    
+    df$Collection_date <- parsed_date
+  }
+  
+  # Harmonize numeric columns
+  for (col in columns_to_numeric) {
+    if (col %in% names(df)) {
+      df[[col]] <- suppressWarnings(as.numeric(df[[col]]))
+    }
+  }
+  
+  return(df)
+})
+
+# Combine all datasets safely
+OSRI_data <- bind_rows(datasets_fixed)
+
+
+
+
+
+#Now I need to go through each of the columns and make sure they have consistent values 
+str(OSRI_data)
+attach(OSRI_data)
+
+unique(Data_source) #looks good
+unique(Study_name) #looks good
+unique(OSRI_siteID)                                           #Need to calculate
+unique(OSRI_sampleID)                                         #Need to calculate
+unique(Sample_motivation) #looks good
+unique(General_location) #Hmmm, this might need some work.... 
+unique(Specific_location) #Hmmm, this might need some work.... 
+unique(Lat)               #I added all these so they should be the primary way to map data
+unique(Long)              #I added all these so they should be the primary way to map data
+unique(Year)   #STOPPED HERE FOR THE EVENING
+unique(Month)
+unique(Collection_date)
+unique(DOY)
+unique(Collection_time)
+unique(Collection_method)
+unique(Species_complex)
+unique(Common_name)
+unique(Scientific_name)
+unique(Genus_latin)
+unique(Species_latin)
+unique(Tissue_type)
+unique(Sample_composition)
+unique(Sample_composition)
+unique(Number_in_composite)
+unique(Sex)
+unique(Analysis_method)
+unique(Chem_code)
+unique(Parameter)
+unique(Value)
+unique(Units)
+unique(Value_standardized)
+unique(Units_standardized)
+unique(Detection_limit)
+unique(Reporting_limit)
+unique(Detection_limit)
+unique(Basis)
+unique(Lab_replicate)
+unique(Qualifier_code)
+unique(Lipid_pct)
+unique(Moisture_pct)
+unique(Total_PAHs)
+unique(Total_LMWAHs)
+unique(Total_HMWAHs)
+unique(Lab_ID)
+unique()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+detach(OSRI_data)
+
+
+
+
 
 
 
