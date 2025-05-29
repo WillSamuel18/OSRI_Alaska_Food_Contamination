@@ -2528,7 +2528,7 @@ ERM_data_processed <- ERM_data_processed %>%
 
 # Selendang data ----------------------------------------------------------
 
-Selendang_data <- read_excel("Input Data/2003 Selendang AYU study.xlsx")      
+Selendang_data <- read_excel("Input Data/2005 Selendang AYU study.xlsx")      
 
 str(Selendang_data)
 #tibble [1,922 x 17] (S3: tbl_df/tbl/data.frame)
@@ -2960,47 +2960,50 @@ unique(Data_source) #looks good
 unique(Study_name) #looks good
 unique(OSRI_siteID)                                           #Need to calculate
 unique(OSRI_sampleID)                                         #Need to calculate
-unique(Sample_motivation) #looks good
+unique(Sample_motivation) #looks good, maybe we can add it
+#ADD unique(Region)      #Maybe make this after we start mapping
 unique(General_location) #Hmmm, this might need some work.... 
 unique(Specific_location) #Hmmm, this might need some work.... 
 unique(Lat)               #I added all these so they should be the primary way to map data
 unique(Long)              #I added all these so they should be the primary way to map data
-unique(Year)   #STOPPED HERE FOR THE EVENING
+unique(Year)   #STOPPED HERE FOR THE EVENING - Need to fix certain years
 unique(Month)
 unique(Collection_date)
 unique(DOY)
 unique(Collection_time)
 unique(Collection_method)
-unique(Species_complex)
+unique(Species_complex)   #Refine this from common and scientific name. Maybe add a taxanomic version and one thats layman's terms
 unique(Common_name)
 unique(Scientific_name)
 unique(Genus_latin)
 unique(Species_latin)
 unique(Tissue_type)
-unique(Sample_composition)
+#ADD unique(Tissue_type_standardized)
+#ADD unique(Tissue_type_standardized_grouped)
 unique(Sample_composition)
 unique(Number_in_composite)
-unique(Sex)
+unique(Sex) #empty 
 unique(Analysis_method)
 unique(Chem_code)
 unique(Parameter)
 unique(Value)
 unique(Units)
-unique(Value_standardized)
-unique(Units_standardized)
+unique(Value_standardized)  #Need to standardize all of these
+unique(Units_standardized)  #Need to standardize all of these
+unique(Basis)   #Might need to pull some of these from the Units column
 unique(Detection_limit)
 unique(Reporting_limit)
-unique(Detection_limit)
-unique(Basis)
+#ADD unique(Detection_limit_standardized)
+#ADD unique(Reporting_limit_standardized)
 unique(Lab_replicate)
 unique(Qualifier_code)
-unique(Lipid_pct)
-unique(Moisture_pct)
-unique(Total_PAHs)
-unique(Total_LMWAHs)
-unique(Total_HMWAHs)
+unique(Lipid_pct)       #NEED to go back and retrieve this from each original dataset
+unique(Moisture_pct)    #NEED to go back and retrieve this from each original dataset
+unique(Total_PAHs)     #Can we calculate this? From the parameter column?
+unique(Total_LMWAHs)  #Probably not going to use
+unique(Total_HMWAHs)  #Probably not going to use
 unique(Lab_ID)
-unique()
+unique(Notes)        #Need to transfer over to other columns
 
 
 
