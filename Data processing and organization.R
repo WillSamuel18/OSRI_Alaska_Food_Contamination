@@ -2956,37 +2956,37 @@ OSRI_data <- bind_rows(datasets_fixed)
 str(OSRI_data)
 attach(OSRI_data)
 
-unique(Data_source) #looks good
-unique(Study_name) #looks good
-unique(OSRI_siteID)                                           #Need to calculate
-unique(OSRI_sampleID)                                         #Need to calculate
+unique(Data_source)       #looks good
+unique(Study_name)        #looks good
+unique(OSRI_siteID)       #Need to calculate
+unique(OSRI_sampleID)     #Need to calculate
 unique(Sample_motivation) #looks good, maybe we can add it
 #ADD unique(Region)      #Maybe make this after we start mapping
 unique(General_location) #Hmmm, this might need some work.... 
 unique(Specific_location) #Hmmm, this might need some work.... 
 unique(Lat)               #I added all these so they should be the primary way to map data
 unique(Long)              #I added all these so they should be the primary way to map data
-unique(Year)   #STOPPED HERE FOR THE EVENING - Need to fix certain years
-unique(Month)
-unique(Collection_date)
-unique(DOY)
-unique(Collection_time)
-unique(Collection_method)
-unique(Species_complex)   #Refine this from common and scientific name. Maybe add a taxanomic version and one thats layman's terms
-unique(Common_name)
-unique(Scientific_name)
-unique(Genus_latin)
-unique(Species_latin)
+unique(Year)              #Need to fix certain years
+unique(Month)             #Looks good
+unique(Collection_date)   #Need to reformat as a date
+unique(DOY)               #Looks good
+unique(Collection_time)   #No data here, we should drop it
+unique(Collection_method) #This is not that useful, we could probably drop it?
+unique(Species_complex)   #Refine this from common and scientific name. Maybe add a taxonomic version and one that's layman's terms
+unique(Common_name)       #Need to standardize formatting in all these names
+unique(Scientific_name)   #Need to double check these and standardize them where necessary
+unique(Genus_latin)       #These are probably okay
+unique(Species_latin)     #These are probably okay
 unique(Tissue_type)
-#ADD unique(Tissue_type_standardized)
-#ADD unique(Tissue_type_standardized_grouped)
-unique(Sample_composition)
-unique(Number_in_composite)
-unique(Sex) #empty 
-unique(Analysis_method)
-unique(Chem_code)
-unique(Parameter)
-unique(Value)
+#ADD unique(Tissue_type_standardized)    #Need to remove duplicates and standardize these 
+#ADD unique(Tissue_type_standardized_grouped)  #Larger groups, muscle, organ, fat, whole body
+unique(Sample_composition) #Look good
+unique(Number_in_composite) #remove -999.0 and -9 and replace with NA
+unique(Sex)               #empty, we cam drop it
+unique(Analysis_method)   #This is mostly redundant with Parameter
+unique(Chem_code)         #This seemed redundant and confusing so lets drop it
+unique(Parameter)         #Send to Morgan to make sure they are all consistent
+unique(Value)   
 unique(Units)
 unique(Value_standardized)  #Need to standardize all of these
 unique(Units_standardized)  #Need to standardize all of these
@@ -2995,30 +2995,75 @@ unique(Detection_limit)
 unique(Reporting_limit)
 #ADD unique(Detection_limit_standardized)
 #ADD unique(Reporting_limit_standardized)
-unique(Lab_replicate)
-unique(Qualifier_code)
+unique(Lab_replicate)    #Is this really that many replicates?
+unique(Qualifier_code)   #Most of these can be removed I think
 unique(Lipid_pct)       #NEED to go back and retrieve this from each original dataset
 unique(Moisture_pct)    #NEED to go back and retrieve this from each original dataset
 unique(Total_PAHs)     #Can we calculate this? From the parameter column?
 unique(Total_LMWAHs)  #Probably not going to use
 unique(Total_HMWAHs)  #Probably not going to use
-unique(Lab_ID)
+unique(Lab_ID)        #Remove the lab sample ID's, keep the lab informations in there
 unique(Notes)        #Need to transfer over to other columns
 
 
 
 
 
-
-
-
-
-
-
-
-
-
 detach(OSRI_data)
+
+#Add a standardized sample ID
+OSRI_data <- OSRI_data %>% 
+  mutate(
+    OSRI_sampleID = 1:nrow(OSRI_data))
+    #I might come back to site ID, or do that in ArcGIS
+
+
+
+
+##### EDIT - I should do this in each indivdual study instead of here. 
+#Only 2 sites have general locations that do not have lat long. 
+#One site has a specific location that doesn't have a lat long. 
+#I'll add those manually below
+OSRI_data %>%
+  filter(is.na(Lat) | is.na(Long)) %>%
+  select(General_location, Specific_location, Data_source) %>%
+  distinct()
+
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Lat = ifelse(General_location == "Meade River JN Site", 70.902435, Lat),
+    Long = ifelse(General_location == "Meade River JN Site", -156.031247, Long), 
+    #Lat = ifelse(General_location == "Meade River FN Site", 70.902435, Lat),
+    #Long = ifelse(General_location == "Meade River FN Site", -156.031247, Long), 
+    Lat = ifelse(General_location == "Puvisuk", __________, Lat),
+    Long = ifelse(General_location == "Puvisuk", __________, Long),
+    Lat = ifelse(Specific_location == "Meade River JN Site", 70.902435, Lat),
+    Long = ifelse(Specific_location == "Meade River JN Site", -156.031247, Long),
+    
+
+  )
+
+
+
+
+
+
+
+    
+
+    
+    
+    
+    
+  
+  
+  
+  
+  select(-c(Collection_time, Collection_method, Sex, Analysis_method, Chem_code))
+
+
+
+
 
 
 
