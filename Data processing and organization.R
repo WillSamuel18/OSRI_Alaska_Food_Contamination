@@ -20,7 +20,7 @@ library(lubridate)
 library(stringr)
 library(dplyr)
 library(tibble)
-
+library(writexl)
 
 # Function to compare column names between NCCOS and another dataset
 compare_column_names <- function(other_df) {
@@ -774,7 +774,7 @@ Diver_data <- read.csv("Input Data/DIVER_Explorer_2025_03_19_points/DIVER_Alaska
 View(Diver_data_points)
 str(Diver_data_points)
 #'data.frame':	1694 obs. of  25 variables:
-#  $ ï..Case_Act: chr  "Alaska (Mussel Watch)" "Alaska (Mussel Watch)" "Alaska (Mussel Watch)" "Alaska (Mussel Watch)" ...
+#  $ Ã¯..Case_Act: chr  "Alaska (Mussel Watch)" "Alaska (Mussel Watch)" "Alaska (Mussel Watch)" "Alaska (Mussel Watch)" ...
 #$ QMSITEID   : chr  "MWAK" "MWAK" "MWAK" "MWAK" ...
 #$ StudyName  : chr  "Mussel Watch:Alaska 1990" "Mussel Watch:Alaska 1990" "Mussel Watch:Alaska 1991" "Mussel Watch:Alaska 1991" ...
 #$ StudyID    : chr  "05" "05" "06" "06" ...
@@ -950,7 +950,7 @@ Diver_processed <- Diver_processed %>%
     Sample_composition = ifelse(Number_in_composite %in% c(-999, -9), NA, Sample_composition),
     
     Scientific_name = str_trim(Scientific_name),
-    Scientific_name = ifelse(Scientific_name == "Clupea pallasii pallasiiÂ", "Clupea pallasii", Scientific_name),
+    Scientific_name = ifelse(Scientific_name == "Clupea pallasii pallasiiÃ‚", "Clupea pallasii", Scientific_name),
     Scientific_name = ifelse(Scientific_name == "Octopus", "Octopoda", Scientific_name)
   ) %>%
   separate_wider_delim(
@@ -1635,23 +1635,23 @@ Wetzel_data_processed <- rbind(Wetzel_fish_processed, Wetzel_crustaceans_process
 unique(Wetzel_data_processed$General_location)
 
 
-
+#I cant find any other infomation for these other sites. 
 wetzel_coords <- tibble::tribble(
   ~General_location,           ~Lat,       ~Long,
   "Nigliq Channel, AK",         70.4333,   -150.4333,
-  "Meade River JN Site",        NA,        NA,
-  "Meade River FN Site",        NA,        NA,
+  "Meade River JN Site",        70.4958,   -157.393,
+  "Meade River FN Site",        70.4958,   -157.393,
   "Nuiqsut, AK",                70.2163,   -151.0057,
   "Puvisuk",                    NA,        NA,
   "Uyagagvik Nigliq",           70.3300,   -150.7500,
   "Wood's Camp",                70.4333,   -150.4333,
   "CD2 loc 1",                  70.3421,   -150.9304,
-  "TL003",                      NA,        NA,
+  "TL003",                      61.9333,   -152.0833,  #May be off, but it looks like these are USGS documented areas where boreholes have been drilled
   "Ikpikpuk DL Camp",           70.8236,   -154.3025,
-  "TL005",                      NA,        NA,
+  "TL005",                      61.9333,   -152.0833,  #May be off, boreholes
   "TLSB2",                      NA,        NA,
   "Ruth Nukapigak Site",        NA,        NA,
-  "S.Ikpikpuk",                 NA,        NA,
+  "S.Ikpikpuk",                 69.7669,   -154.661,
   "Trib 3",                     NA,        NA,
   "Teshekpuk Lake Site 1",      70.5714,   -153.5142,
   "Joe Station",                69.0500,   -140.4500,
@@ -1670,12 +1670,12 @@ wetzel_coords <- tibble::tribble(
   "Ship Cr",                    61.2261,   -149.8925,
   "Ship Creek",                 61.2261,   -149.8925,
   "Tesh Offshore Camp",         NA,        NA,
-  "T602",                       NA,        NA,
-  "T600",                       NA,        NA,
-  "T611",                       NA,        NA,
+  "T602",                       61.9333,   -152.0833,  #May be off, boreholes
+  "T600",                       61.9333,   -152.0833,  #May be off, boreholes
+  "T611",                       61.9333,   -152.0833,  #May be off, boreholes
   "Ship",                       61.2261,   -149.8925,
   "Wai Inlet",                  70.6000,   -160.1300,
-  "Ship Cr or N. Port Exp",     NA,        NA,
+  "Ship Cr or N. Port Exp",     61.2261,   -149.8925,
   "Port",                       61.2403,   -149.8861,
   "Nome, AK",                   64.5039,   -165.3994,
   "Gambell, AK",                63.7761,   -171.7008,
@@ -1738,7 +1738,7 @@ str(Stimmelmayr_data)
 #$ Sample Motivation        : chr [1:33] "oiling observed" "oiling observed" "oiling observed" "oiling observed" ...
 #$ Sample n                 : num [1:33] 1 1 1 1 3 1 1 1 1 1 ...
 #$ Percent lipid            : chr [1:33] "89" "85" "94" "92" ...
-#$ LOQ                      : chr [1:33] "6.4 ± 7.8" "6.4 ± 7.8" "6.4 ± 7.8" "6.4 ± 7.8" ...
+#$ LOQ                      : chr [1:33] "6.4 Â± 7.8" "6.4 Â± 7.8" "6.4 Â± 7.8" "6.4 Â± 7.8" ...
 #$ SUM LMWAHs               : chr [1:33] "35" "48" "12" "25" ...
 #$ SUMHMWAHS                : chr [1:33] "0.6" "0.4" "< LOQ" "< LOQ" ...
 #$ SumPAHs                  : chr [1:33] "36" "48" "12" "25" ...
@@ -1843,8 +1843,8 @@ Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
 Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
   mutate(
     Year = case_when(
-      # Year range (e.g., "2012-2013" or "2012-2014")
-      str_detect(Collection_date, "^\\d{4}\\s*[--]\\s*\\d{4}$") ~ str_replace_all(Collection_date, "\\s*", ""),
+      # Year range (e.g., "2012â€“2013" or "2012-2014")
+      str_detect(Collection_date, "^\\d{4}\\s*[â€“-]\\s*\\d{4}$") ~ str_replace_all(Collection_date, "\\s*", ""),
       
       # Standard date format (YYYY-MM-DD)
       str_detect(Collection_date, "^\\d{4}-\\d{2}-\\d{2}$") ~ str_sub(Collection_date, 1, 4),
@@ -1852,18 +1852,19 @@ Stimmelmayr_data_processed <- Stimmelmayr_data_processed %>%
       TRUE ~ NA_character_
     ),
 
-      Lat = case_when(
-        str_detect(General_location, "Shishmaref") ~ 66.25674,
-        str_detect(General_location, "Gambell") ~ 63.77836,
-        str_detect(General_location, "Utqiagvik") ~ 71.29088, 
-    ),  
+    Lat = case_when(
+      str_detect(General_location, "Shishmaref") ~ 66.25674,
+      str_detect(General_location, "Gambell") ~ 63.77836,
+      str_detect(General_location, "Utqiagvik|UtqiaÄ§vik") ~ 71.29088
+    ),
     
-      Long = case_when(
-        str_detect(General_location, "Shishmaref") ~ -166.06247,
-        str_detect(General_location, "Gambell") ~ -171.72921,
-        str_detect(General_location, "Utqiagvik") ~ -156.78864
-      )
-  ) %>%
+    # Same for Long
+    Long = case_when(
+      str_detect(General_location, "Shishmaref") ~ -166.06247,
+      str_detect(General_location, "Gambell") ~ -171.72921,
+      str_detect(General_location, "Utqiagvik|UtqiaÄ§vik") ~ -156.78864
+    )
+    ) %>%
   mutate(
     # Only convert to Date where it's in standard format
     Collection_date = suppressWarnings(as.Date(Collection_date, format = "%Y-%m-%d")),
@@ -1902,7 +1903,7 @@ str(Arnold_data)
 #$ Sample Motivation : chr [1:67] "Post Seledang AYU spill assessment" "Post Seledang AYU spill assessment" "Post Seledang AYU spill assessment" "Post Seledang AYU spill assessment" ...
 #$ Sample Composition: chr [1:67] "10-20 individuals pooled" "10-20 individuals pooled" "10-20 individuals pooled" "10-20 individuals pooled" ...
 #$ Total PAHs        : num [1:67] 36 836 791 1882 13.8 ...
-#$ Unit              : chr [1:67] "µg/kg" "µg/kg" "µg/kg" "µg/kg" ...
+#$ Unit              : chr [1:67] "Âµg/kg" "Âµg/kg" "Âµg/kg" "Âµg/kg" ...
 #$ Basis             : logi [1:67] NA NA NA NA NA NA ...
 #$ LOQ               : logi [1:67] NA NA NA NA NA NA ...
 #$ Lab               : chr [1:67] "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" "Woods Hole Group Analytical Laboratory in Raynham, Massachusetts" ...
@@ -1971,7 +1972,7 @@ unique(Arnold_data_processed$General_location)
 
 #Add lat long
 Arnold_coords <- tibble::tribble(
-  ~Site_Name,        ~Lat,        ~Long,
+  ~General_location,        ~Lat,        ~Long,
   "Captains Bay",     53.8602778, -166.5780556,
   "Humpy Cove 1",     53.919583,  -166.434158,
   "Humpy Cove 2",     53.919583,  -166.434158,
@@ -2003,8 +2004,15 @@ Arnold_coords <- tibble::tribble(
 
 
 Arnold_data_processed <- Arnold_data_processed %>%
-  left_join(Arnold_coords, by = c("General_location" = "Site_Name"))
+  select(-any_of(c("Lat", "Long"))) %>%  # remove existing if they exist
+  left_join(Arnold_coords, by = "General_location")
 
+
+
+
+Arnold_locations <- Arnold_data_processed %>%
+  distinct(General_location, Specific_location, Lat, Long)
+Arnold_locations
 
 
 
@@ -2136,7 +2144,7 @@ LTEMP_data_processed <- data.frame(
   Sex = NA,                                 
   Analysis_method = LTEMP_data$ANALYTE, 
   Chem_code = NA,                           
-  Parameter = NA,
+  Parameter = LTEMP_data$ANALYTE,
   Value = LTEMP_data$RESULT_Lab,
   Units = LTEMP_data$RESULT_UNITS,
   Value_standardized = NA,
@@ -2154,6 +2162,26 @@ LTEMP_data_processed <- data.frame(
   Lab_ID = LTEMP_data$LAB,
   Notes = LTEMP_data$UnitBasis
 )
+
+
+
+
+LTEMP_data_processed <- tibble::tribble(
+  ~General_location,                                 ~Lat,       ~Long,
+  "GAL",                                             61.1292,   -146.3556,
+  "SMB",                                             61.1292,   -146.3556,
+  "TLP Alyeska Terminal Loading Platform",           61.1200,   -146.3500,
+  "ZAB2",                                            61.1292,   -146.3556,
+  NA,                                                61.1292,   -146.3556,
+  )
+
+
+#Hmmm this data is formatted weird:
+LTEMP_data_processed %>%
+  filter(tolower(trimws(Units)) %in% c("%", "percent")) %>%
+  select(Data_source, Parameter, Value, Units)
+
+
 
 
 
@@ -2334,8 +2362,8 @@ str(Harvey_data)
 #$ Result                : num [1:111] 1.43 0.68 0.52 0 0 0.72 0.65 0.49 0 0.23 ...
 #$ Unit                  : chr [1:111] "ng/g" "ng/g" "ng/g" "ng/g" ...
 #$ Basis                 : chr [1:111] "wet" "wet" "wet" "wet" ...
-#$ Latitude              : chr [1:111] "70°28.122'" "70°28.122'" "70°28.122'" "70°28.122'" ...
-#$ Longitude             : chr [1:111] "166°05.168'" "166°05.168'" "166°05.168'" "166°05.168'" ...
+#$ Latitude              : chr [1:111] "70Â°28.122'" "70Â°28.122'" "70Â°28.122'" "70Â°28.122'" ...
+#$ Longitude             : chr [1:111] "166Â°05.168'" "166Â°05.168'" "166Â°05.168'" "166Â°05.168'" ...
 #$ data quality          : chr [1:111] "Blank Corrected" "Blank Corrected" "Blank Corrected" "Blank Corrected" ...
 #$ Study                 : chr [1:111] "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" "Harvey et al 2014 - COMIDA" ...
 
@@ -2430,7 +2458,7 @@ str(ERM_data)
 # $ Tissue             : chr [1:2900] "Wholebody" "Wholebody" "Wholebody" "Wholebody" ...
 # $ Method             : chr [1:2900] "SW8270D-SIM" "SW8270D-SIM" "SW8270D-SIM" "SW8270D-SIM" ...
 # $ Compound           : chr [1:2900] "2-Methylnaphthalene" "Acenaphthene" "Acenaphthylene" "Anthracene" ...
-# $ Units              : chr [1:2900] "µg/kg" "µg/kg" "µg/kg" "µg/kg" ...
+# $ Units              : chr [1:2900] "Âµg/kg" "Âµg/kg" "Âµg/kg" "Âµg/kg" ...
 # $ Result             : chr [1:2900] "ND" "ND" "ND" "ND" ...
 # $ MDL                : num [1:2900] 1.2 0.45 0.53 0.36 0.36 0.94 0.63 0.9 0.54 0.53 ...
 # $ MRL                : num [1:2900] 4.8 4.8 4.8 4.8 4.8 4.8 4.8 4.8 4.8 4.8 ...
@@ -2544,7 +2572,7 @@ str(Selendang_data)
 #$ Sample Size (wet): num [1:1922] 15.3 15.3 15.3 15.3 15.3 ...
 #$ % Solid          : num [1:1922] 100 100 100 100 100 100 100 100 100 100 ...    WE DROP THIS SINCE IT'S ALL THE SAME
 #$ File ID          : chr [1:1922] "P14865.D" "P14865.D" "P14865.D" "P14865.D" ...
-#$ Units            : chr [1:1922] "µg/Kg" "µg/Kg" "µg/Kg" "µg/Kg" ...
+#$ Units            : chr [1:1922] "Âµg/Kg" "Âµg/Kg" "Âµg/Kg" "Âµg/Kg" ...
 #$ Analytes         : chr [1:1922] "cis/trans-Decalin" "C1-Decalins" "C2-Decalins" "C3-Decalins" ...
 #$ Result           : num [1:1922] 0.62 NA NA NA NA NA NA NA NA NA ...
 #$ Lab Flag         : chr [1:1922] "J" "U" "U" "U" ...
@@ -2616,6 +2644,9 @@ Selendang_data_processed <- Selendang_data_processed %>%
   ))
 
 
+#No location Data available
+
+
 #Now add the rest
 Selendang_data_processed <- Selendang_data_processed %>%
   mutate(
@@ -2671,8 +2702,8 @@ str(Shigenaka_sites)
 #tibble [11 x 4] (S3: tbl_df/tbl/data.frame)
 #$ Oiling Category: chr [1:11] NA "Unoiled" "Unoiled" "Unoiled" ...
 #$ Site           : chr [1:11] NA "Bainbridge Bight" "Sheep Bay" "Outside Bay" ...
-#$ Coordinates    : chr [1:11] "Latitude" "60°06'59\"N" "60°41 '06\"N" "60°38'17\"N" ...
-#$ ...4           : chr [1:11] "Longitude" "148° 14' 48\"W" "145°56'22\"W" "147°27'02\"W" ...
+#$ Coordinates    : chr [1:11] "Latitude" "60Â°06'59\"N" "60Â°41 '06\"N" "60Â°38'17\"N" ...
+#$ ...4           : chr [1:11] "Longitude" "148Â° 14' 48\"W" "145Â°56'22\"W" "147Â°27'02\"W" ...
 
 Shigenaka_data_processed <- data.frame(
   Data_source = rep("Shigenaka", nrow(Shigenaka_data)),
@@ -2960,11 +2991,12 @@ unique(Data_source)       #looks good
 unique(Study_name)        #looks good
 unique(OSRI_siteID)       #Need to calculate
 unique(OSRI_sampleID)     #Need to calculate
-unique(Sample_motivation) #looks good, maybe we can add it
+unique(Sample_motivation) #looks good, maybe we can add to it
 #ADD unique(Region)      #Maybe make this after we start mapping
 unique(General_location) #Hmmm, this might need some work.... 
 unique(Specific_location) #Hmmm, this might need some work.... 
-unique(Lat)               #I added all these so they should be the primary way to map data
+unique(Lat)               #I added all these so they should be the primary way to map data. 
+#We are missing some locations, from the Wetzel, LTEMP, and Selendang datasets, but we have exhausted our search on those sites.
 unique(Long)              #I added all these so they should be the primary way to map data
 unique(Year)              #Need to fix certain years
 unique(Month)             #Looks good
@@ -2973,6 +3005,8 @@ unique(DOY)               #Looks good
 unique(Collection_time)   #No data here, we should drop it
 unique(Collection_method) #This is not that useful, we could probably drop it?
 unique(Species_complex)   #Refine this from common and scientific name. Maybe add a taxonomic version and one that's layman's terms
+#ADD Laymans_group
+#ADD Family_Latin
 unique(Common_name)       #Need to standardize formatting in all these names
 unique(Scientific_name)   #Need to double check these and standardize them where necessary
 unique(Genus_latin)       #These are probably okay
@@ -2980,9 +3014,9 @@ unique(Species_latin)     #These are probably okay
 unique(Tissue_type)
 #ADD unique(Tissue_type_standardized)    #Need to remove duplicates and standardize these 
 #ADD unique(Tissue_type_standardized_grouped)  #Larger groups, muscle, organ, fat, whole body
-unique(Sample_composition) #Look good
+unique(Sample_composition) #Looks good
 unique(Number_in_composite) #remove -999.0 and -9 and replace with NA
-unique(Sex)               #empty, we cam drop it
+unique(Sex)               #empty, we can drop it
 unique(Analysis_method)   #This is mostly redundant with Parameter
 unique(Chem_code)         #This seemed redundant and confusing so lets drop it
 unique(Parameter)         #Send to Morgan to make sure they are all consistent
@@ -3002,11 +3036,8 @@ unique(Moisture_pct)    #NEED to go back and retrieve this from each original da
 unique(Total_PAHs)     #Can we calculate this? From the parameter column?
 unique(Total_LMWAHs)  #Probably not going to use
 unique(Total_HMWAHs)  #Probably not going to use
-unique(Lab_ID)        #Remove the lab sample ID's, keep the lab informations in there
+unique(Lab_ID)        #Remove the lab sample ID's, keep the lab information in there
 unique(Notes)        #Need to transfer over to other columns
-
-
-
 
 
 detach(OSRI_data)
@@ -3018,104 +3049,393 @@ OSRI_data <- OSRI_data %>%
     #I might come back to site ID, or do that in ArcGIS
 
 
+#Adjust sample motivation
+Sample_motivation
+
+unique(OSRI_data$Notes)
+unique(OSRI_data$Data_source)
+unique(OSRI_data$Study_name)
+
+unique_motivations <- OSRI_data %>%
+  filter(!is.na(Study_name) & Study_name != "") %>%
+  distinct(Study_name, Data_source, Sample_motivation)
+unique_motivations
+
+write_xlsx(unique_motivations, "Output Data/unique_motivations.xlsx")
 
 
-##### EDIT - I should do this in each indivdual study instead of here. 
-#Only 2 sites have general locations that do not have lat long. 
-#One site has a specific location that doesn't have a lat long. 
-#I'll add those manually below
-OSRI_data %>%
-  filter(is.na(Lat) | is.na(Long)) %>%
-  select(General_location, Specific_location, Data_source) %>%
-  distinct()
 
+#Location data
 OSRI_data <- OSRI_data %>%
   mutate(
-    Lat = ifelse(General_location == "Meade River JN Site", 70.902435, Lat),
-    Long = ifelse(General_location == "Meade River JN Site", -156.031247, Long), 
-    #Lat = ifelse(General_location == "Meade River FN Site", 70.902435, Lat),
-    #Long = ifelse(General_location == "Meade River FN Site", -156.031247, Long), 
-    Lat = ifelse(General_location == "Puvisuk", __________, Lat),
-    Long = ifelse(General_location == "Puvisuk", __________, Long),
-    Lat = ifelse(Specific_location == "Meade River JN Site", 70.902435, Lat),
-    Long = ifelse(Specific_location == "Meade River JN Site", -156.031247, Long),
-    
-
+    Lat = case_when(
+      str_detect(General_location, "Utqiagvik") ~ 71.29088,
+      TRUE ~ Lat  # Preserve existing values
+    ),
+    Long = case_when(
+      str_detect(General_location, "Utqiagvik") ~ -156.78864,
+      TRUE ~ Long  # Preserve existing values
+    )
   )
 
 
 
 
 
+locations <- OSRI_data %>%
+  filter(is.na(Lat) | is.na(Long)) %>%
+  distinct(Study_name, Data_source, General_location, Specific_location, Lat, Long)
+locations
+
+write_xlsx(locations, "Output Data/locations.xlsx")
 
 
+
+
+#Reformat dates to get rid of Excel format
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Year_clean = case_when(
+      Year > 30000 ~ year(as.Date(Year, origin = "1899-12-30")),  # Excel numeric date fix
+      TRUE ~ as.integer(Year)
+    ),
+    Collection_date = as.Date(Collection_date, origin = "1899-12-30")
+    
+  )
+
+
+#Add taxanomic and laymans groups
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Species_standard = str_to_lower(str_trim(Species_complex)),
+    
+    Taxonomic_group = case_when(
+      Species_standard %in% c("clam", "cockles", "mussel", "mussels", "scallop-i", "scallop-2", "whelk", "mollusk", "molluscs") ~ "Mollusca",
+      Species_standard %in% c("crab", "shrimp", "crustaceans") ~ "Arthropoda (Crustacea)",
+      Species_standard %in% c("urchin", "starfish", "echinoderms") ~ "Echinodermata",
+      Species_standard %in% c("fish", "finfish", "flatfish", "fish-adult", "fish-larval", "fish-adult/pregnant") ~ "Chordata (Actinopterygii)",
+      Species_standard %in% c("cephalapods") ~ "Mollusca (Cephalopoda)",
+      Species_standard %in% c("pinnipeds", "mammals", "whale") ~ "Chordata (Mammalia)",
+      Species_standard %in% c("tunicate") ~ "Chordata (Tunicata)",
+      Species_standard %in% c("vegetation") ~ "Plantae or Algae",
+      Species_standard %in% c("other") ~ "Other/Unclassified",
+      TRUE ~ NA_character_
+    ),
+    
+    Layman_group = case_when(
+      Species_standard %in% c("clam", "cockles", "mussel", "mussels", "scallop-i", "scallop-2", "whelk", "mollusk", "molluscs", "cephalapods") ~ "Shellfish",
+      Species_standard %in% c("crab", "shrimp", "crustaceans") ~ "Crab/Shrimp",
+      Species_standard %in% c("urchin", "starfish", "echinoderms") ~ "Urchins/Starfish",
+      Species_standard %in% c("fish", "finfish", "flatfish", "fish-adult", "fish-larval", "fish-adult/pregnant") ~ "Fish",
+      Species_standard %in% c("pinnipeds", "mammals", "whale") ~ "Marine Mammals",
+      Species_standard %in% c("tunicate") ~ "Tunicates",
+      Species_standard %in% c("vegetation") ~ "Plants/Algae",
+      Species_standard %in% c("other") ~ "Other",
+      TRUE ~ NA_character_
+    )
+  )
     
 
     
+#Clean up common and scientific names:
+OSRI_data <- OSRI_data %>%
+  mutate(
+    # Standardize common names
+    Common_name = Common_name %>%
+      str_trim() %>%
+      str_to_lower() %>%
+      str_replace_all("artic cod", "arctic cod") %>%
+      str_replace_all("pink salmon\\?", "Pink Salmon") %>%
+      str_replace_all("mussels?, mytilus sp\\.", "Mussel") %>%
+      str_replace_all("blue mussels", "Blue Mussel") %>%
+      str_replace_all("black chitons", "Black Chiton") %>%
+      str_replace_all("ringed seal", "Ringed Seal") %>%
+      str_replace_all("unoiled ringed seals", "Ringed Seal") %>%
+      str_replace_all("spotted seal", "Spotted Seal") %>%
+      str_replace_all("unknown seal", "Seal") %>%
+      str_to_title(),
     
+    # Clean scientific names and remove "sp.", "spp.", and similar
+    Scientific_name = Scientific_name %>%
+      str_trim() %>%
+      str_to_lower() %>%
+      str_replace_all("\\bsp\\.?\\b", "") %>%
+      str_replace_all("\\bspp\\.?\\b", "") %>%
+      str_replace_all("\\bspecies\\b", "") %>%
+      str_replace_all("\\.+$", "") %>%       # remove trailing periods
+      str_replace_all("\\s{2,}", " ") %>%
+      str_trim() %>%
+      str_to_sentence(),
     
+    # Use if_else() inside mutate to replace values conditionally
+    Scientific_name = if_else(Scientific_name == "Not defined", NA_character_, Scientific_name),
+    Scientific_name = if_else(Common_name == "Cockle", "Clinocardium nuttallii", Scientific_name)
+  ) %>% 
+  mutate(
+    # Remove any trailing/extra spaces again
+    Scientific_name = str_trim(Scientific_name)
+  ) %>%
+  separate(
+    col = Scientific_name,
+    into = c("Genus_latin", "Species_latin"),
+    sep = " ",
+    remove = FALSE,
+    extra = "drop",
+    fill = "right"
+  )
+
+
+
+unique_names <- OSRI_data %>%
+  select(any_of(c("Common_name", "Scientific_name", "Taxonomic_group", "Layman_group"))) %>%
+  pivot_longer(cols = everything(), names_to = "Name_Type", values_to = "Name") %>%
+  filter(!is.na(Name) & Name != "") %>%
+  distinct(Name)
+
+unique_names <- OSRI_data %>%
+  filter(!is.na(Scientific_name) & Scientific_name != "") %>%
+  distinct(Scientific_name, Common_name, Taxonomic_group, Layman_group)
+unique_names
+
+write_xlsx(unique_names, "Output Data/unique_names.xlsx")
+
+
+
+
+
+#Standardize tissue types
+OSRI_data <- OSRI_data %>%
+  mutate(
+    # Standardize spelling, capitalization, and naming
+    Tissue_type_standardized = Tissue_type %>%
+      str_trim() %>%
+      str_to_lower() %>%
+      str_replace_all("whole bodies composited", "whole body") %>%
+      str_replace_all("wholebody", "whole body") %>%
+      str_replace_all("whole organism", "whole body") %>%
+      str_replace_all("whole fish", "whole body") %>%
+      str_replace_all("whole head", "head") %>%
+      str_replace_all("smoked fillet", "muscle") %>%
+      str_replace_all("edible parts only", "muscle") %>%
+      str_replace_all("roe", "eggs") %>%
+      str_replace_all("blubber", "fat") %>%
+      str_replace_all("heart", "heart") %>%
+      str_replace_all("kidney", "kidney") %>%
+      str_replace_all("muscle", "muscle") %>%
+      str_replace_all("epidermis", "skin") %>%
+      str_replace_all("neocortex", "brain") %>%
+      str_replace_all("gut content", "stomach contents") %>%
+      str_replace_all("stomach contents", "stomach contents") %>%
+      str_replace_all("trachea contents", "stomach contents") %>%
+      str_replace_all("^et$", "other") %>%
+      str_replace_all("^tissue$", "unspecified tissue") %>%
+      str_to_title(),  # Capitalize final standardized labels
     
+    # Group into larger categories
+    Tissue_type_standardized_grouped = case_when(
+      Tissue_type_standardized %in% c("Muscle", "Smoked Fillet") ~ "Muscle",
+      Tissue_type_standardized %in% c("Fat", "Blubber") ~ "Fat",
+      Tissue_type_standardized %in% c("Liver", "Kidney", "Heart", "Pancreas", "Lung", "Ovary", "Thyroid", "Brain") ~ "Organ",
+      Tissue_type_standardized %in% c("Skin", "Hair", "Epidermis") ~ "Skin",
+      Tissue_type_standardized %in% c("Eggs", "Roe") ~ "Eggs",
+      Tissue_type_standardized %in% c("Whole Body", "Whole Organism") ~ "Whole Body",
+      Tissue_type_standardized %in% c("Digestive Content", "Feces") ~ "Digestive",
+      TRUE ~ "Other"
+    )
+  )
+    
+
+Parameter_data <- data.frame(unique(OSRI_data$Parameter))
+Parameter_data
+
+write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
+
+
+
+#Add composite data
+composite_values_from_notes <- c("< 5", "5-8", "> 8")
+
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Number_in_composite = if_else(
+      is.na(Number_in_composite) | Notes %in% composite_values_from_notes,
+      as.character(Notes),
+      as.character(Number_in_composite)),
+    Sample_composition = ifelse(Number_in_composite > 1, "composite", "individual")
+  )
+
+
+
+
+
+#Fix composite data issues
+OSRI_data <- OSRI_data %>%
+  mutate(Number_in_composite = ifelse(Number_in_composite == -999.0, NA, Number_in_composite), 
+         Number_in_composite = ifelse(Number_in_composite == -9.0, NA, Number_in_composite))
+
+
+
+#Create  a new dataframe with the Parameter information for Morgan to review:
+unique(OSRI_data$Parameter)
+
+
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Parameter = Parameter %>%
+      str_trim() %>%
+      str_replace_all("\\s+", " ") %>%  # collapse multiple spaces
+      str_replace_all("\\(a\\)", "[a]") %>%  # unify bracket styles
+      str_replace_all("\\(b\\)", "[b]") %>%
+      str_replace_all("\\(k\\)", "[k]") %>%
+      str_replace_all("\\(g,h,i\\)", "[g,h,i]") %>%
+      str_replace_all("\\(1,2,3 - cd\\)", "[1,2,3-c,d]") %>%
+      str_replace_all("Benzo \\(", "Benzo(") %>%  # fix escaped parenthesis
+      str_replace_all("\\) ", ")") %>%
+      str_replace_all(" +", " ") %>%
+      str_to_title()
+  )
+
+
+Parameter_data <- data.frame(unique(OSRI_data$Parameter))
+Parameter_data
+
+write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
+
+
+####Read back in Morgans edited dataset here:
+
+
+
+
+
+
+
+
+
+#Filter out fat content in rows and assign it to the correct samples:
+OSRI_data %>%
+  filter(tolower(trimws(Units)) %in% c("%", "percent")) %>%
+  select(Data_source, Parameter, Value)
+
+
+#Convert the units and values to standardized format:
+convert_to_ng_per_g <- function(value, unit) {
+  unit <- tolower(trimws(unit))
   
+  if (unit %in% c("ppb", "ug/kg", "Âµg/kg", "Î¼g/kg", "Âµg/kg")) {
+    return(value)  # Âµg/kg = 1 ng/g
+  } else if (unit %in% c("ug/g", "Âµg/g")) {
+    return(value * 1000)  # Âµg/g = 1000 ng/g
+  } else if (unit %in% c("mg/kg")) {
+    return(value * 1000)  # mg/kg = 1000 ng/g
+  } else if (unit %in% c("ng/g", "ng/g dry", "ng/g wet", "ng/dry g")) {
+    return(value)
+  } else if (unit %in% c("ng/mg")) {
+    return(value * 1000)
+  } else if (unit %in% c("g")) {
+    return(value * 1e9)
+  } else if (unit %in% c("%", "percent")) {
+    return(value * 1e7)
+  } else if (unit == "ng") {
+    return(NA_real_)
+  } else {
+    return(NA_real_)
+  }
+}
+
+
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Units_standardized = "ng/g",
+    Value_standardized = mapply(convert_to_ng_per_g, Value, Units), 
+    Value_standardized = ifelse(Value_standardized == -9, NA, Value_standardized),
+    Detection_limit_standardized = mapply(convert_to_ng_per_g, Detection_limit, Units),  #Also adjust the MDL and MRL
+    Detection_limit_standardized = ifelse(Detection_limit_standardized == -9, NA, Detection_limit_standardized),
+    Reporting_limit_standardized = mapply(convert_to_ng_per_g, Reporting_limit, Units),    
+    Reporting_limit_standardized = ifelse(Reporting_limit_standardized == -9, NA, Reporting_limit_standardized),
   
+  )
+
+
+unique(OSRI_data$Units)
+unique(OSRI_data$Value)
+unique(OSRI_data$Units_standardized)
+unique(OSRI_data$Value_standardized)
+summary(OSRI_data$Value_standardized)
+
+OSRI_data %>%
+  filter(Value_standardized < 0 | Value_standardized > 1e6) %>%
+  select(Data_source, Parameter, Value, Units, Value_standardized)
+
+
+summary(OSRI_data$Detection_limit_standardized)
+
+OSRI_data %>%
+  filter(Detection_limit_standardized < 0 | Detection_limit_standardized > 1e6) %>%
+  select(Data_source, Parameter, Value, Units, Value_standardized)
+
+
+summary(OSRI_data$Reporting_limit_standardized)
+
+OSRI_data %>%
+  filter(Reporting_limit_standardized < 0 | Reporting_limit_standardized > 1e6) %>%
+  select(Data_source, Parameter, Value, Units, Value_standardized)
+
+#^^All of these look good except for the LTEMP data that I need to revisit
+
+
+#Standardize the basis:
+basis_values_from_notes <- c("wet", "DRY", "dry", "dry wt", "Wet", "WET", "Dry")
+
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Basis = if_else(is.na(Basis) | Notes %in% basis_values_from_notes, Notes, Basis),
+    
+    Basis_standardized = case_when(
+      is.na(Basis) ~ NA_character_,
+      tolower(trimws(Basis)) %in% c("dry", "dw", "dry wt", "dwt", "dry weight", "dry", "DRY", "Dry") ~ "dry",
+      tolower(trimws(Basis)) %in% c("wet", "ww", "wet weight", "wet", "Wet", "WET") ~ "wet",
+      TRUE ~ NA_character_
+    )
+  )
+
+
+
+#Remove NA values in lipid pct
+OSRI_data <- OSRI_data %>% 
+  mutate(Lipid_pct = ifelse(Lipid_pct == -9, NA, Lipid_pct))
+
+
+#Clean up the Lab_ID column
+values_to_na <- c(
+  "","0507100-01", "0507100-02", "0507100-03", "0507100-03X", "0507100-04", "0507100-05",
+  "0507100-06", "0507100-07", "0507100-08", "0507100-09", "0507100-10", "0507100-11",
+  "0507100-12", "0507100-13", "0507100-13X", "0507100-14", "0507100-14X", "0507100-15",
+  "0507100-16", "0507100-17", "0507008-01", "0507008-02", "0507007-01", "0507007-02",
+  "0507006-01", "0507006-02", "0507006-03", "0507006-04", "0507006-05", "0507006-06",
+  "0507006-07"
+)
+
+OSRI_data <- OSRI_data %>%
+  mutate(Lab_ID = if_else(Lab_ID %in% values_to_na, NA_character_, Lab_ID))
+
+
+
+
+
+
+
+#Calculate the total PAHs in a sample
+##############Need to figure everything else out before we come back to this
+
+
   
-  
+#Remove rows we don't use  
+OSRI_data <- OSRI_data %>%
   select(-c(Collection_time, Collection_method, Sex, Analysis_method, Chem_code))
 
 
 
-
-
-
-
-
-
-
-
-# Storage -----------------------------------------------------------------
-
-NCCOS_clam_processed <- df %>% rename ( 
-  Data_source = 
-    Study_name = 
-    Source_siteID = 
-    Source_sampleID = 
-    OSRI_siteID = 
-    OSRI_sampleID = 
-    Sample_motivation =    
-    General_location = 
-    Specific_location = 
-    Lat = 
-    Long = 
-    Year = 
-    Month = 
-    Collection_date =	
-    DOY = 
-    Collection_time = 
-    Collection_method = 
-    Species_complex =
-    Species = 
-    Scientific_name = 
-    Genus_latin = 
-    Species_latin = 
-    Tissue_type = 
-    Sample_composition = 
-    Sex = 
-    Analysis_method = 
-    Chem_code = 
-    Parameter = 
-    Value = 
-    Units = 
-    Value_standardized = 
-    Units_standardized = 
-    Detection_limit = 
-    Reporting_limit = 
-    Lab_replicate = 
-    Qualifier_code = 
-    Lipid_pct = 
-    Total_PAHs = 
-    Total_LMWAHs = 
-    Total_HMWAHs = 
-    Lab_ID =
-)
 
 
 
