@@ -3064,6 +3064,10 @@ unique_motivations
 write_xlsx(unique_motivations, "Output Data/unique_motivations.xlsx")
 
 
+unique_motivations <- read_xlsx("Output Data/unique_motivations_MP.xlsx")
+unique_motivations
+
+
 
 #Location data
 OSRI_data <- OSRI_data %>%
@@ -3116,7 +3120,7 @@ OSRI_data <- OSRI_data %>%
       Species_standard %in% c("fish", "finfish", "flatfish", "fish-adult", "fish-larval", "fish-adult/pregnant") ~ "Chordata (Actinopterygii)",
       Species_standard %in% c("cephalapods") ~ "Mollusca (Cephalopoda)",
       Species_standard %in% c("pinnipeds", "mammals", "whale") ~ "Chordata (Mammalia)",
-      Species_standard %in% c("tunicate") ~ "Chordata (Tunicata)",
+      Species_standard %in% c("tunicate") ~ "Mollusca",
       Species_standard %in% c("vegetation") ~ "Plantae or Algae",
       Species_standard %in% c("other") ~ "Other/Unclassified",
       TRUE ~ NA_character_
@@ -3128,7 +3132,7 @@ OSRI_data <- OSRI_data %>%
       Species_standard %in% c("urchin", "starfish", "echinoderms") ~ "Urchins/Starfish",
       Species_standard %in% c("fish", "finfish", "flatfish", "fish-adult", "fish-larval", "fish-adult/pregnant") ~ "Fish",
       Species_standard %in% c("pinnipeds", "mammals", "whale") ~ "Marine Mammals",
-      Species_standard %in% c("tunicate") ~ "Tunicates",
+      Species_standard %in% c("tunicate") ~ "Shellfish",
       Species_standard %in% c("vegetation") ~ "Plants/Algae",
       Species_standard %in% c("other") ~ "Other",
       TRUE ~ NA_character_
@@ -3249,6 +3253,22 @@ Parameter_data <- data.frame(unique(OSRI_data$Parameter))
 Parameter_data
 
 write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
+
+Parameter_data <- read_xlsx("Output Data/Parameter_data_MP.xlsx")
+Parameter_data
+
+
+OSRI_data <- OSRI_data %>%
+  left_join(
+    Parameter_data %>%
+      distinct(Parameter_original, Parameter_standardized),
+    by = c("Parameter" = "Parameter_original")
+  )
+
+
+
+
+
 
 
 
