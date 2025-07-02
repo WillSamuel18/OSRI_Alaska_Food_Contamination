@@ -1224,7 +1224,12 @@ cat("Remaining unique Nationwide rows:", nrow(Nationwide_unique), "\n")
 
 
 
-#No overlapping data in either of them
+#No overlapping data in either of them -- NEED TO REVISIT THIS
+
+
+#Removing one duplicate study
+OSRI_data <- OSRI_data %>%
+  filter(Study_name != "NOAA Prince William Sound RCAC 1993-2007")
 
 
 
@@ -1642,22 +1647,22 @@ wetzel_coords <- tibble::tribble(
   "Meade River JN Site",        70.4958,   -157.393,
   "Meade River FN Site",        70.4958,   -157.393,
   "Nuiqsut, AK",                70.2163,   -151.0057,
-  "Puvisuk",                    NA,        NA,
+  "Puvisuk",                    70.09154,  -151.09264,
   "Uyagagvik Nigliq",           70.3300,   -150.7500,
   "Wood's Camp",                70.4333,   -150.4333,
   "CD2 loc 1",                  70.3421,   -150.9304,
-  "TL003",                      61.9333,   -152.0833,  #May be off, but it looks like these are USGS documented areas where boreholes have been drilled
+  "TL003",                      70.48743,  -153.79658,
   "Ikpikpuk DL Camp",           70.8236,   -154.3025,
-  "TL005",                      61.9333,   -152.0833,  #May be off, boreholes
-  "TLSB2",                      NA,        NA,
-  "Ruth Nukapigak Site",        NA,        NA,
+  "TL005",                      70.49447,  -153.85656,
+  "TLSB2",                      70.44987,  -153.53802,
+  "Ruth Nukapigak Site",        70.33376,  -150.77203,
   "S.Ikpikpuk",                 69.7669,   -154.661,
-  "Trib 3",                     NA,        NA,
+  "Trib 3",                     70.65972,  -154.34734,
   "Teshekpuk Lake Site 1",      70.5714,   -153.5142,
   "Joe Station",                69.0500,   -140.4500,
   "Joe Creek",                  69.0500,   -140.4500,
-  "Moses Nayakik Site",         NA,        NA,
-  "DANLE",                      NA,        NA,
+  "Moses Nayakik Site",         70.12184,  -159.63497,
+  "DANLE",                      70.7028,   -154.52689,
   "Cook Inlet, AK",             60.3378,   -151.8750,
   "Big Su River/East Fork",     61.2706,   -150.5758,
   "Little Su River",            61.2508,   -150.2880,
@@ -1669,10 +1674,10 @@ wetzel_coords <- tibble::tribble(
   "POA",                        61.2403,   -149.8861,
   "Ship Cr",                    61.2261,   -149.8925,
   "Ship Creek",                 61.2261,   -149.8925,
-  "Tesh Offshore Camp",         NA,        NA,
-  "T602",                       61.9333,   -152.0833,  #May be off, boreholes
-  "T600",                       61.9333,   -152.0833,  #May be off, boreholes
-  "T611",                       61.9333,   -152.0833,  #May be off, boreholes
+  "Tesh Offshore Camp",         70.48743,  -153.79658,
+  "T602",                       70.55245,  -153.82244,
+  "T600",                       70.72253,  -153.76562,
+  "T611",                       70.72253,  -153.76562,
   "Ship",                       61.2261,   -149.8925,
   "Wai Inlet",                  70.6000,   -160.1300,
   "Ship Cr or N. Port Exp",     61.2261,   -149.8925,
@@ -2558,6 +2563,9 @@ ERM_data_processed <- ERM_data_processed %>%
 
 Selendang_data <- read_excel("Input Data/2005 Selendang AYU study.xlsx")      
 
+Selendang_locations <- read_excel("Input Data/2005 Selendang AYU study.xlsx", sheet = "Samples")      
+
+
 str(Selendang_data)
 #tibble [1,922 x 17] (S3: tbl_df/tbl/data.frame)
 #$ Client ID        : chr [1:1922] "ML-SMB10-7-20-05" "ML-SMB10-7-20-05" "ML-SMB10-7-20-05" "ML-SMB10-7-20-05" ...
@@ -2578,20 +2586,47 @@ str(Selendang_data)
 #$ Lab Flag         : chr [1:1922] "J" "U" "U" "U" ...
 #$ Reporting Limit  : num [1:1922] 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
 
+#Pull the location data
+# Deduplicate location data
+names(Selendang_locations) <- gsub('^"|"$', '', names(Selendang_locations))
+
+names(Selendang_locations)
+
+
+Selendang_locations <- Selendang_locations %>%
+  distinct(`Sample ID`, `Location ID`, LAT, LONG)
+
+
+
+
+
+# Join into Selendang_data using Client ID
+Selendang_data <- Selendang_data %>%
+  left_join(
+    Selendang_locations %>%
+      distinct(`Sample ID`, `Location ID`, LAT, LONG),
+    by = c("Client ID" = "Sample ID")
+  )
+
+
+Selendang_data %>%
+  select(`Location ID`, LAT, LONG) %>%
+  summary()
+
 
 
 Selendang_data_processed <- data.frame(
   Data_source = rep("Selendang", nrow(Selendang_data)),
   Study_name = rep("Selendang", nrow(Selendang_data)),                         
-  Source_siteID = NA,
+  Source_siteID = Selendang_data$'Location ID',
   Source_sampleID = Selendang_data$'Client ID',
   OSRI_siteID = NA,
   OSRI_sampleID = NA,
   Sample_motivation = NA,                  
   General_location = NA,
-  Specific_location = NA,   
-  Lat = NA,                                
-  Long = NA,                              
+  Specific_location = Selendang_data$'Location ID',   
+  Lat = Selendang_data$LAT,                                
+  Long = Selendang_data$LONG,                              
   Year = NA,                                #Need to calculate 
   Month = NA,                               #Need to calculate
   Collection_date =	Selendang_data$'Date Collected',          
@@ -3050,8 +3085,6 @@ OSRI_data <- OSRI_data %>%
 
 
 #Adjust sample motivation
-Sample_motivation
-
 unique(OSRI_data$Notes)
 unique(OSRI_data$Data_source)
 unique(OSRI_data$Study_name)
@@ -3066,6 +3099,34 @@ write_xlsx(unique_motivations, "Output Data/unique_motivations.xlsx")
 
 unique_motivations <- read_xlsx("Output Data/unique_motivations_MP.xlsx")
 unique_motivations
+
+
+unique_motivations <- unique_motivations %>%
+  group_by(Study_name) %>%
+  summarise(Sample_motivation = first(Sample_motivation), .groups = "drop")
+
+
+OSRI_data <- OSRI_data %>%
+  select(-Sample_motivation) %>%
+  left_join(unique_motivations, by = "Study_name")
+
+
+
+
+
+OSRI_data <- OSRI_data %>%
+  select(-Sample_motivation) %>%  # Remove any existing Sample_motivation column to avoid .x/.y
+  left_join(
+    unique_motivations %>%
+      select(Study_name, Sample_motivation) %>%
+      distinct(),
+    by = "Study_name"
+  )
+
+
+unique_motivations %>%
+  count(Study_name) %>%
+  filter(n > 1)
 
 
 
@@ -3249,22 +3310,6 @@ OSRI_data <- OSRI_data %>%
   )
     
 
-Parameter_data <- data.frame(unique(OSRI_data$Parameter))
-Parameter_data
-
-write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
-
-Parameter_data <- read_xlsx("Output Data/Parameter_data_MP.xlsx")
-Parameter_data
-
-
-OSRI_data <- OSRI_data %>%
-  left_join(
-    Parameter_data %>%
-      distinct(Parameter_original, Parameter_standardized),
-    by = c("Parameter" = "Parameter_original")
-  )
-
 
 
 
@@ -3319,10 +3364,28 @@ OSRI_data <- OSRI_data %>%
 Parameter_data <- data.frame(unique(OSRI_data$Parameter))
 Parameter_data
 
+
+
+
+
+Parameter_data <- data.frame(unique(OSRI_data$Parameter))
+Parameter_data
+
 write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
 
+Parameter_data <- read_xlsx("Output Data/Parameter_data_MP.xlsx")
+Parameter_data
 
-####Read back in Morgans edited dataset here:
+
+OSRI_data <- OSRI_data %>%
+  left_join(
+    Parameter_data %>%
+      distinct(Parameter_original, Parameter_standardized),
+    by = c("Parameter" = "Parameter_original")
+  )
+
+
+
 
 
 
