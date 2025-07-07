@@ -761,6 +761,14 @@ NCCOS_data_processed <- rbind(NCCOS_clam_processed, NCCOS_cockles_processed, NCC
                     NCCOS_flatfish_processed, NCCOS_mussel_processed, NCCOS_shrimp_processed, 
                     NCCOS_starfish_processed) 
 
+#Figure out which one of these Morgan wants done!!!!!!!!!!!!!!!!!!!!!!!!
+NCCOS_data_processed <- NCCOS_data_processed %>% 
+  select(Study_name != "Mussel Watch")
+
+#NCCOS_data_processed <- NCCOS_data_processed %>% 
+#  filter(str_detect(tolower(Study_name), "mussel watch"))
+
+
 View(NCCOS_data_processed) #22,428 data points!!
 
 
@@ -968,7 +976,7 @@ Diver_processed <- Diver_processed %>%
 latlong <- data.frame(Diver_data$Location_Geom) 
 latlong <- latlong %>%   
   mutate(Diver_data.Location_Geom = str_remove_all(Diver_data.Location_Geom, "POINT\\(|\\)")) %>% 
-  separate(Diver_data.Location_Geom, into = c("Lat", "Long"), sep = " ", convert = TRUE)
+  separate(Diver_data.Location_Geom, into = c("Long", "Lat"), sep = " ", convert = TRUE)
 head(latlong)
 
 Diver_processed <- Diver_processed %>% 
@@ -990,6 +998,9 @@ compare_column_names(Diver_processed)
 
 
 # Nationwide PAHs (supplement to NCCOS and Diver) -------------------------
+
+
+
 
 #PAH Data 
 Nationwide_data <- read.csv("Input Data/Nationwide Tissue PAHs.csv")      
@@ -1075,7 +1086,7 @@ Nationwide_data <- Nationwide_data %>%
 
 
 
-#Now proccess it
+#Now process it
 str(Nationwide_data)
 
 
@@ -1167,7 +1178,10 @@ Nationwide_data_processed <- Nationwide_data_processed %>%
     ))
     
     
-    
+#Remove duplicate samples, selected by Morgan 
+Nationwide_data_processed <- Nationwide_data_processed %>% 
+  filter(Year == 2012)
+
 
 str(Nationwide_data_processed)
 head(Nationwide_data_processed) 
@@ -1175,6 +1189,21 @@ head(Nationwide_data_processed)
 
 
 ### Check for redundancy between NCCOS and Diver datasets -------------------
+
+
+
+unique_motivations_MP <- read_xlsx("Output Data/unique_motivations_MP.xlsx")      
+unique_motivations_MP
+
+
+
+
+
+
+
+
+
+
 
 # Define identifying columns for overlap
 id_cols <- c("Source_sampleID", "Source_siteID", "Scientific_name", "Year", "Parameter", "Value", "Units")
@@ -3519,6 +3548,29 @@ OSRI_data <- OSRI_data %>%
 
 
 
+
+write_xlsx(OSRI_data, "Output Data/OSRI_data.xlsx")
+
+
+write.csv("Output Data/OSRI_data.xlsx")
+
+
+
+
+
+
+
+unique_motivations_MP <- read_xlsx("Output Data/unique_motivations_MP.xlsx")      
+unique_motivations_MP
+
+
+str(OSRI_data)
+
+
+mussel_watch_data <- OSRI_data %>%
+  filter(str_detect(tolower(Study_name), "mussel watch"))
+
+mussel_watch_data
 
 
 
