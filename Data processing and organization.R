@@ -1062,25 +1062,25 @@ str(Nationwide_sum)
 
 
 #Pick identifying columns (adjust as needed)
-id_cols <- c("Site_ID", "Scientific_Name", "Calendar_Year", "Specific_Location")
+#id_cols <- c("Site_ID", "Scientific_Name", "Calendar_Year", "Specific_Location")
 
 # Check overlap
-overlap <- inner_join(Nationwide_data, Nationwide_sum, by = id_cols)
+#overlap <- inner_join(Nationwide_data, Nationwide_sum, by = id_cols)
 
 # Show how many are duplicated
-nrow(overlap)
+#nrow(overlap)
 
 # Alternatively: show just the overlapping IDs
-overlapping_ids <- semi_join(Nationwide_data, Nationwide_sum, by = id_cols)
-distinct(overlapping_ids, across(all_of(id_cols)))
+#overlapping_ids <- semi_join(Nationwide_data, Nationwide_sum, by = id_cols)
+#distinct(overlapping_ids, across(all_of(id_cols)))
 #All of the PAH sum columns match the full dataset, so I'll join them
 
 # Join the non-redundant columns from Nationwide_sum into Nationwide_data
-Nationwide_data <- Nationwide_data %>%
-  left_join(
-    Nationwide_sum %>% select(all_of(id_cols), Sum, Count),
-    by = id_cols
-  )
+#Nationwide_data <- Nationwide_data %>%
+#  left_join(
+#    Nationwide_sum %>% select(all_of(id_cols), Sum, Count),
+#    by = id_cols
+#  )
 
 
 
@@ -1131,7 +1131,7 @@ Nationwide_data_processed <- data.frame(
   Qualifier_code = NA,
   Lipid_pct = NA,
   Moisture_pct = NA,
-  Total_PAHs = Nationwide_data$Sum,
+  Total_PAHs = NA,
   Total_LMWAHs = NA,
   Total_HMWAHs = NA,
   Lab_ID = Nationwide_data$Laboratory,
@@ -1185,6 +1185,114 @@ Nationwide_data_processed <- Nationwide_data_processed %>%
 
 str(Nationwide_data_processed)
 head(Nationwide_data_processed) 
+
+
+#Now Repeat for Nationwide Sum
+str(Nationwide_sum)
+
+
+Nationwide_sum_processed <- data.frame(
+  Data_source = rep("Nationwide", nrow(Nationwide_sum)),
+  Study_name = Nationwide_sum$Study,
+  Source_siteID = Nationwide_sum$Site_ID,
+  Source_sampleID = Nationwide_sum$Site_ID,
+  OSRI_siteID = NA,
+  OSRI_sampleID = NA,
+  Sample_motivation = NA,
+  General_location = Nationwide_sum$General_Location,
+  Specific_location = Nationwide_sum$Specific_Location,   
+  Lat = Nationwide_sum$Latitude,
+  Long = Nationwide_sum$Longitude,
+  Year = Nationwide_sum$Calendar_Year,
+  Month = NA,                               
+  Collection_date =	NA,
+  DOY = NA,                                 
+  Collection_time = NA,
+  Collection_method = NA, 
+  Species_complex = NA,                 #Need to calculate
+  Common_name = NA,                     #Need to calculate
+  Scientific_name = Nationwide_sum$Scientific_Name,
+  Genus_latin = NA,                        #Need to calculate these below
+  Species_latin = NA,                        #Need to calculate these below
+  Tissue_type = Nationwide_sum$Matrix,
+  Sample_composition = NA,                   
+  Number_in_composite = NA,
+  Sex = NA,                                  
+  Analysis_method = NA, 
+  Chem_code = NA,
+  Parameter = Nationwide_sum$TechMemo_Group,
+  Value = Nationwide_sum$Sum,
+  Units = Nationwide_sum$Unit,
+  Value_standardized = NA,
+  Units_standardized = NA,
+  Detection_limit = NA,
+  Reporting_limit = NA,
+  Basis = NA,
+  Lab_replicate = NA,
+  Qualifier_code = NA,
+  Lipid_pct = NA,
+  Moisture_pct = NA,
+  Total_PAHs = Nationwide_sum$Sum,
+  Total_LMWAHs = NA,
+  Total_HMWAHs = NA,
+  Lab_ID = Nationwide_sum$Laboratory,
+  Notes = NA
+)
+
+
+
+
+
+
+Nationwide_sum_processed <- Nationwide_sum_processed %>%
+  mutate(
+    Scientific_name = case_when(
+      Scientific_name == "Mytilus species" ~ "Mytilus spp.",
+      Scientific_name == "Siliqua Patula" ~ "Siliqua patula",
+    ),
+    
+    Common_name = case_when(
+      Scientific_name == "Mytilus edulis" ~ "Blue mussel",
+      Scientific_name == "Siliqua patula" ~ "Pacific razor clam",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ),
+    
+    Genus_latin = case_when(
+      Scientific_name == "Mytilus species" ~ "Mytilus",
+      Scientific_name == "Mytilus edulis" ~ "Mytilus",
+      Scientific_name == "Siliqua patula" ~ "Siliqua",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ),
+    
+    Species_latin = case_when(
+      Scientific_name == "Mytilus species" ~ NA,
+      Scientific_name == "Mytilus edulis" ~ "edulis",
+      Scientific_name == "Siliqua patula" ~ "patula",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ),
+    
+    Species_complex = case_when(
+      Scientific_name == "Mytilus species" ~ "Mussel",
+      Scientific_name == "Mytilus edulis" ~ "Mussel",
+      Scientific_name == "Siliqua patula" ~ "Clam",
+      TRUE ~ NA_character_  # Default case if no match is found
+    ))
+
+
+#Remove duplicate samples, selected by Morgan 
+Nationwide_sum_processed <- Nationwide_sum_processed %>% 
+  filter(Year == 2012)
+
+
+str(Nationwide_sum_processed)
+head(Nationwide_sum_processed) 
+
+
+
+
+Nationwide_data_processed2 <- rbind(Nationwide_data_processed, Nationwide_sum_processed)
+Nationwide_data_processed2
+
 
 
 
