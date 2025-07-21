@@ -761,10 +761,9 @@ NCCOS_data_processed <- rbind(NCCOS_clam_processed, NCCOS_cockles_processed, NCC
                     NCCOS_flatfish_processed, NCCOS_mussel_processed, NCCOS_shrimp_processed, 
                     NCCOS_starfish_processed) 
 
-#Figure out which one of these Morgan wants done!!!!!!!!!!!!!!!!!!!!!!!!
 NCCOS_data_processed <- NCCOS_data_processed %>% 
   select(Study_name != "Mussel Watch")
-
+ 
 #NCCOS_data_processed <- NCCOS_data_processed %>% 
 #  filter(str_detect(tolower(Study_name), "mussel watch"))
 
@@ -1241,42 +1240,42 @@ Nationwide_sum_processed <- data.frame(
 
 
 
-
-
-
 Nationwide_sum_processed <- Nationwide_sum_processed %>%
   mutate(
     Scientific_name = case_when(
       Scientific_name == "Mytilus species" ~ "Mytilus spp.",
       Scientific_name == "Siliqua Patula" ~ "Siliqua patula",
+      TRUE ~ Scientific_name  # keep others unchanged
     ),
     
     Common_name = case_when(
       Scientific_name == "Mytilus edulis" ~ "Blue mussel",
+      Scientific_name == "Mytilus spp." ~ "Mussel",
       Scientific_name == "Siliqua patula" ~ "Pacific razor clam",
-      TRUE ~ NA_character_  # Default case if no match is found
+      TRUE ~ NA_character_
     ),
     
     Genus_latin = case_when(
-      Scientific_name == "Mytilus species" ~ "Mytilus",
-      Scientific_name == "Mytilus edulis" ~ "Mytilus",
+      Scientific_name %in% c("Mytilus edulis", "Mytilus spp.") ~ "Mytilus",
       Scientific_name == "Siliqua patula" ~ "Siliqua",
-      TRUE ~ NA_character_  # Default case if no match is found
+      TRUE ~ NA_character_
     ),
     
     Species_latin = case_when(
-      Scientific_name == "Mytilus species" ~ NA,
       Scientific_name == "Mytilus edulis" ~ "edulis",
       Scientific_name == "Siliqua patula" ~ "patula",
-      TRUE ~ NA_character_  # Default case if no match is found
+      TRUE ~ NA_character_
     ),
     
     Species_complex = case_when(
-      Scientific_name == "Mytilus species" ~ "Mussel",
-      Scientific_name == "Mytilus edulis" ~ "Mussel",
+      Scientific_name %in% c("Mytilus edulis", "Mytilus spp.") ~ "Mussel",
       Scientific_name == "Siliqua patula" ~ "Clam",
-      TRUE ~ NA_character_  # Default case if no match is found
-    ))
+      TRUE ~ NA_character_
+    )
+  )
+
+
+
 
 
 #Remove duplicate samples, selected by Morgan 
@@ -1290,8 +1289,8 @@ head(Nationwide_sum_processed)
 
 
 
-Nationwide_data_processed2 <- rbind(Nationwide_data_processed, Nationwide_sum_processed)
-Nationwide_data_processed2
+Nationwide_data_processed <- rbind(Nationwide_data_processed, Nationwide_sum_processed)
+head(Nationwide_data_processed)
 
 
 
@@ -1840,6 +1839,15 @@ Wetzel_data_processed <- Wetzel_data_processed %>%
     Long = Long.y
   ) %>%
   select(-Lat.x, -Lat.y, -Long.x, -Long.y)
+
+
+
+Wetzel_data_processed <- Wetzel_data_processed %>%
+  mutate(
+    Study_name = rep("Dr Wetzel, Mote Marine Database", nrow(Wetzel_data_processed)),
+    Sample_motivation = rep("background monitoring/post-spill assessment", nrow(Wetzel_data_processed))
+  )
+
 
 
 
@@ -3231,7 +3239,7 @@ unique_motivations <- OSRI_data %>%
   distinct(Study_name, Data_source, Sample_motivation)
 unique_motivations
 
-write_xlsx(unique_motivations, "Output Data/unique_motivations.xlsx")
+#write_xlsx(unique_motivations, "Output Data/unique_motivations.xlsx")
 
 
 unique_motivations <- read_xlsx("Output Data/unique_motivations_MP.xlsx")
@@ -3289,7 +3297,14 @@ locations <- OSRI_data %>%
   distinct(Study_name, Data_source, General_location, Specific_location, Lat, Long)
 locations
 
-write_xlsx(locations, "Output Data/locations.xlsx")
+#write_xlsx(locations, "Output Data/locations.xlsx")
+
+
+
+
+OSRI_data <- OSRI_data %>%
+  mutate(Long = ifelse(Long > 0, -Long, Long))
+
 
 
 
@@ -3399,7 +3414,7 @@ unique_names <- OSRI_data %>%
   distinct(Scientific_name, Common_name, Taxonomic_group, Layman_group)
 unique_names
 
-write_xlsx(unique_names, "Output Data/unique_names.xlsx")
+#write_xlsx(unique_names, "Output Data/unique_names.xlsx")
 
 
 
@@ -3508,7 +3523,7 @@ Parameter_data
 Parameter_data <- data.frame(unique(OSRI_data$Parameter))
 Parameter_data
 
-write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
+#write_xlsx(Parameter_data, "Output Data/Parameter_data.xlsx")
 
 Parameter_data <- read_xlsx("Output Data/Parameter_data_MP.xlsx")
 Parameter_data
@@ -3538,16 +3553,46 @@ OSRI_data %>%
   select(Data_source, Parameter, Value)
 
 
-#Convert the units and values to standardized format:
+
+# Fix the conversion function so it handles NA `unit` values safely
 convert_to_ng_per_g <- function(value, unit) {
+  if (is.na(unit)) return(NA_real_)
+  
+  unit <- tolower(str_trim(unit))
+  unit <- str_replace_all(unit, "μ", "µ")  # standardize Greek mu
+  unit <- str_replace_all(unit, fixed(" "), "")  # remove all spaces
+  
+  if (unit %in% c("ppb", "ug/kg", "µg/kg")) {
+    return(value)
+  } else if (unit %in% c("ug/g", "µg/g")) {
+    return(value * 1000)
+  } else if (unit %in% c("mg/kg")) {
+    return(value * 1000)
+  } else if (unit %in% c("ng/g", "ng/gdry", "ng/gwet", "ng/dryg")) {
+    return(value)
+  } else if (unit %in% c("ng/mg")) {
+    return(value * 1000)
+  } else if (unit %in% c("g")) {
+    return(value * 1e9)
+  } else if (unit %in% c("%", "percent")) {
+    return(value)
+  } else {
+    return(NA_real_)
+  }
+}
+
+
+#convert_to_ng_per_g <- function(value, unit) {
+  if (is.na(unit)) return(NA_real_)
+  
   unit <- tolower(trimws(unit))
   
-  if (unit %in% c("ppb", "ug/kg", "µg/kg", "μg/kg", "µg/kg")) {
+  if (unit %in% c("ppb", "PPB", "ug/kg", "µg/kg", "μg/kg")) {
     return(value)  # µg/kg = 1 ng/g
   } else if (unit %in% c("ug/g", "µg/g")) {
-    return(value * 1000)  # µg/g = 1000 ng/g
+    return(value * 1000)
   } else if (unit %in% c("mg/kg")) {
-    return(value * 1000)  # mg/kg = 1000 ng/g
+    return(value * 1000)
   } else if (unit %in% c("ng/g", "ng/g dry", "ng/g wet", "ng/dry g")) {
     return(value)
   } else if (unit %in% c("ng/mg")) {
@@ -3555,7 +3600,7 @@ convert_to_ng_per_g <- function(value, unit) {
   } else if (unit %in% c("g")) {
     return(value * 1e9)
   } else if (unit %in% c("%", "percent")) {
-    return(value * 1e7)
+    return(value)
   } else if (unit == "ng") {
     return(NA_real_)
   } else {
@@ -3563,18 +3608,30 @@ convert_to_ng_per_g <- function(value, unit) {
   }
 }
 
-
+# Apply conversion to OSRI_data
 OSRI_data <- OSRI_data %>%
   mutate(
     Units_standardized = "ng/g",
     Value_standardized = mapply(convert_to_ng_per_g, Value, Units), 
     Value_standardized = ifelse(Value_standardized == -9, NA, Value_standardized),
-    Detection_limit_standardized = mapply(convert_to_ng_per_g, Detection_limit, Units),  #Also adjust the MDL and MRL
+    Detection_limit_standardized = mapply(convert_to_ng_per_g, Detection_limit, Units),
     Detection_limit_standardized = ifelse(Detection_limit_standardized == -9, NA, Detection_limit_standardized),
-    Reporting_limit_standardized = mapply(convert_to_ng_per_g, Reporting_limit, Units),    
-    Reporting_limit_standardized = ifelse(Reporting_limit_standardized == -9, NA, Reporting_limit_standardized),
-  
+    Reporting_limit_standardized = mapply(convert_to_ng_per_g, Reporting_limit, Units),
+    Reporting_limit_standardized = ifelse(Reporting_limit_standardized == -9, NA, Reporting_limit_standardized)
   )
+
+
+OSRI_data %>%
+  filter(!is.na(Value) & is.na(Value_standardized)) %>%
+  count(Units, sort = TRUE)
+
+
+OSRI_data %>%
+  filter(!is.na(Value) & is.na(Value_standardized))
+
+
+
+
 
 
 unique(OSRI_data$Units)
@@ -3657,28 +3714,19 @@ OSRI_data <- OSRI_data %>%
 
 
 
+
+
+
 write_xlsx(OSRI_data, "Output Data/OSRI_data.xlsx")
 
 
-write.csv("Output Data/OSRI_data.xlsx")
+#write.csv("Output Data/OSRI_data.xlsx")
 
 
 
 
 
 
-
-unique_motivations_MP <- read_xlsx("Output Data/unique_motivations_MP.xlsx")      
-unique_motivations_MP
-
-
-str(OSRI_data)
-
-
-mussel_watch_data <- OSRI_data %>%
-  filter(str_detect(tolower(Study_name), "mussel watch"))
-
-mussel_watch_data
 
 
 
