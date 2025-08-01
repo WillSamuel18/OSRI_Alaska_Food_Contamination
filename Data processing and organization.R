@@ -3417,6 +3417,69 @@ unique_names
 #write_xlsx(unique_names, "Output Data/unique_names.xlsx")
 
 
+#updating it with new modifications
+# Read in the revised species data
+revised_data <- read_excel("Output data/unique_species_combinations.xlsx", sheet = "Revised")
+
+# For faster matching, create named lookup vectors from the revised spreadsheet
+common_name_lookup <- setNames(revised_data$Common_name, revised_data$Scientific_name)
+species_complex_lookup <- setNames(revised_data$Species_complex, revised_data$Scientific_name)
+species_standard_lookup <- setNames(revised_data$Species_standard, revised_data$Scientific_name)
+taxonomic_group_lookup <- setNames(revised_data$Taxonomic_group, revised_data$Scientific_name)
+layman_group_lookup <- setNames(revised_data$Layman_group, revised_data$Scientific_name)
+
+# Replace columns using ifelse and lookup
+OSRI_data <- OSRI_data %>%
+  mutate(
+    Common_name = ifelse(Scientific_name %in% names(common_name_lookup),
+                         common_name_lookup[Scientific_name], Common_name),
+    Species_complex = ifelse(Scientific_name %in% names(species_complex_lookup),
+                             species_complex_lookup[Scientific_name], Species_complex),
+    Species_standard = ifelse(Scientific_name %in% names(species_standard_lookup),
+                              species_standard_lookup[Scientific_name], Species_standard),
+    Taxonomic_group = ifelse(Scientific_name %in% names(taxonomic_group_lookup),
+                             taxonomic_group_lookup[Scientific_name], Taxonomic_group),
+    Layman_group = ifelse(Scientific_name %in% names(layman_group_lookup),
+                          layman_group_lookup[Scientific_name], Layman_group)
+  )
+
+
+
+
+# Make sure there are no mismatches
+check_transfer <- OSRI_data %>%
+  select(Scientific_name, Common_name, Species_complex, Species_standard, Taxonomic_group, Layman_group) %>%
+  left_join(
+    revised_data %>%
+      distinct(Scientific_name, .keep_all = TRUE) %>%   
+      select(Scientific_name, 
+             Common_name_revised = Common_name,
+             Species_complex_revised = Species_complex,
+             Species_standard_revised = Species_standard,
+             Taxonomic_group_revised = Taxonomic_group,
+             Layman_group_revised = Layman_group),
+    by = "Scientific_name"
+  ) %>%
+  mutate(
+    Common_name_match = Common_name == Common_name_revised,
+    Species_complex_match = Species_complex == Species_complex_revised,
+    Species_standard_match = Species_standard == Species_standard_revised,
+    Taxonomic_group_match = Taxonomic_group == Taxonomic_group_revised,
+    Layman_group_match = Layman_group == Layman_group_revised
+  )
+
+# Summarize mismatches
+mismatches <- check_transfer %>%
+  summarise(
+    Common_name_mismatches = sum(!Common_name_match, na.rm = TRUE),
+    Species_complex_mismatches = sum(!Species_complex_match, na.rm = TRUE),
+    Species_standard_mismatches = sum(!Species_standard_match, na.rm = TRUE),
+    Taxonomic_group_mismatches = sum(!Taxonomic_group_match, na.rm = TRUE),
+    Layman_group_mismatches = sum(!Layman_group_match, na.rm = TRUE)
+  )
+
+print(mismatches)
+
 
 
 
@@ -3556,69 +3619,49 @@ OSRI_data %>%
 
 # Fix the conversion function so it handles NA `unit` values safely
 convert_to_ng_per_g <- function(value, unit) {
-  if (is.na(unit)) return(NA_real_)
+  # Return NA if value or unit is missing
+  if (is.na(unit) || is.na(value)) return(NA_real_)
   
-  unit <- tolower(str_trim(unit))
-  unit <- str_replace_all(unit, "μ", "µ")  # standardize Greek mu
-  unit <- str_replace_all(unit, fixed(" "), "")  # remove all spaces
-  
-  if (unit %in% c("ppb", "ug/kg", "µg/kg")) {
-    return(value)
-  } else if (unit %in% c("ug/g", "µg/g")) {
-    return(value * 1000)
-  } else if (unit %in% c("mg/kg")) {
-    return(value * 1000)
-  } else if (unit %in% c("ng/g", "ng/gdry", "ng/gwet", "ng/dryg")) {
-    return(value)
-  } else if (unit %in% c("ng/mg")) {
-    return(value * 1000)
-  } else if (unit %in% c("g")) {
-    return(value * 1e9)
-  } else if (unit %in% c("%", "percent")) {
-    return(value)
-  } else {
-    return(NA_real_)
-  }
-}
-
-
-#convert_to_ng_per_g <- function(value, unit) {
-  if (is.na(unit)) return(NA_real_)
-  
+  # Standardize unit formatting
   unit <- tolower(trimws(unit))
+  unit <- str_replace_all(unit, "μ", "µ")   # Convert different "mu" symbols
+  unit <- str_replace_all(unit, fixed(" "), "")  # Remove spaces
   
-  if (unit %in% c("ppb", "PPB", "ug/kg", "µg/kg", "μg/kg")) {
-    return(value)  # µg/kg = 1 ng/g
+  # Conversion logic
+  if (unit %in% c("ppb", "ug/kg", "µg/kg")) {
+    return(value)                  # µg/kg is equivalent to ng/g
   } else if (unit %in% c("ug/g", "µg/g")) {
-    return(value * 1000)
+    return(value * 1000)           # µg/g -> ng/g
   } else if (unit %in% c("mg/kg")) {
-    return(value * 1000)
-  } else if (unit %in% c("ng/g", "ng/g dry", "ng/g wet", "ng/dry g")) {
-    return(value)
+    return(value * 1000)           # mg/kg -> µg/kg equivalent
+  } else if (unit %in% c("ng/g", "ng/gdry", "ng/gwet", "ng/dryg")) {
+    return(value)                  # Already ng/g
   } else if (unit %in% c("ng/mg")) {
-    return(value * 1000)
+    return(value * 1000)           # ng/mg -> ng/g
   } else if (unit %in% c("g")) {
-    return(value * 1e9)
+    return(value * 1e9)            # grams -> ng
   } else if (unit %in% c("%", "percent")) {
-    return(value)
-  } else if (unit == "ng") {
-    return(NA_real_)
+    return(value)                  # Leave % unchanged
   } else {
-    return(NA_real_)
+    return(NA_real_)               # Unrecognized unit
   }
 }
 
-# Apply conversion to OSRI_data
+
+
+
 OSRI_data <- OSRI_data %>%
   mutate(
     Units_standardized = "ng/g",
-    Value_standardized = mapply(convert_to_ng_per_g, Value, Units), 
-    Value_standardized = ifelse(Value_standardized == -9, NA, Value_standardized),
+    Value_standardized = mapply(convert_to_ng_per_g, Value, Units),
     Detection_limit_standardized = mapply(convert_to_ng_per_g, Detection_limit, Units),
-    Detection_limit_standardized = ifelse(Detection_limit_standardized == -9, NA, Detection_limit_standardized),
-    Reporting_limit_standardized = mapply(convert_to_ng_per_g, Reporting_limit, Units),
-    Reporting_limit_standardized = ifelse(Reporting_limit_standardized == -9, NA, Reporting_limit_standardized)
+    Reporting_limit_standardized = mapply(convert_to_ng_per_g, Reporting_limit, Units)
   )
+
+
+
+
+
 
 
 OSRI_data %>%
@@ -3713,7 +3756,7 @@ OSRI_data <- OSRI_data %>%
 
 
 
-
+str(OSRI_data)
 
 
 
