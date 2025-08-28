@@ -139,7 +139,56 @@ mutate(Common_name = case_when(
 missing_rows <- D17 %>%
   filter(is.na(Year_clean))
 write_xlsx(D16, "OSRI_Totals_Full.xlsx")
+
 ```
 
+#Start again with new round of data polishing
+```{r}
+D17<-D16%>%#Reorder layman group to be more intuitive
+  mutate(Layman_group = factor(Layman_group, levels = c("Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
 
-A list of PAHs to work with PAH60
+D18<- D17 %>% # Cleaning up study names in new column for better grouping and visusalizations
+mutate(Study_name_clean = case_when(
+    Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "NorthSlope Subsistence Study",
+    Study_name == "LTEMP"~ "Prince William Sound Regional Citizens' Advisory Council Monitoring Program",
+    Study_name == "Kachemak Bay Bioeffects"~"NOAA Kachemak Bay Bioeffects",
+    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                                                  
+    Study_name == "Resurrection Bay Intercomparison Project" ~  "NOAA Resurrection Bay Project",
+    Study_name == "Bristol Bay Study"  ~      "NOAA Bristol Bay Study",
+  Study_name == "NOAA Pribilofs Special Study 2000" ~        "NOAA Pribilofs Special Study",
+  Study_name == "Mussel Watch:Alaska 2001"    ~    "NOAA Mussel Watch",
+  Study_name == "NOAA Metlakatla Annette Islands Biota 2002"  ~ "NOAA Metlakatla Annette Islands Biota Study",
+  Study_name == "Mussel Watch:Alaska 2003"   ~    "NOAA Mussel Watch" ,
+  Study_name == "Mussel Watch:Alaska 2005" ~   "NOAA Mussel Watch" ,
+  Study_name == "Mussel Watch:Alaska 2007" ~    "NOAA Mussel Watch" ,
+  Study_name == "NOAA Southwest Alaska Nearshore Monitoring 2007" ~   "NOAA Southwest Alaska Nearshore Monitoring",
+  Study_name == "NOAA AKMAP Special Study 2007"   ~  "NOAA AKMAP Special Study",
+  Study_name == "NOAA Special Alaska Study 2007" ~    "NOAA AKMAP Special Study",
+  Study_name == "Mussel Watch:Alaska 2008"   ~     "NOAA Mussel Watch" ,
+  Study_name == "Mussel Watch:Alaska 2009"   ~      "NOAA Mussel Watch" ,
+  Study_name == "NOAA North Pacific Research Board Study 2010"   ~      "NOAA North Pacific Research Board Study",  
+  Study_name == "Western Mariner Preassessment Tissue"  ~    "NOAA Western Mariner Assessment",
+  Study_name == "Shigenaka 2008, Exxon Valdez Intertidal monitoring"  ~ "Exxon Valdez Intertidal Study, Shigenaka",
+  Study_name == "Mussel Watch"  ~ "NOAA Mussel Watch",
+  Study_name == "Dr Wetzel, Mote Marine Database"  ~   "Mote Marine Laboratory",
+  Study_name == "Stimmelmayr et al 2018"  ~   "Oil Fouling of Seals, Stimmelmayr",
+  Study_name == "Arnold 2006- Public Health Evaluation of Subsistence\r\r\r\nResources Collected During 2005\r\r\r\n"~"Public Health Evaluation of Subsistence Resources, Arnold",
+  Study_name == "Harvey et al 2014 - COMIDA"    ~ "Chukchi Sea Whelks, Harvey",
+    TRUE~Study_name))%>%
+  mutate(Study_name_cleaner = case_when(
+    Study_name_clean == "NOAA Kachemak Bay Bioeffects"~"NOAA Regional Studies",
+    Study_name_clean == "NOAA Alaska Arctic Study"   ~    "NOAA Regional Studies",
+  Study_name_clean == "NOAA Resurrection Bay Project" ~  "NOAA Regional Studies", 
+  Study_name_clean == "NOAA Bristol Bay Study"  ~      "NOAA Regional Studies",
+  Study_name_clean == "NOAA Pribilofs Special Study" ~        "NOAA Regional Studies",
+  Study_name_clean == "NOAA Metlakatla Annette Islands Biota Study"  ~ "NOAA Regional Studies",
+  Study_name_clean == "NOAA Southwest Alaska Nearshore Monitoring" ~   "NOAA Regional Studies",
+  Study_name_clean == "NOAA AKMAP Special Study"   ~  "NOAA Regional Studies",
+  Study_name_clean == "NOAA Special Alaska Study" ~    "NOAA Regional Studies",
+  Study_name_clean == "NOAA North Pacific Research Board Study"   ~      "NOAA Regional Studies", 
+  Study_name_clean == "Exxon Valdez Intertidal Study, Shigenaka"~"Other Peer-reviewed Studies",
+  Study_name_clean == "Oil Fouling of Seals, Stimmelmayr"~"Other Peer-reviewed Studies",
+  Study_name_clean == "Chukchi Sea Whelks, Harvey"~"Other Peer-reviewed Studies",
+    TRUE~Study_name_clean))
+write_xlsx(D18, "OSRI_Totals_Full_Aug28.xlsx")
+```

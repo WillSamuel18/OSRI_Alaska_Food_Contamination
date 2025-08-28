@@ -260,7 +260,7 @@ D7<-D6%>%
   select(!`Year_clean+K:AL`)
 write_xlsx(D7, "FullOSRIData_WDups_AllYears_Aug27.xlsx")
 
-##Then take out the duplicates
+##FIND DUPLICATES
 char_col <- "Study_name"  # the main character column
 paired_cols <- c("Data_source","Year", "Species_standard")
 
@@ -412,10 +412,6 @@ PAH60Tot<-c("Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18","Acenaphthene",
 ````
 Troubleshooting Missing Data
 ```{r}
-unique(D1$Parameter_standardized)
-
-#I want to work with 'Common_name', 'Scientific_name','Species_standard', and 'Layman_group'
-
 #need to check to see what are NAs in these groups and if they can be filled in
 columns_to_check <- c("Common_name", "Scientific_name","Species_standard","Layman_group")
 columns_to_check1 <- c("Lat", "Long","Parameter_standardized","Layman_group")
@@ -424,11 +420,6 @@ columns_to_check1 <- c("Lat", "Long","Parameter_standardized","Layman_group")
 rows_with_na_specific <- D1[!complete.cases(D1[, columns_to_check]), ]
 print(rows_with_na_specific)
 write_xlsx(rows_with_na_specific, "rows_with_na_specific.xlsx")
-
-## Now Add in olde data set and see if the problem is there too
-file_path <- "data/OSRI_data_D0.xlsx"
-D0<- read_xlsx(file_path)
-rows_with_na_specific_D0 <- D0[!complete.cases(D0[, columns_to_check]), ] # Number of rows is very similar. Take the D1 data set and handbomb the species names, fix missing parameter and lat long values
 
 #Now join D1 without the #rows_with_na_specific with the new rows_with_na_specific_fixed
 D2<-D1[complete.cases(D1[, columns_to_check]), ]# New unchanged data set with fixed rows removed
