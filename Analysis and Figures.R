@@ -202,6 +202,12 @@ View(subsistence_summary)
 write_xlsx(subsistence_summary, "Output data/subsistence_summary_by_community.xlsx")
 
 
+
+write_csv(subsistence_summary, "Output data/subsistence_summary_by_community.csv")
+
+
+
+
 # Import and organize Data ------------------------------------------------
 
 

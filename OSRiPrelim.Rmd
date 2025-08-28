@@ -1,0 +1,512 @@
+---
+title: "OSRIPrelim"
+output: html_document
+date: "2025-07-14"
+editor_options: 
+  chunk_output_type: console
+---
+Load Packages
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(ggpubr)
+library(ggh4x)
+library(readxl)
+library(lemon)
+library(janitor)
+library(patchwork)
+library(lubridate)
+library(writexl)
+```
+
+Import OSRI Data from Will July 14
+```{r}
+file_path <- "data/OSRI_data_D1.xlsx"
+D0<- read_xlsx(file_path)
+
+glimpse(D0) ##Inspect the data
+#Rows: 146,116 obs.
+#Columns: 50 variable
+summary(D0)
+#study name - add for wetzel
+#Longitude, some stuff still needs to be fixed, several longitudes are missing the (-)
+#Collection_date - does is work as date?
+#General and specific locations are messy, not unique - will thing
+#Species complex is overlapping and needs cleaning
+
+unique(D0$General_location) #needs cleaning
+unique(D0$Species_complex)# needs cleaning
+unique(D0$Common_name)
+unique(D0$Units_standardized) # Standardized to ng/g PPB
+unique(D0$Basis_standardized) #Wet, dry, NA
+unique(D0$Species_standard) #This doesnt make too much sense to me
+unique(D0$Taxonomic_group) #See what Other/Unclassified and NA are, also resolve Mollusca group
+unique(D0$Layman_group)# resolve NA and Other and should be good, maybe Snails, clams and mussels instead of shellfish
+
+
+#way to see the extent of NAs colSums(is.na(numeric_vars[, c(1:10)])) 
+
+##Initial data Conversion
+D1 <- D0 %>%
+  mutate(`Collection_date` = as.Date(`Collection_date`))  # Ensure Date is in Date format
+```
+Things to fix
+ADD IN LTEMP DATA
+```{r}
+file_path <- "data/LTEMPDataForOSRI.csv"
+D0<- read_csv(file_path)
+
+LTEMPD0<-D0 %>% # Trim down to Just PAHs
+  filter(ANALYTE%in%c(PAH60b))
+#PAH Nomenclature MESS AROUND
+#######
+PAH60b<-c("Acenaphthene",
+"Acenaphthylene",
+"Anthracene",
+"Benzo[a]anthracene",
+"Benz[a]anthracene",
+"Benzo[a]fluoranthene",
+"Dibenz[a,h]anthracene/Dibenz[a,c]anthracene",
+"Dibenzo[a,h]anthracene",
+"Benzo[a]pyrene",
+"Benzo[b]fluoranthene",
+"Benzo[b+j]fluoranthene",
+"Benzo[e]pyrene",
+"Benzo[g,h,i]perylene",
+"Benzo[j+k]fluoranthene",
+"Benzo[j]fluoranthene/Benzo[k]fluoranthene",
+"Benzo[k]fluoranthene",
+"Benzo[b]fluorene",
+"C1-Benz[a]anthracenes/Chrysenes",
+"C1-Chrysenes",
+"C1-Dibenzothiophenes",
+"C1-Fluorenes",
+"C1-Fluoranthenes/Pyrenes",
+"C1-Naphthalenes",
+"C1-Phenanthrenes/Anthracenes",
+"C1-Phenanthrenes",
+"C1-Pyrenes",
+"C2-Benz[a]anthracenes/Chrysenes",
+"C2-Chrysenes",
+"C2-Dibenzothiophenes",
+"C2-Fluorenes",
+"C2-Fluoranthenes/Pyrenes",
+"C2-Naphthalenes",
+"C2-Phenanthrenes/Anthracenes",
+"C2-Phenanthrenes",
+"C2-Pyrenes",
+"C3-Benz[a]anthracenes/Chrysenes",
+"C3-Chrysenes",
+"C3-Dibenzothiophenes",
+"C3-Fluorenes",
+"C3-Fluoranthenes/Pyrenes",
+"C3-Naphthalenes",
+"C3-Phenanthrenes/Anthracenes",
+"C3-Phenanthrenes",
+"C3-Pyrenes",
+"C4-Benz[a]anthracenes/Chrysenes",
+"C4-Chrysenes",
+"C4-Dibenzothiophenes",
+"C4-Fluoranthenes/Pyrenes",
+"C4-Naphthalenes",
+"C4-Phenanthrenes/Anthracenes",
+"C4-Phenanthrenes",
+"C4-Pyrenes",
+"Chrysene/Triphenylene",
+"Chrysene",
+"Dibenzothiophene",
+"Fluoranthene",
+"Fluorene",
+"IndenoIndeno[1,2,3-cd]pyrene",
+"Naphthalene",
+"Perylene",
+"Phenanthrene",
+"Pyrene")
+#####
+
+LTEMPD1<-LTEMPD0 %>% # Match Column structure to OSRI Database where possible
+  mutate(Data_source="PWSRCAC",
+         Study_name="LTEMP",
+         Source_siteID=Location_Full,
+         Source_sampleID=SAMPID,
+         General_location="Southcentral",
+         Specific_location=Location_Full,
+         Lat=as.numeric(Lat_DD),
+         Long=as.numeric(Long_DD),
+         Year=YEAR,
+         Collection_date=as.Date(Coll_date),
+         Species_complex="Mussel", 
+         Common_name="Blue Mussel",
+         Scientific_name="Mytilus trossulus",
+         Genus_latin="Mytilus",
+         Species_latin="trossulus",
+         Tissue_type="Whole",
+         Sample_composition="pooled",
+         Number_in_composite=30,
+         Parameter=ANALYTE,
+         Value=RESULT_Lab,
+         Units=RESULT_UNITS,
+         Detection_limit=MDL,
+         Reporting_limit=RDL,
+         Basis=UnitBasis,
+         Qualifier_code=LAB_FLAG,
+         Moisture_pct=PCT_MOIST,
+         Lab_ID="AlphaAnalytics",
+         Sample_motivation="Background biomonitoring / Post-oil spill assessment",
+         Year_clean=YEAR,
+         Species_standard="mussel",
+         Taxonomic_group="Bivalvia",
+         Layman_group="Shellfish",
+         Tissue_type_standardized="Invertebrate",
+         Tissue_type_standardized_grouped="Whole Body",
+         Basis_standardized=UnitBasis,
+         Parameter_standardized=ANALYTE)
+
+# Add in standardizations
+LTEMPD2<-LTEMPD1%>%
+  filter(!Units=="%")%>%
+  mutate(Units_standardized="ng/g",#"ng/g","ng/g dry", "ug/kg","%" REMOVE PRECENT, ALL ARE IN ng/g
+         Value_standardized=as.numeric(Value),
+         Detection_limit_standardized=Detection_limit,
+         Reporting_limit_standardized=Reporting_limit,
+         Basis_standardized = case_when(
+    Basis == "DRY" ~ "dry",
+    Basis == "dry wt"  ~ "dry",
+    Basis == "Dry"     ~ "dry",
+    Basis == "Wet"     ~ "wet",
+    TRUE ~ Basis))
+
+###Mutate Parameter Names
+##########
+LTEMPD3<-LTEMPD2%>%
+mutate(Parameter_standardized=case_when( 
+    Parameter == "Benzo[a]anthracene" ~ "Benzo(a)anthracene",
+    Parameter =="Benz[a]anthracene"~"Benz(a)anthracene",
+    Parameter =="Benzo[a]fluoranthene"~"Benzo(a)fluoranthene",
+    Parameter =="Dibenz[a,h]anthracene/Dibenz[a,c]anthracene"~"Dibenz(a,h)anthracene/Dibenz(a,c)anthracene",
+    Parameter =="Dibenzo[a,h]anthracene"~"Dibenzo(a,h)anthracene",
+    Parameter =="Benzo[a]pyrene"~"Benzo(a)pyrene",
+    Parameter =="Benzo[b]fluoranthene"~"Benzo(b)fluoranthene",
+    Parameter =="Benzo[b+j]fluoranthene"~"Benzo(b+j)fluoranthene",
+    Parameter =="Benzo[e]pyrene"~"Benzo(e)pyrene",
+    Parameter =="Benzo[g,h,i]perylene"~"Benzo(g,h,i)perylene",
+    Parameter =="Benzo[j+k]fluoranthene"~"Benzo(j+k)fluoranthene",
+    Parameter =="Benzo[j]fluoranthene/Benzo[k]fluoranthene"~"Benzo(j)fluoranthene/benzo(k)fluoranthene",
+    Parameter =="Benzo[k]fluoranthene"~"Benzo(k)fluoranthene",
+    Parameter =="Benzo[b]fluorene"~"Benzo(b)fluorene",
+    Parameter =="C1-Benz[a]anthracenes/Chrysenes"~"C1-Benz(a)anthracene/chrysene",
+    Parameter =="C1-Chrysenes"~"C1-Chrysene",
+    Parameter =="C1-Dibenzothiophenes"~"C1-Dibenzothiophene",
+    Parameter =="C1-Fluorenes"~"C1-Fluorene",
+    Parameter =="C1-Fluoranthenes/Pyrenes"~"C1-Fluoranthene/pyrene",
+    Parameter =="C1-Naphthalenes"~"C1-Naphthalene",
+    Parameter =="C1-Phenanthrenes/Anthracenes"~"C1-Phenanthrene/anthracene",
+    Parameter =="C1-Phenanthrenes"~"C1-Phenanthrene",
+    Parameter =="C1-Pyrenes"~"C1-Pyrene",
+    Parameter =="C2-Benz[a]anthracenes/Chrysenes"~"C2-Benz(a)anthracene/chrysene",
+    Parameter =="C2-Chrysenes"~"C2-Chrysene",
+    Parameter =="C2-Dibenzothiophenes"~"C2-Dibenzothiophene",
+    Parameter =="C2-Fluorenes"~"C2-Fluorene",
+    Parameter =="C2-Fluoranthenes/Pyrenes"~"C2-Fluoranthene/pyrene",
+    Parameter =="C2-Naphthalenes"~"C2-Naphthalene",
+    Parameter =="C2-Phenanthrenes/Anthracenes"~"C2-Phenanthrene/anthracene",
+    Parameter =="C2-Phenanthrenes"~"C2-Phenanthrene",
+    Parameter =="C2-Pyrenes"~"C2-Pyrene",
+    Parameter =="C3-Benz[a]anthracenes/Chrysenes"~"C3-Benz(a)anthracene/chrysene",
+    Parameter =="C3-Chrysenes"~"C3-Chrysene",
+    Parameter =="C3-Dibenzothiophenes"~"C3-Dibenzothiophene",
+    Parameter =="C3-Fluorenes"~"C3-Fluorene",
+    Parameter =="C3-Fluoranthenes/Pyrenes"~"C3-Fluoranthene/pyrene",
+    Parameter =="C3-Naphthalenes"~"C3-Naphthalene",
+    Parameter =="C3-Phenanthrenes/Anthracenes"~"C3-Phenanthrene/anthracene",
+    Parameter =="C3-Phenanthrenes"~"C3-Phenanthrene",
+    Parameter =="C3-Pyrenes"~"C3-Pyrene",
+    Parameter =="C4-Benz[a]anthracenes/Chrysenes"~"C4-Benz(a)anthracene/chrysene",
+    Parameter =="C4-Chrysenes"~"C4-Chrysene",
+    Parameter =="C4-Dibenzothiophenes"~"C4-Dibenzothiophene",
+    Parameter =="C4-Fluoranthenes/Pyrenes"~"C4-Fluoranthene/pyrene",
+    Parameter =="C4-Naphthalenes"~"C4-Naphthalene",
+    Parameter =="C4-Phenanthrenes/Anthracenes"~"C4-Phenanthrene/anthracene",
+    Parameter =="C4-Phenanthrenes"~"C4-Phenanthrene",
+    Parameter =="C4-Pyrenes"~"C4-Pyrene",
+    Parameter =="Chrysene/Triphenylene"~"Chrysene+Triphenylene",
+    Parameter =="Indeno[1,2,3-cd]pyrene"~"Indeno(1,2,3-c,d)pyrene",
+    TRUE ~ Parameter))
+#####
+##Clip to OSRI Data Columns
+LTEMPD4<-LTEMPD3%>%
+  select(24:63)
+
+D6<-bind_rows(D5,LTEMPD4)
+
+```
+
+##Now, fixed the issue with nomenclature of parameter Standardized and make Clean full Data set
+```{r}
+p<- data.frame(unique(D6$Parameter_standardized))
+write_xlsx(p, "Parameter_Aug27.xlsx")
+
+D7<-D6%>%
+  mutate(Parameter_standardized=case_when( 
+    Parameter_standardized == "Benzo(a)anthracene" ~ "Benz(a)anthracene",
+    Parameter_standardized == "Benzo(g,h,i)perylene" ~ "Benzo(ghi)perylene",
+    Parameter_standardized == "Benzo(j)fluoranthene/benzo(k)fluoranthene" ~ "Benzo(j+k)fluoranthrene",
+    Parameter_standardized == "Benzo(k)fluoranthene" ~ "Benzo(j+k)fluoranthrene",
+    Parameter_standardized == "Dibenzo(a,h)anthracene" ~ "Dibenzo(a,h+a,c)anthracene",
+    Parameter_standardized == "Dibenz(a,h)anthracene/Dibenz(a,c)anthracene" ~ "Dibenzo(a,h+a,c)anthracene",
+    Parameter_standardized == "Dibenz(a,h)anthracene" ~ "Dibenzo(a,h+a,c)anthracene",
+    Parameter_standardized == "Indeno(1,2,3-cd)pyrene" ~ "Indeno(1,2,3-c,d)pyrene",
+    TRUE ~ Parameter_standardized))%>%
+  select(!`Year_clean+K:AL`)
+write_xlsx(D7, "FullOSRIData_WDups_AllYears_Aug27.xlsx")
+
+##Then take out the duplicates
+char_col <- "Study_name"  # the main character column
+paired_cols <- c("Data_source","Year", "Species_standard")
+
+# Print unique combinations (character column + 5 others)
+unique_pairs <- D8 %>%
+  distinct(across(all_of(c(char_col, paired_cols)))) %>%
+  print(n = Inf)  # show all rows
+library(writexl)
+write_xlsx(unique_pairs, path = file.path("exports", "unique_StudyYearTaxa2.xlsx"))
+
+D8<-D7%>%
+  filter(!Study_name%in%c("Prince William Sound Regional Citizens Advisory Council","NOAA Prince William Sound RCAC 1993-2007","NOAA Resurrection Bay Intercomparison Project 2009", "Special Alaska Study","Pribilofs Special Study","AKMAP Special Study","Special Alaska Study","North Pacific Research Board Alaska Study"),
+         Year_clean>1999,
+         !(Data_source == "NCCOS" & Study_name == "Mussel Watch"),
+         !Parameter=="Pahs, Total For Washington State (17 Chems; Db Calc)",
+         Parameter_standardized%in%c(PAH60Tot))
+
+
+write_xlsx(D8, "CleanPAH_OSRI_Data>1999_Aug27.xlsx")
+```
+
+PAH60 Selection Vectors
+````{r}
+PAH60<-c("Acenaphthene",
+"Acenaphthylene",
+"Anthracene",
+"Benzo(a)anthracene",
+"Benz(a)anthracene",
+"Benzo(a)fluoranthene",
+"Dibenzo(a,h+a,c)anthracene",
+"Dibenzo(a,h)anthracene",
+"Benzo(a)pyrene",
+"Benzo(b)fluoranthene",
+"Benzo(b+j)fluoranthene",
+"Benzo(e)pyrene",
+"Benzo(g,h,i)perylene",
+"Benzo(j+k)fluoranthene",
+"Benzo(k)fluoranthene",
+"Benzo(b)fluorene",
+"C1-Benz(a)anthracene/chrysene",
+"C1-Chrysene",
+"C1-Dibenzothiophene",
+"C1-Fluorene",
+"C1-Fluoranthene/pyrene",
+"C1-Naphthalene",
+"C1-Phenanthrene/anthracene",
+"C1-Phenanthrene",
+"C1-Pyrene",
+"C2-Benz(a)anthracene/chrysene",
+"C2-Chrysene",
+"C2-Dibenzothiophene",
+"C2-Fluorene",
+"C2-Fluoranthene/pyrene",
+"C2-Naphthalene",
+"C2-Phenanthrene/anthracene",
+"C2-Phenanthrene",
+"C2-Pyrene",
+"C3-Benz(a)anthracene/chrysene",
+"C3-Chrysene",
+"C3-Dibenzothiophene",
+"C3-Fluorene",
+"C3-Fluoranthene/pyrene",
+"C3-Naphthalene",
+"C3-Phenanthrene/anthracene",
+"C3-Phenanthrene",
+"C3-Pyrene",
+"C4-Benz(a)anthracene/chrysene",
+"C4-Chrysene",
+"C4-Dibenzothiophene",
+"C4-Fluoranthene/pyrene",
+"C4-Naphthalene",
+"C4-Phenanthrene/anthracene",
+"C4-Phenanthrene",
+"C4-Pyrene",
+"Chrysene+Triphenylene",
+"Chrysene",
+"Dibenzothiophene",
+"Fluoranthene",
+"Fluorene",
+"Indeno(1,2,3-c,d)pyrene",
+"Naphthalene",
+"Perylene",
+"Phenanthrene",
+"Pyrene")
+
+PAH60Tot<-c("Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18","Acenaphthene",
+"Acenaphthylene",
+"Anthracene",
+"Benzo(a)anthracene",
+"Benz(a)anthracene",
+"Benzo(a)fluoranthene",
+"Dibenzo(a,h+a,c)anthracene",
+"Dibenzo(a,h)anthracene",
+"Benzo(a)pyrene",
+"Benzo(b)fluoranthene",
+"Benzo(b+j)fluoranthene",
+"Benzo(e)pyrene",
+"Benzo(g,h,i)perylene",
+"Benzo(j+k)fluoranthene",
+"Benzo(k)fluoranthene",
+"Benzo(b)fluorene",
+"C1-Benz(a)anthracene/chrysene",
+"C1-Chrysene",
+"C1-Dibenzothiophene",
+"C1-Fluorene",
+"C1-Fluoranthene/pyrene",
+"C1-Naphthalene",
+"C1-Phenanthrene/anthracene",
+"C1-Phenanthrene",
+"C1-Pyrene",
+"C2-Benz(a)anthracene/chrysene",
+"C2-Chrysene",
+"C2-Dibenzothiophene",
+"C2-Fluorene",
+"C2-Fluoranthene/pyrene",
+"C2-Naphthalene",
+"C2-Phenanthrene/anthracene",
+"C2-Phenanthrene",
+"C2-Pyrene",
+"C3-Benz(a)anthracene/chrysene",
+"C3-Chrysene",
+"C3-Dibenzothiophene",
+"C3-Fluorene",
+"C3-Fluoranthene/pyrene",
+"C3-Naphthalene",
+"C3-Phenanthrene/anthracene",
+"C3-Phenanthrene",
+"C3-Pyrene",
+"C4-Benz(a)anthracene/chrysene",
+"C4-Chrysene",
+"C4-Dibenzothiophene",
+"C4-Fluoranthene/pyrene",
+"C4-Naphthalene",
+"C4-Phenanthrene/anthracene",
+"C4-Phenanthrene",
+"C4-Pyrene",
+"Chrysene+Triphenylene",
+"Chrysene",
+"Dibenzothiophene",
+"Fluoranthene",
+"Fluorene",
+"Indeno(1,2,3-c,d)pyrene",
+"Naphthalene",
+"Perylene",
+"Phenanthrene",
+"Pyrene")
+
+#Make a summary spread sheet only using sum PAH numbers so that there is one observation for every sample
+````
+Troubleshooting Missing Data
+```{r}
+unique(D1$Parameter_standardized)
+
+#I want to work with 'Common_name', 'Scientific_name','Species_standard', and 'Layman_group'
+
+#need to check to see what are NAs in these groups and if they can be filled in
+columns_to_check <- c("Common_name", "Scientific_name","Species_standard","Layman_group")
+columns_to_check1 <- c("Lat", "Long","Parameter_standardized","Layman_group")
+
+# Filter rows where any of the specified columns have NA
+rows_with_na_specific <- D1[!complete.cases(D1[, columns_to_check]), ]
+print(rows_with_na_specific)
+write_xlsx(rows_with_na_specific, "rows_with_na_specific.xlsx")
+
+## Now Add in olde data set and see if the problem is there too
+file_path <- "data/OSRI_data_D0.xlsx"
+D0<- read_xlsx(file_path)
+rows_with_na_specific_D0 <- D0[!complete.cases(D0[, columns_to_check]), ] # Number of rows is very similar. Take the D1 data set and handbomb the species names, fix missing parameter and lat long values
+
+#Now join D1 without the #rows_with_na_specific with the new rows_with_na_specific_fixed
+D2<-D1[complete.cases(D1[, columns_to_check]), ]# New unchanged data set with fixed rows removed
+file_path <- "data/rows_with_na_specific_fixed.xlsx"
+fixed<- read_xlsx(file_path)
+D3<-bind_rows(D2,fixed)
+
+#Make sure every row has a lat, long, parameter and layman_group
+columns_to_check1 <- c("Lat", "Long","Parameter_standardized","Layman_group")
+rows_with_na_specific_D3 <- D3[!complete.cases(D3[, columns_to_check1]), ]
+write_xlsx(rows_with_na_specific_D3, "rows_with_na_specific_D3.xlsx") # this sheet has been handbombed to fill in missing values
+
+#Now join D3- rows_with_na_specific_D3 with the rows_with_na_specific_D3_fixed
+D4<-D3[complete.cases(D3[, columns_to_check1]), ]# New unchanged data set with fixed rows removed
+file_path <- "data/rows_with_na_specific_D3_fixed.xlsx"
+fixed1<- read_xlsx(file_path)
+D5<-bind_rows(D4,fixed1)
+write_xlsx(D5, "Full_OSRI_Data_Aug26.xlsx")
+```
+
+
+MORE TROUBLE SHOOTING
+```{r}
+#Figure Out Mussel, Mollusk issue
+unique(D1$Scientific_name) #80
+unique(D1$Common_name)
+
+df <- D6
+char_col <- "Common_name"  # the main character column
+paired_cols <- c("Species_complex", "Scientific_name", "Species_standard", "Taxonomic_group", "Layman_group", "Study_name")
+
+# Print unique values of the character column
+df %>%
+  distinct(.data[[char_col]]) %>%
+  pull() %>%
+  print()
+
+# Print unique combinations (character column + 5 others)
+unique_pairs <- df %>%
+  distinct(across(all_of(c(char_col, paired_cols)))) %>%
+  print(n = Inf)  # show all rows
+library(writexl)
+write_xlsx(unique_pairs, path = file.path("exports", "unique_species_combinations_D6.xlsx"))
+
+
+```
+
+
+
+Plot some Data
+```{r}
+#values over Species standard, 
+a<-ggplot(D0, aes(x = `Layman_group`, y = log(`Value_standardized`), color = `Layman_group`)) +
+  geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
+  geom_jitter(aes(color = `Layman_group`), 
+              width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
+  labs(title = "All Hydrocarbon data across taxa", x = "", y = "PAH ng/g") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Removes the legend
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
+  )
+
+a
+b<-ggplot(data=(D0%>%filter(Long<-140)), aes(x = Lat, y = filter(Long<-140))) +
+  geom_point() +  # Add jittered points
+  labs(title = "", x = "", y = "") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Removes the legend
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
+  )
+
+b
+
+#Double check Nationwide dataset
+ERM<-D1%>%
+  filter(`Data_source`=="ERM")
+summary(Nat)
+unique(Nat$Parameter_standardized)
+```

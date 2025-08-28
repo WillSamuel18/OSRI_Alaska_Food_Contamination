@@ -1,0 +1,136 @@
+---
+title: "OSRI.Figures"
+output: html_document
+date: "2025-08-28"
+editor_options: 
+  chunk_output_type: console
+---
+To Do
+Get Awesome color palette
+Order taxa and evt. regions
+```{r setup, include=FALSE}
+
+library(viridis)
+library(ggstream)
+D17<-D16%>%
+  mutate(Layman_group = factor(Layman_group, levels = c("Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
+##Figure 1 - Data in Analysis- Ridge plot chart or area density chart with Time on x-axis and samples reported on y, colors are studies, hues are databases? Too much?
+#####
+
+
+D18<- D17 %>% 
+mutate(Study_name_clean = case_when(
+    Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "NorthSlope Subsistence Study",
+    Study_name == "LTEMP"~ "Prince William Sound Regional Citizens' Advisory Council Monitoring Program",
+    Study_name == "Kachemak Bay Bioeffects"~"NOAA Kachemak Bay Bioeffects",
+    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                                                                         
+Study_name == "Resurrection Bay Intercomparison Project" ~  "NOAA Resurrection Bay Project",                                                        
+Study_name == "Bristol Bay Study"  ~      "NOAA Bristol Bay Study",                                                                          
+Study_name == "NOAA Pribilofs Special Study 2000" ~        "NOAA Pribilofs Special Study",                                                         
+Study_name == "Mussel Watch:Alaska 2001"    ~    "NOAA Mussel Watch",                                                                   
+Study_name == "NOAA Metlakatla Annette Islands Biota 2002"  ~ "NOAA Metlakatla Annette Islands Biota Study",                                                      
+Study_name == "Mussel Watch:Alaska 2003"   ~    "NOAA Mussel Watch" ,                                                                    
+Study_name == "Mussel Watch:Alaska 2005" ~   "NOAA Mussel Watch" ,                                                                       
+Study_name == "Mussel Watch:Alaska 2007" ~    "NOAA Mussel Watch" ,                                                                      
+Study_name == "NOAA Southwest Alaska Nearshore Monitoring 2007" ~   "NOAA Southwest Alaska Nearshore Monitoring",                                                
+Study_name == "NOAA AKMAP Special Study 2007"   ~  "NOAA AKMAP Special Study",                                                                 
+Study_name == "NOAA Special Alaska Study 2007" ~    "NOAA AKMAP Special Study",                                                                
+Study_name == "Mussel Watch:Alaska 2008"   ~     "NOAA Mussel Watch" ,                                                                   
+Study_name == "Mussel Watch:Alaska 2009"   ~      "NOAA Mussel Watch" ,                                                                  
+Study_name == "NOAA North Pacific Research Board Study 2010"   ~      "NOAA North Pacific Research Board Study",                                              
+Study_name == "Western Mariner Preassessment Tissue"  ~    "NOAA Western Mariner Assessment",                                                         
+Study_name == "Shigenaka 2008, Exxon Valdez Intertidal monitoring"  ~ "Exxon Valdez Intertidal Study, Shigenaka",                                              
+Study_name == "Mussel Watch"  ~ "NOAA Mussel Watch",                                                                               
+Study_name == "Dr Wetzel, Mote Marine Database"  ~   "Mote Marine Laboratory",                                                               
+Study_name == "Stimmelmayr et al 2018"  ~   "Oil Fouling of Seals, Stimmelmayr",                                                                        
+Study_name == "Arnold 2006- Public Health Evaluation of Subsistence\r\r\r\nResources Collected During 2005\r\r\r\n"~"Public Health Evaluation of Subsistence Resources, Arnold",
+Study_name == "Harvey et al 2014 - COMIDA"    ~ "Chukchi Sea Whelks, Harvey",
+    TRUE~Study_name))%>%
+  mutate(Study_name_cleaner = case_when(
+    Study_name_clean == "NOAA Kachemak Bay Bioeffects"~"NOAA Regional Studies",
+    Study_name_clean == "NOAA Alaska Arctic Study"   ~    "NOAA Regional Studies",                                                                         
+Study_name_clean == "NOAA Resurrection Bay Project" ~  "NOAA Regional Studies",                                                        
+Study_name_clean == "NOAA Bristol Bay Study"  ~      "NOAA Regional Studies",                                                                          
+Study_name_clean == "NOAA Pribilofs Special Study" ~        "NOAA Regional Studies",                                                         
+Study_name_clean == "NOAA Metlakatla Annette Islands Biota Study"  ~ "NOAA Regional Studies",                                                      
+Study_name_clean == "NOAA Southwest Alaska Nearshore Monitoring" ~   "NOAA Regional Studies",                                                
+Study_name_clean == "NOAA AKMAP Special Study"   ~  "NOAA Regional Studies",                                                                 
+Study_name_clean == "NOAA Special Alaska Study" ~    "NOAA Regional Studies",                                                                
+Study_name_clean == "NOAA North Pacific Research Board Study"   ~      "NOAA Regional Studies", 
+Study_name_clean == "Exxon Valdez Intertidal Study, Shigenaka"~"Other Peer-reviewed Studies",
+Study_name_clean == "Oil Fouling of Seals, Stimmelmayr"~"Other Peer-reviewed Studies",
+Study_name_clean == "Chukchi Sea Whelks, Harvey"~"Other Peer-reviewed Studies",
+    TRUE~Study_name_clean))
+write_xlsx(D18, "OSRI_Totals_Full_Aug28.xlsx")
+
+# Step 1: Identify all possible combinations
+all_years <- unique(D18$Year_clean)
+all_studies <- unique(D18$Study_name_cleaner)
+complete_grid <- expand.grid(Year_clean = all_years, Study_name_cleaner = all_studies)
+
+# Step 2: Summarise actual data
+summary_df <- D18 %>%
+  group_by(Year_clean, Study_name_cleaner) %>%
+  summarise(Count = n(), .groups = "drop")
+
+# Step 3: Merge with the complete grid and fill missing values with 0
+summary_df_complete <- complete_grid %>%
+  left_join(summary_df, by = c("Year_clean", "Study_name_cleaner")) %>%
+  mutate(Count = replace_na(Count, 0)) %>%
+  arrange(Year_clean, Study_name_cleaner)
+
+summary_cumulative <- summary_df_complete %>%
+  group_by(Study_name_cleaner) %>%
+  arrange(Year_clean) %>%
+  mutate(CumulativeCount = cumsum(Count)) %>%
+  ungroup()
+
+# Plot
+ggplot(summary_cumulative, aes(x = Year_clean, y = Count, group = Study_name_cleaner, fill= Study_name_cleaner)) +
+  geom_stream(color = "white", size = 0.1, alpha = 0.9,type = "ridge", bw=1) +
+  scale_fill_viridis_d(name = "Study",option = "D") +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Observations Over Time",
+    x= "",
+    y = "Number of Observations"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = c(0.5, 0.05),  # Position legend inside plot (x, y from bottom-left)
+    legend.justification = c("right", "top"),  # Anchor the legend box
+    legend.background = element_rect(fill = "white", color = "white", linewidth = 0.2),
+    legend.title = element_text(face = "bold"))
+#####
+##Figure 2a - Pie chart of taxa and observations with list of species under each label
+#2b- 
+
+#Figure 3 - Boxplots of Taxa and all observations Total PAHs
+ggplot(data=D17, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Layman_group`)) +
+  geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
+  geom_jitter(aes(color = `Layman_group`), 
+              width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
+  labs(title = "PAH concentrations measured in marine organisms", x = "", y = "log(Total PAHs (ng/g))") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Removes the legend
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
+  )
+
+#Figure 4 - Panel break down of Fish, inverts, and marine mammal by species_standard
+
+#Figure 5- Time and total PAHs, paneled by taxa - point and line
+
+#Figure 6 - Sample Motivation by Total PAHs by taxa - comparative boxplots
+
+#Figure 7 - Number of samples for each taxa by region
+
+#Figure 8 - Mussels over time and region, line and point plots
+
+#Figure 9 - Data Quality - # of observations reporting lab flags, detection limits, Number of observation BDL, reporting tissue type, pct moisture
+
+#Figure 10 - By taxa number of observations reporting wet vs dry and provided or calculated Total PAH levels, range of PAH number and distribution going into Total_PAH calculations
+
+#Figure 11 - Subsistence gaps, by region marine subsistence resources harvested compared to numbers of observations
+
+```
+

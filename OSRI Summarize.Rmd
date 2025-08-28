@@ -1,0 +1,145 @@
+---
+title: "OSRI.Analysis"
+output: html_document
+date: "2025-08-26"
+editor_options: 
+  chunk_output_type: console
+---
+•	Summary statistics (mean, median, range, detection frequency) by:
+o	Analyte and SumPAH
+o	Taxon
+o	Region (e.g., Arctic, Northwest, Southwest, Southcentral, Southeast)
+o	Time period (decadal, seasonal)
+4.2.2.	Data Gap Identification
+•	Spatial Gaps: Map sampling locations to identify understudied areas.
+•	Temporal Gaps: Assess whether data coverage is consistent over time.
+•	Taxonomic Gaps: Compare representation across taxa groups and over space
+•	Subsistence diet Mismatch: Investigate data found against subsistence consumed items to find what is missing
+
+```{r}
+#I see an issue in making sum calculation because not every data set has a "sample ID" that is unique
+#I can do "counts" of data by filtering for unique sample ID - either OSRI_sampleID or Source_sampleID
+
+Totals<-D8 %>% #Pull out all the different Totals "Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18" 
+  filter(Parameter_standardized%in%c("Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18"))
+  
+# How many unique IDs are there in this data set and are there any duplicates?
+# Identify duplicated values in the character column
+columns_to_check <- c("Source_sampleID", "Tissue_type_standardized_grouped")
+duplicate_rows <- Totals[duplicated(Totals[, columns_to_check]) | duplicated(Totals[, columns_to_check], fromLast = TRUE), ]
+
+length(unique(Totals$Source_sampleID)) #995 unique samples with pre-calculated totals
+#now try to remove those without data
+Totals_clean <- Totals[!is.na(Totals$Value_standardized) & Totals$Value_standardized != "", ]
+D9<-D8_filtered%>%filter(Parameter_standardized=="Total_PAH") # This are the BDL samples from the wetzel lab, add them to the Totals data
+Totals_cleaner<-bind_rows(Totals_clean, D9)#1211 unique samples with precalculated totals
+
+#Any Outliers in the Totals Values?
+ggplot(Totals_cleaner, aes(x = Study_name, y = Value_standardized)) +
+  geom_boxplot() +
+  theme_minimal()
+
+write_xlsx(Totals_clean, "Sums_LowFruit_Aug27.xlsx")
+
+##Figure out how much of a problem we have with nonunique samp ID
+##First remove those that have IDs already in the Totals_cleaner dataset
+D8_filtered <- D8[!(D8$Source_sampleID %in% Totals_cleaner$Source_sampleID), ] #39,977 obs.
+D10<-D8_filtered%>%filter(!Parameter_standardized=="Total_PAH") # This are the BDL samples from the Wetzel lab, add them to the Totals data
+write_xlsx(D10, "AnalyteData_Aug27.xlsx")
+
+length(unique(D10$Source_sampleID)) #1,068, atleast this many more observations
+sum(grepl("C1-Naphthalene", D10$Parameter_standardized)) #This a weird one and may just be calling out all instances, not perfect case
+
+#Any Outliers in the Analytes Values?
+ggplot(D10, aes(x = Study_name, y = Value_standardized)) +
+  geom_boxplot() +
+  theme_minimal()
+
+##Pull out columns with missing SAMPID to handbomb
+missing_rows <- D10 %>%
+  filter(is.na(Source_sampleID)) # Turns up with nothing???
+
+D10_summarized <- D10 %>% # Make Total PAH calculations and Count of number of PAHs included in Total
+  group_by(Source_sampleID) %>%
+  summarise(
+    Total_PAH = sum(Value_standardized, na.rm = TRUE),
+    Count = n(),
+    .groups = "drop")
+
+D11 <- D10_summarized %>%
+  right_join(D10, by = c("Source_sampleID"))%>%
+  distinct(Source_sampleID, .keep_all = TRUE)
+
+D12<-D11%>% # prepare calculated sheet to be merged with pre-calculated
+  mutate(Sum_Method="Calculated")%>%
+         rename(SumPAHCount= Count)
+
+Totals_cleaner1<-Totals_cleaner%>% # prepare calculated sheet to be merged with pre-calculated
+  mutate(Sum_Method="Provided",
+         SumPAHCount= as.integer(NA))%>%
+  rename(Total_PAH=Value_standardized)
+
+D13<-bind_rows(D12,Totals_cleaner1)
+
+D14<-D13%>%
+  select(1:6,11:13,17:19,29,34,36,40:46,48,50:53)
+
+D15 <- D14 %>%
+  select( Data_source, Study_name, Year_clean, Total_PAH, Lat, Long, Common_name, Scientific_name, Species_standard, Taxonomic_group, Layman_group, Sample_motivation,
+  Source_sampleID, SumPAHCount, Units_standardized, Basis_standardized, Sum_Method,  Tissue_type_standardized_grouped, Detection_limit_standardized, Reporting_limit_standardized, Qualifier_code, Moisture_pct, Lab_ID, Notes)
+
+#Clean up the biological information, fill in years, Tissue type, sample motivation
+char_col <- "Common_name"  # the main character column
+paired_cols <- c("Scientific_name", "Species_standard", "Taxonomic_group", "Layman_group","Study_name")
+
+# Print unique combinations (character column + 5 others)
+unique_pairs <- D16 %>%
+  distinct(across(all_of(c(char_col, paired_cols)))) 
+write_xlsx(unique_pairs, path = file.path("exports", "unique_species_combinations_D16.xlsx"))
+
+#issue with species = I Lost 23 species over the course of summarizing and merging!!!! Looks like there were cut when I cut off the 90s data
+
+D16<- D15 %>% 
+mutate(Common_name = case_when(
+    Common_name == "Spot" ~ "Spot Shrimp",
+    Common_name == "Mediteranean Mussel"~ "Blue Mussel",
+    TRUE~Common_name))%>%
+  mutate(Scientific_name = case_when(
+    Scientific_name == "Leiostomus xanthurus" ~ "Pandalus platyceros",
+    Scientific_name == "Polyplacophora" ~ "Katharina tunicata",
+    Scientific_name == "Mytilus galloprovincialis" ~ "Mytilus spp.",
+    TRUE~Scientific_name))%>%
+  mutate(Species_standard = case_when(
+    Scientific_name == "Katharina tunicata" ~ "chiton",
+    Scientific_name == "Mytilus" ~ "mussel",
+    Scientific_name == "Mytilus spp." ~ "mussel",
+    Scientific_name == "Mytilus" ~ "mussel",
+    Scientific_name == "Mytilus" ~ "mussel",
+    TRUE~Species_standard))%>%
+  mutate(Species_standard = case_when(
+    Species_standard == "finfish" ~ "shrimp",
+    TRUE~Species_standard))%>%
+  mutate(Taxonomic_group = case_when(
+    Species_standard == "chiton" ~ "Gastropoda",
+    Species_standard == "snail" ~ "Gastropoda",
+    Species_standard == "shrimp" ~ "Decapoda",
+    Species_standard == "mussel" ~ "Bivalvia",
+    TRUE~Taxonomic_group))%>%
+  mutate(Layman_group = case_when(
+    Taxonomic_group == "Gastropoda" ~ "Snails",
+    Taxonomic_group == "Decapoda" ~ "Crabs/ Shrimp",
+    Species_standard == "clam" ~ "Clams",
+    Species_standard == "cockle" ~ "Clams",
+    Species_standard == "mussel" ~ "Mussels",
+    Taxonomic_group == "Mollusca (Cephalopoda)" ~ "Octopus",
+    Taxonomic_group == "Chordata (Mammalia)" ~ "Seals/ Whales",
+   Taxonomic_group == "Echinodermata" ~  "Urchins/ Starfish",
+    TRUE~Layman_group))
+
+missing_rows <- D17 %>%
+  filter(is.na(Year_clean))
+write_xlsx(D16, "OSRI_Totals_Full.xlsx")
+```
+
+
+A list of PAHs to work with PAH60
