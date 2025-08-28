@@ -3721,8 +3721,9 @@ OSRI_data <- OSRI_data %>%
 
 
 
-#Remove NA values in lipid pct
+#Remove NA values in Value_standardized and lipid pct
 OSRI_data <- OSRI_data %>% 
+  mutate(Value_standardized = ifelse(Value_standardized == -9, NA, Value_standardized)) %>% 
   mutate(Lipid_pct = ifelse(Lipid_pct == -9, NA, Lipid_pct))
 
 
@@ -3763,11 +3764,22 @@ str(OSRI_data)
 write_xlsx(OSRI_data, "Output Data/OSRI_data.xlsx")
 
 
-#write.csv("Output Data/OSRI_data.xlsx")
+write.csv(OSRI_data, "Output Data/OSRI_data.csv")
 
 
+#Need to clean up NA and other problematic values in the lat and long columns in order to plot in ArcGIS
+OSRI_clean <- OSRI_data %>%
+  filter(
+    !is.na(Lat),
+    !is.na(Long),
+    is.numeric(Lat),
+    is.numeric(Long),
+    Lat >= -90 & Lat <= 90,
+    Long >= -180 & Long <= 180
+  )
 
-
+# Save to new clean CSV for ArcGIS
+write_csv(OSRI_clean, "Output Data/OSRI_data_clean.csv")
 
 
 
