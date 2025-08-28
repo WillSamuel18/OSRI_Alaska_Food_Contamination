@@ -18,6 +18,7 @@ library(ggplot2)
 library(readr)
 library(tibble)
 library(stringr)
+library(writexl)
 
 
 
@@ -150,47 +151,39 @@ subistence_data <- subistence_data %>%
          Beluga_kg = ABWC_BELUGA_NUM*550)
 
 
+
+write_csv(subistence_data, "Output data/subistence_data.csv")
+
+
+
 str(subistence_data)
 
-subsistence_summary <- subistence_data %>%
+
+sub_one_coord <- subistence_data %>%
+  arrange(COMMUNITY, desc(!is.na(LATITUDE)), desc(!is.na(LONGITUDE))) %>%
   group_by(COMMUNITY) %>%
-  summarise(
-    # Fish: sum all salmon, halibut, and non-salmon fish
-    Fish_kg = mean(
-      rowSums(across(c(Chinook_kg, Coho_kg, Chum_kg, Sockeye_kg,
-                       Pink_kg, Halibut_kg, NonSalmon_kg),
-                     na.rm = TRUE)),
-      na.rm = TRUE
-    ),
-    
-    # Marine mammals: sum up all marine mammal columns
-    MarineMammals_kg = mean(
-      rowSums(across(c(Walrus_kg, Beluga_kg, PolarBear_kg, SeaOtter_kg),
-                     na.rm = TRUE)),
-      na.rm = TRUE
-    ),
-    
-    # Marine invertebrates: just the invert column
-    MarineInverts_kg = mean(Invert_kg, na.rm = TRUE),
-    
-    .groups = "drop"
-  )
-
-
+  summarise(LATITUDE = first(na.omit(LATITUDE)),
+            LONGITUDE = first(na.omit(LONGITUDE)),
+            .groups = "drop")
 
 subsistence_summary <- subistence_data %>%
   group_by(COMMUNITY) %>%
   summarise(
     Fish_kg = mean(rowSums(across(c(Chinook_kg, Coho_kg, Chum_kg, Sockeye_kg,
                                     Pink_kg, Halibut_kg, NonSalmon_kg)),
-                           na.rm = TRUE),
-                   na.rm = TRUE),
+                           na.rm = TRUE), na.rm = TRUE),
     MarineMammals_kg = mean(rowSums(across(c(Walrus_kg, Beluga_kg, PolarBear_kg, SeaOtter_kg)),
-                                    na.rm = TRUE),
-                            na.rm = TRUE),
+                                    na.rm = TRUE), na.rm = TRUE),
     MarineInverts_kg = mean(Invert_kg, na.rm = TRUE),
     .groups = "drop"
-  )
+  ) %>%
+  left_join(sub_one_coord, by = "COMMUNITY") %>%
+  mutate(across(c(Fish_kg, MarineMammals_kg, MarineInverts_kg), as.numeric)) %>%
+  mutate(total_kg = rowSums(across(c(Fish_kg, MarineMammals_kg, MarineInverts_kg)), na.rm = TRUE)) %>% 
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .)))
+
+
+
 
 
 subsistence_summary <- subsistence_summary %>%
@@ -203,7 +196,14 @@ write_xlsx(subsistence_summary, "Output data/subsistence_summary_by_community.xl
 
 
 
-write_csv(subsistence_summary, "Output data/subsistence_summary_by_community.csv")
+write_csv(subsistence_summary, "Output data/subsistence_summary_by_community2.csv")
+
+
+
+
+subsistence_summary_coastal <- read.csv("Input Data/subsistence_communities.csv")      
+
+
 
 
 
