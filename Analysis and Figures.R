@@ -19,7 +19,7 @@ library(readr)
 library(tibble)
 library(stringr)
 library(writexl)
-
+library(tidyr)
 
 
 # Summarize subsistence harvest -------------------------------------------
@@ -208,9 +208,184 @@ write_csv(subsistence_summary, "Output data/subsistence_summary_by_community2.cs
 #Assign regions to the Sum dataset and read back in -> Create pie charts
 #Add pie charts to ArcGIS
 #Create heatmaps by layman group using the tessalation
-subsistence_summary_coastal <- read.csv("Input Data/subsistence_summary_by_community2_coastal.csv")      
 
 
+subsistence_summary_coastal <- read.csv("subsistence_summary_by_community_coastal.csv")      
+
+OSRI_totals <- read.csv("OSRI_totals_region.csv")      
+
+str(subsistence_summary_coastal)
+
+
+
+
+
+# 1) Summarize by Region (totals)
+region_totals <- subsistence_summary_coastal %>%
+  group_by(Region) %>%
+  summarise(
+    Fish_kg          = sum(Fish_kg, na.rm = TRUE),
+    MarineMammals_kg = sum(MarineMammals_kg, na.rm = TRUE),
+    MarineInverts_kg = sum(MarineInverts_kg, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# 2) Long format for ggplot
+region_long <- region_totals %>%
+  pivot_longer(
+    cols = c(Fish_kg, MarineMammals_kg, MarineInverts_kg),
+    names_to = "Category",
+    values_to = "kg"
+  ) %>%
+  mutate(
+    Category = factor(
+      Category,
+      levels = c("Fish_kg", "MarineMammals_kg", "MarineInverts_kg"),
+      labels = c("Fish", "Marine mammals", "Invertebrates")
+    )
+  )
+
+# 3) Function to build a pie for one region
+make_pie <- function(df_region, title = NULL, show_legend = FALSE) {
+  ggplot(df_region, aes(x = "", y = kg, fill = Category)) +
+    geom_col(width = 1) +
+    coord_polar(theta = "y") +
+    scale_fill_viridis_d(option = "D", begin = 0.1, end = 0.9) +  # <- Viridis colors
+    theme_void() +
+    theme(
+      legend.position = if (show_legend) "right" else "none",
+      plot.background  = element_rect(fill = NA, color = NA),
+      panel.background = element_rect(fill = NA, color = NA),
+      plot.title = element_text(hjust = 0.5, size = 12, face = "bold")
+    ) +
+    labs(title = "")
+}
+
+
+  # 5) Save one transparent PNG per region in "Figures"
+  unique_regions <- unique(region_long$Region)
+  
+  for (r in unique_regions) {
+    df_r <- region_long %>% filter(Region == r)
+    
+    p <- make_pie(df_r, title = r, show_legend = FALSE)
+    
+    fname <- file.path(figures_dir, paste0("pie_", str_replace_all(r, "[^A-Za-z0-9]+", "_"), ".png"))
+    
+    ggsave(
+      filename = fname,
+      plot = p,
+      width = 3.5, height = 3.5, dpi = 300,
+      bg = "transparent"
+    )
+  }
+  
+  
+  
+
+# Optional: also save a legend image once (if you want a separate legend on layout)
+  legend_plot <- ggplot(region_long %>% filter(Region == unique_regions[1]),
+                        aes(x = "", y = Value, fill = Category)) +
+    geom_blank() +  # Nothing plotted, but we keep the fill mapping
+    guides(fill = guide_legend(title = NULL)) +
+    theme_void() +
+    theme(
+      legend.position = "right",
+      legend.title = element_blank(),
+      legend.text = element_text(size = 12),
+      plot.background = element_rect(fill = "transparent", color = NA),
+      panel.background = element_rect(fill = "transparent", color = NA)
+    )
+  
+  # Save the legend as a transparent PNG
+  ggsave(
+    "Figures/pie_legend.png",
+    legend_plot,
+    width = 3.5, height = 3.5, dpi = 300,
+    bg = "transparent"
+  )
+
+
+
+  
+  
+  
+str(OSRI_totals)
+unique(OSRI_totals$Layman_group)
+  
+# --- 1) Map Layman_group to the 3 buckets you specified ----------------------
+osri_groups <- OSRI_totals %>%
+  mutate(
+    lg_norm = trimws(Layman_group),
+    group3 = case_when(
+      lg_norm %in% c("Fish") ~ "Fish",
+      lg_norm %in% c("Seals/ Whales") ~ "Marine mammals",
+      lg_norm %in% c("Mussels", "Clams", "Octopus", "Snails",
+                     "Crabs/ Shrimp", "Urchins/ Starfish") ~ "Invertebrates",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(group3), !is.na(Region))
+
+# --- 2) Summarize by Region ---------------------------------------------------
+# Using counts per group (swap to mean(Total_PAH, na.rm=TRUE) if preferred)
+region_totals <- osri_groups %>%
+  group_by(Region, group3) %>%
+  summarise(value = n(), .groups = "drop")
+
+# Ensure all 3 groups exist in every region (fill missing with 0)
+region_long <- region_totals %>%
+  complete(
+    Region,
+    group3 = factor(c("Fish","Marine mammals","Invertebrates"),
+                    levels = c("Fish","Marine mammals","Invertebrates")),
+    fill = list(value = 0)
+  )
+
+# --- 3) Pie chart function (Viridis, transparent) ----------------------------
+make_pie <- function(df_region, title = NULL, show_legend = FALSE) {
+  ggplot(df_region, aes(x = "", y = value, fill = group3)) +
+    geom_col(width = 1) +
+    coord_polar(theta = "y") +
+    scale_fill_viridis_d(option = "D", begin = 0.1, end = 0.9) +
+    theme_void() +
+    theme(
+      legend.position = if (show_legend) "right" else "none",
+      plot.background  = element_rect(fill = NA, color = NA),
+      panel.background = element_rect(fill = NA, color = NA),
+      plot.title = element_text(hjust = 0.5, size = 12, face = "bold")
+    ) +
+    labs(title = "", fill = NULL)
+}
+
+# --- 4) Save one transparent PNG per Region to Figures/ ----------------------
+unique_regions <- unique(region_long$Region)
+
+for (r in unique_regions) {
+  df_r <- region_long %>% filter(Region == r)
+  p <- make_pie(df_r, title = r, show_legend = FALSE)
+  
+  fname <- file.path("Figures", paste0("osri_pie_", str_replace_all(r, "[^A-Za-z0-9]+", "_"), ".png"))
+  ggsave(filename = fname, plot = p, width = 3.5, height = 3.5, dpi = 300, bg = "transparent")
+}
+
+# --- 5) Legend-only image (no pie), saved to Figures/ ------------------------
+legend_plot <- ggplot(region_long %>% filter(Region == unique_regions[1]),
+                      aes(x = "", y = value, fill = group3)) +
+  geom_blank() +
+  scale_fill_viridis_d(option = "D", begin = 0.1, end = 0.9) +
+  guides(fill = guide_legend(title = NULL)) +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_blank(),
+    legend.text = element_text(size = 12),
+    plot.background  = element_rect(fill = "transparent", color = NA),
+    panel.background = element_rect(fill = "transparent", color = NA)
+  )
+
+ggsave(file.path("Figures", "osri_pie_legend.png"),
+       legend_plot, width = 3.5, height = 3.5, dpi = 300, bg = "transparent")
 
 
 
