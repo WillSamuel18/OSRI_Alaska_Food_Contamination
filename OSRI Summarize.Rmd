@@ -16,48 +16,29 @@ o	Time period (decadal, seasonal)
 •	Taxonomic Gaps: Compare representation across taxa groups and over space
 •	Subsistence diet Mismatch: Investigate data found against subsistence consumed items to find what is missing
 
+Pull Out Observations with provided PAH Sum Calculations
 ```{r}
-#I see an issue in making sum calculation because not every data set has a "sample ID" that is unique
-#I can do "counts" of data by filtering for unique sample ID - either OSRI_sampleID or Source_sampleID
 
-Totals<-D8 %>% #Pull out all the different Totals "Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18" 
-  filter(Parameter_standardized%in%c("Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18"))
-  
-# How many unique IDs are there in this data set and are there any duplicates?
-# Identify duplicated values in the character column
-columns_to_check <- c("Source_sampleID", "Tissue_type_standardized_grouped")
-duplicate_rows <- Totals[duplicated(Totals[, columns_to_check]) | duplicated(Totals[, columns_to_check], fromLast = TRUE), ]
-
-length(unique(Totals$Source_sampleID)) #995 unique samples with pre-calculated totals
-#now try to remove those without data
+Totals<-D9 %>% #Pull out all the different Totals 
+  filter(Parameter_standardized%in%c("Total_PAH","PAH16","PAH34","PAH13","PAH44","PAH18"))%>%
+  mutate( # Fill the sums with zero for studies that dont report level below detection. Diver database reports only total PAHs and has alot of blank rows with other calculations
+    Value_standardized = if_else(is.na(Value) & !Data_source == "Diver", 0, Value_standardized)
+  )
+  #Remove the totals without values
 Totals_clean <- Totals[!is.na(Totals$Value_standardized) & Totals$Value_standardized != "", ]
-D9<-D8_filtered%>%filter(Parameter_standardized=="Total_PAH") # This are the BDL samples from the wetzel lab, add them to the Totals data
-Totals_cleaner<-bind_rows(Totals_clean, D9)#1211 unique samples with precalculated totals
 
-#Any Outliers in the Totals Values?
-ggplot(Totals_cleaner, aes(x = Study_name, y = Value_standardized)) +
+##remove those that have IDs already in the Totals_clean dataset
+D10 <- D9[!(D9$Source_sampleID %in% Totals_clean$Source_sampleID), ] #40,980obs.
+
+length(unique(D10$Source_sampleID)) #1,096 atleast this many more observations
+sum(grepl("Naphthalene", D9$Parameter_standardized)) #This a weird one and may just be calling out all instances, not perfect case
+
+#Any Outliers in the Values?
+ggplot(Totals_clean, aes(x = Study_name, y = Value_standardized)) +
   geom_boxplot() +
-  theme_minimal()
+  theme_minimal()+
+  theme (axis.text.x = element_text(angle = 45, hjust = 1))
 
-write_xlsx(Totals_clean, "Sums_LowFruit_Aug27.xlsx")
-
-##Figure out how much of a problem we have with nonunique samp ID
-##First remove those that have IDs already in the Totals_cleaner dataset
-D8_filtered <- D8[!(D8$Source_sampleID %in% Totals_cleaner$Source_sampleID), ] #39,977 obs.
-D10<-D8_filtered%>%filter(!Parameter_standardized=="Total_PAH") # This are the BDL samples from the Wetzel lab, add them to the Totals data
-write_xlsx(D10, "AnalyteData_Aug27.xlsx")
-
-length(unique(D10$Source_sampleID)) #1,068, atleast this many more observations
-sum(grepl("C1-Naphthalene", D10$Parameter_standardized)) #This a weird one and may just be calling out all instances, not perfect case
-
-#Any Outliers in the Analytes Values?
-ggplot(D10, aes(x = Study_name, y = Value_standardized)) +
-  geom_boxplot() +
-  theme_minimal()
-
-##Pull out columns with missing SAMPID to handbomb
-missing_rows <- D10 %>%
-  filter(is.na(Source_sampleID)) # Turns up with nothing???
 
 D10_summarized <- D10 %>% # Make Total PAH calculations and Count of number of PAHs included in Total
   group_by(Source_sampleID) %>%
@@ -66,7 +47,7 @@ D10_summarized <- D10 %>% # Make Total PAH calculations and Count of number of P
     Count = n(),
     .groups = "drop")
 
-D11 <- D10_summarized %>%
+D11 <- D10_summarized %>% # Put the calculated totals together again with the metadata
   right_join(D10, by = c("Source_sampleID"))%>%
   distinct(Source_sampleID, .keep_all = TRUE)
 
@@ -74,17 +55,17 @@ D12<-D11%>% # prepare calculated sheet to be merged with pre-calculated
   mutate(Sum_Method="Calculated")%>%
          rename(SumPAHCount= Count)
 
-Totals_cleaner1<-Totals_cleaner%>% # prepare calculated sheet to be merged with pre-calculated
+Totals_cleaner1<-Totals_clean%>% # prepare calculated sheet to be merged with pre-calculated
   mutate(Sum_Method="Provided",
          SumPAHCount= as.integer(NA))%>%
   rename(Total_PAH=Value_standardized)
 
-D13<-bind_rows(D12,Totals_cleaner1)
+D13<-bind_rows(D12,Totals_cleaner1) # Gather provided and calculated totals
 
-D14<-D13%>%
+D14<-D13%>% # To reduce width
   select(1:6,11:13,17:19,29,34,36,40:46,48,50:53)
 
-D15 <- D14 %>%
+D15 <- D14 %>% # To reorder columns
   select( Data_source, Study_name, Year_clean, Total_PAH, Lat, Long, Common_name, Scientific_name, Species_standard, Taxonomic_group, Layman_group, Sample_motivation,
   Source_sampleID, SumPAHCount, Units_standardized, Basis_standardized, Sum_Method,  Tissue_type_standardized_grouped, Detection_limit_standardized, Reporting_limit_standardized, Qualifier_code, Moisture_pct, Lab_ID, Notes)
 
@@ -136,59 +117,73 @@ mutate(Common_name = case_when(
    Taxonomic_group == "Echinodermata" ~  "Urchins/ Starfish",
     TRUE~Layman_group))
 
-missing_rows <- D17 %>%
+#look for more missing values
+missing_rows <- D16 %>%
   filter(is.na(Year_clean))
-write_xlsx(D16, "OSRI_Totals_Full.xlsx")
 
 ```
 
 #Start again with new round of data polishing
 ```{r}
 D17<-D16%>%#Reorder layman group to be more intuitive
-  mutate(Layman_group = factor(Layman_group, levels = c("Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
+  mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
 
 D18<- D17 %>% # Cleaning up study names in new column for better grouping and visusalizations
 mutate(Study_name_clean = case_when(
-    Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "NorthSlope Subsistence Study",
-    Study_name == "LTEMP"~ "Prince William Sound Regional Citizens' Advisory Council Monitoring Program",
+    Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "North Slope Subsistence Study",
+    Study_name == "LTEMP"~ "Prince William Sound Regional Citizens' Advisory Council Monitoring",
     Study_name == "Kachemak Bay Bioeffects"~"NOAA Kachemak Bay Bioeffects",
-    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                                                  
+    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                         Study_name ==  "Selendang" ~ "Seledang AYU Post Spill Monitoring",
     Study_name == "Resurrection Bay Intercomparison Project" ~  "NOAA Resurrection Bay Project",
     Study_name == "Bristol Bay Study"  ~      "NOAA Bristol Bay Study",
+    Study_name == "Alaska NPS Mussel Watch"  ~ "Alaska NPS Mussel Watch",
+  Study_name == "Long Term Monitoring Gulf Watch 2013"~ "Long Term Monitoring Gulf Watch",
   Study_name == "NOAA Pribilofs Special Study 2000" ~        "NOAA Pribilofs Special Study",
-  Study_name == "Mussel Watch:Alaska 2001"    ~    "NOAA Mussel Watch",
+  Study_name == "Mussel Watch:Alaska 2001" ~    "NOAA Mussel Watch",
   Study_name == "NOAA Metlakatla Annette Islands Biota 2002"  ~ "NOAA Metlakatla Annette Islands Biota Study",
-  Study_name == "Mussel Watch:Alaska 2003"   ~    "NOAA Mussel Watch" ,
+  Study_name == "Mussel Watch:Alaska 2003" ~    "NOAA Mussel Watch" ,
   Study_name == "Mussel Watch:Alaska 2005" ~   "NOAA Mussel Watch" ,
   Study_name == "Mussel Watch:Alaska 2007" ~    "NOAA Mussel Watch" ,
-  Study_name == "NOAA Southwest Alaska Nearshore Monitoring 2007" ~   "NOAA Southwest Alaska Nearshore Monitoring",
+  Study_name == "Southwest Alaska Nearshore Monitoring Program" ~ "NOAA Southwest Alaska Nearshore Monitoring",
   Study_name == "NOAA AKMAP Special Study 2007"   ~  "NOAA AKMAP Special Study",
   Study_name == "NOAA Special Alaska Study 2007" ~    "NOAA AKMAP Special Study",
   Study_name == "Mussel Watch:Alaska 2008"   ~     "NOAA Mussel Watch" ,
   Study_name == "Mussel Watch:Alaska 2009"   ~      "NOAA Mussel Watch" ,
-  Study_name == "NOAA North Pacific Research Board Study 2010"   ~      "NOAA North Pacific Research Board Study",  
+  Study_name == "NOAA North Pacific Research Board Study 2010"  ~ "NOAA North Pacific Research Board Study",  
   Study_name == "Western Mariner Preassessment Tissue"  ~    "NOAA Western Mariner Assessment",
   Study_name == "Shigenaka 2008, Exxon Valdez Intertidal monitoring"  ~ "Exxon Valdez Intertidal Study, Shigenaka",
   Study_name == "Mussel Watch"  ~ "NOAA Mussel Watch",
   Study_name == "Dr Wetzel, Mote Marine Database"  ~   "Mote Marine Laboratory",
   Study_name == "Stimmelmayr et al 2018"  ~   "Oil Fouling of Seals, Stimmelmayr",
-  Study_name == "Arnold 2006- Public Health Evaluation of Subsistence\r\r\r\nResources Collected During 2005\r\r\r\n"~"Public Health Evaluation of Subsistence Resources, Arnold",
+  Study_name == "Arnold 2006- Public Health Evaluation of Subsistence\r\r\r\nResources Collected During 2005\r\r\r\n"~"Public Health Evaluation following Selendang AYU, Arnold",
+  Study_name =="CHINARE 2014" ~ "Bering and Chukchi Sea Sampling, Ma",
   Study_name == "Harvey et al 2014 - COMIDA"    ~ "Chukchi Sea Whelks, Harvey",
     TRUE~Study_name))%>%
   mutate(Study_name_cleaner = case_when(
     Study_name_clean == "NOAA Kachemak Bay Bioeffects"~"NOAA Regional Studies",
     Study_name_clean == "NOAA Alaska Arctic Study"   ~    "NOAA Regional Studies",
-  Study_name_clean == "NOAA Resurrection Bay Project" ~  "NOAA Regional Studies", 
-  Study_name_clean == "NOAA Bristol Bay Study"  ~      "NOAA Regional Studies",
-  Study_name_clean == "NOAA Pribilofs Special Study" ~        "NOAA Regional Studies",
-  Study_name_clean == "NOAA Metlakatla Annette Islands Biota Study"  ~ "NOAA Regional Studies",
-  Study_name_clean == "NOAA Southwest Alaska Nearshore Monitoring" ~   "NOAA Regional Studies",
-  Study_name_clean == "NOAA AKMAP Special Study"   ~  "NOAA Regional Studies",
-  Study_name_clean == "NOAA Special Alaska Study" ~    "NOAA Regional Studies",
-  Study_name_clean == "NOAA North Pacific Research Board Study"   ~      "NOAA Regional Studies", 
+    Study_name_clean == "Alaska NPS Mussel Watch"~"NOAA Mussel Watch",
+    Study_name_clean == "Long Term Monitoring Gulf Watch"~"NOAA Regional Studies",
+    Study_name_clean == "Bering and Chukchi Sea Sampling, Ma"~"Other Peer-reviewed Studies",
+    Study_name_clean == "Seledang AYU Post Spill Monitoring"~"Seledang AYU Post-spill Monitoring",
+    Study_name_clean == "Public Health Evaluation following Selendang AYU, Arnold"~"Seledang AYU Post-spill Monitoring",
+  Study_name_clean == "NOAA Resurrection Bay Project" ~ "NOAA Regional Studies", 
+  Study_name_clean == "NOAA Bristol Bay Study"  ~ "NOAA Regional Studies",
+  Study_name_clean == "NOAA Pribilofs Special Study" ~"NOAA Regional Studies",
+  Study_name_clean == "NOAA Metlakatla Annette Islands Biota Study" ~ "NOAA Regional Studies",
+  Study_name_clean == "NOAA Southwest Alaska Nearshore Monitoring" ~ "NOAA Regional Studies",
+  Study_name_clean == "NOAA AKMAP Special Study"~ "NOAA Regional Studies",
+  Study_name_clean == "NOAA Special Alaska Study" ~ "NOAA Regional Studies",
+  Study_name_clean == "NOAA North Pacific Research Board Study"  ~ "NOAA Regional Studies", 
   Study_name_clean == "Exxon Valdez Intertidal Study, Shigenaka"~"Other Peer-reviewed Studies",
   Study_name_clean == "Oil Fouling of Seals, Stimmelmayr"~"Other Peer-reviewed Studies",
   Study_name_clean == "Chukchi Sea Whelks, Harvey"~"Other Peer-reviewed Studies",
+  
     TRUE~Study_name_clean))
-write_xlsx(D18, "OSRI_Totals_Full_Aug28.xlsx")
+write_xlsx(D18, "OSRI_Totals_Full.xlsx")
 ```
+
+Troubleshooting
+##Pull out columns with missing SAMPID to handbomb
+missing_rows <- D10 %>%
+  filter(is.na(Source_sampleID)) # Turns up with nothing???
