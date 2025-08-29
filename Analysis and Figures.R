@@ -201,7 +201,14 @@ write_csv(subsistence_summary, "Output data/subsistence_summary_by_community2.cs
 
 
 
-subsistence_summary_coastal <- read.csv("Input Data/subsistence_communities.csv")      
+
+
+##### NEED TO DO:
+#Read in the the subsistence data with regions -> Create pie charts
+#Assign regions to the Sum dataset and read back in -> Create pie charts
+#Add pie charts to ArcGIS
+#Create heatmaps by layman group using the tessalation
+subsistence_summary_coastal <- read.csv("Input Data/subsistence_summary_by_community2_coastal.csv")      
 
 
 
