@@ -13,15 +13,18 @@ Order taxa and evt. regions
 library(viridis)
 library(ggstream)
 
-D18<-read_xlsx("OSRI_Totals_Full_Aug28.xlsx")
+D19<-read_xlsx("OSRI_Totals_Full.xlsx")
+
+D19<-D19%>%#Reorder layman group to be more intuitive
+  mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
 ##Figure 1 - Data in Analysis- Ridge plot chart or area density chart with Time on x-axis and samples reported on y, colors are studies, hues are databases? Too much?
 #####
 
-all_years <- unique(D18$Year_clean)
-all_studies <- unique(D18$Study_name_cleaner)
+all_years <- unique(D19$Year_clean)
+all_studies <- unique(D19$Study_name_cleaner)
 complete_grid <- expand.grid(Year_clean = all_years, Study_name_cleaner = all_studies)
 
-summary_df <- D18 %>%
+summary_df <- D19 %>%
   group_by(Year_clean, Study_name_cleaner) %>%
   summarise(Count = n(), .groups = "drop")
 
@@ -66,9 +69,11 @@ ggsave(filename = "Figures/Fig1-ObservationsByStudyOverTime.png",    # output fi
 #####
 
 ##Figure 2a - Pie chart of taxa and observations with list of species under each label
+STILL CANT GET LABEL POSITION RIGHT
+#####
 library(ggrepel)
 
-taxa_summary <- D18 %>%
+taxa_summary <- D19 %>%
   group_by(Layman_group, Common_name) %>%
   summarise(Count = n(), .groups = "drop") %>%
   group_by(Layman_group) %>%
@@ -82,31 +87,43 @@ taxa_summary <- D18 %>%
     Fraction = TotalCount / sum(TotalCount),
     ymax = cumsum(Fraction),
     ymin = lag(ymax, default = 0),
-    label_pos = (ymax + ymin) / .1,
-    Label = paste0(Layman_group, "\n(n=", TotalCount, ")") )
+    label_pos = (ymax + ymin)/5,
+    Label = paste0(Layman_group, "\n(n=", TotalCount, ")")
+  )
 
-#Plot
+# Step 2: Create Plot
 ggplot(taxa_summary, aes(x = "", y = TotalCount, fill = Layman_group)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar(theta = "y") +
+  geom_bar(stat = "identity", position = "stack",width = 10) +
+  coord_polar(theta = "y", direction = 1) +
   theme_void() +
   scale_fill_viridis_d(name = "Taxonomic Group") +
 
-geom_text(
-    aes(x = 1, y = (label_pos), label = Label),
-    color = "white", size = 3, fontface = "bold"
-  ) +
-  geom_label_repel(  # External species annotation
-    aes(x = 2, y = label_pos, label = SpeciesList, fill = Layman_group),
+  # Internal pie labels
+  geom_text(
+    aes(x = label_pos, y = label_pos, label = Label),
+    color = "white",
     size = 3,
-    color = "black",
-    box.padding = 0.4,
-    segment.size = 0.3,
-    segment.color = "grey50",
+    fontface = "bold"
+  ) #+
+
+  # External species annotations
+  geom_label_repel(
+    aes(x = 1.8, y = label_pos, label = SpeciesList, fill = Layman_group),
+    size = 2.8,
+    box.padding = 0.3,
+    segment.size = 0.4,
+    segment.color = "gray60",
     label.size = 0.2,
-    max.overlaps=50,
+    force = 1.5,
+    nudge_x = 0.5,
+    direction = "y",
+    max.overlaps = 200,
     show.legend = FALSE
-  ) + theme(legend.position = "none")
+  ) +
+
+  # Make sure labels fit
+  #xlim(0.5, 2.5) +
+  theme(legend.position = "none")
 
 ggsave(filename = "Figures/Fig2a-SpeciesObservationsBreakdown.png",    # output file name
   plot = last_plot(),                   # or specify your plot object like `my_plot`
@@ -115,25 +132,362 @@ ggsave(filename = "Figures/Fig2a-SpeciesObservationsBreakdown.png",    # output 
   height = 5.5,                         # full height of standard paper
   units = "in",
   dpi=300)
-
-#2b- 
+#####
+#2b- Pie Chart Observations by Region
+NOT DONE
 
 #Figure 3 - Boxplots of Taxa and all observations Total PAHs
-ggplot(data=D17, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Layman_group`)) +
+
+#####
+ggplot(data=D19, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Layman_group`)) +
   geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
   geom_jitter(aes(color = `Layman_group`), 
               width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
-  labs(title = "PAH concentrations measured in marine organisms", x = "", y = "log(Total PAHs (ng/g))") +
+  labs(title = "Log PAH concentrations measured in marine organisms", x = "", y = "log(Total PAHs (ng/g))") +
   theme_minimal() +
   theme(
     legend.position = "none",  # Removes the legend
     axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
   )
 
-#Figure 4 - Panel break down of Fish, inverts, and marine mammal by species_standard
+ggsave(filename = "Figures/Fig3-LogMeasurementsByTaxa.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # 
+  height = 5.5,                         # 
+  units = "in",
+  dpi=300)
+
+###Non Log version
+ggplot(data=D19, aes(x = `Layman_group`, y = `Total_PAH`, color = `Layman_group`)) +
+  geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
+  geom_jitter(aes(color = `Layman_group`), 
+              width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
+  labs(title = "PAH concentrations measured in marine organisms", x = "", y = "Total PAHs (ng/g)") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Removes the legend
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
+  )
+
+ggsave(filename = "Figures/Fig3-MeasurementsByTaxa.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#####
+#Figure 4 - Panel break down of Results in Fish, inverts, and marine mammal by species_standard
+library(dplyr)
+library(ggplot2)
+library(forcats)
+##Fish
+#####
+custom_order <- c("salmon", "anadromous/freshwater fish", "forage fish", "flatfish", "cod", "other fish")
+
+D19_fish <- D19 %>%
+  filter(Layman_group == "Fish") %>%
+  mutate(
+    logPAH = log(Total_PAH),
+    Species_standard = factor(Species_standard, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, logPAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_fish, aes(x = Common_name, y = logPAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = "Log PAH concentrations measured in Fish",
+    x = "",
+    y = "log(Total PAHs (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4a-LogMeasurementsinFish.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 10,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#Non Log Version
+D19_fish <- D19 %>%
+  filter(Layman_group == "Fish") %>%
+  mutate(
+    PAH = Total_PAH,
+    Species_standard = factor(Species_standard, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, PAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_fish, aes(x = Common_name, y = PAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = "PAH concentrations measured in Fish",
+    x = "",
+    y = "Total PAHs (ng/g)"
+  ) +
+  theme_minimal() +
+  ylim(0, 1500) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4a-ClippedMeasurementsinFish.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 10,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+#####
+
+##Inverts
+#####
+custom_order <- c("Snails","Urchins/Starfish","Octopus","Clams","Mussels","Crabs/ Shrimp")
+
+D19_inverts <- D19 %>%
+  filter(Layman_group %in% c("Mussels","Crabs/ Shrimp","Urchins/Starfish","Octopus","Snails","Clams")) %>%
+  mutate(
+    logPAH = log(Total_PAH),
+    Layman_group = factor(Layman_group, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Layman_group, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, logPAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_inverts,  aes(x = Common_name, y = logPAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Layman_group, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " Log PAH concentrations measured in Invertebrates",
+    x = "",
+    y = "log(Total PAHs (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4b-LogMeasurementsinInverts.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+D19_inverts <- D19 %>%
+  filter(Layman_group %in% c("Mussels","Crabs/ Shrimp","Urchins/Starfish","Octopus","Snails","Clams")) %>%
+  mutate(
+    PAH = Total_PAH,
+    Layman_group = factor(Layman_group, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Layman_group, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, PAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_inverts,  aes(x = Common_name, y = PAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Layman_group, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " PAH concentrations measured in Invertebrates",
+    x = "",
+    y = "Total PAHs (ng/g)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4b-MeasurementsinInverts.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+#####
+## Marine Mammals
+#####
+
+D19_mm <- D19 %>%
+  filter(Layman_group =="Seals/ Whales") %>%
+  mutate(
+    logPAH = log(Total_PAH),
+    Species_standard = factor(Species_standard)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, logPAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_mm,  aes(x = Common_name, y = logPAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " Log PAH concentrations measured in Marine Mammals",
+    x = "",
+    y = "log(Total PAHs (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4c-LogMeasurementsinMarineMammals.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#NonLog
+D19_mm <- D19 %>%
+  filter(Layman_group =="Seals/ Whales") %>%
+  mutate(
+    PAH = Total_PAH,
+    Species_standard = factor(Species_standard)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, PAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_mm,  aes(x = Common_name, y = PAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " PAH concentrations measured in Marine Mammals",
+    x = "",
+    y = "Total PAHs (ng/g)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4c-MeasurementsinMarineMammals.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#####
 
 #Figure 5- Time and total PAHs, paneled by taxa - point and line
+##Counts of taxa
+#####
+all_years <- unique(D19$Year_clean)
+all_taxa <- unique(D19$Layman_group)
+complete_grid <- expand.grid(Year_clean = all_years, Layman_group = all_taxa)
 
+summary_df1 <- D19 %>%
+  group_by(Year_clean, Layman_group) %>%
+  summarise(Count = n(), .groups = "drop")
+
+summary_df_complete <- complete_grid %>%
+  left_join(summary_df1, by = c("Year_clean", "Layman_group")) %>%
+  mutate(Count = replace_na(Count, 0)) %>%
+  arrange(Year_clean, Layman_group)
+
+summary_cumulative <- summary_df_complete %>%
+  group_by(Layman_group) %>%
+  arrange(Year_clean) %>%
+  mutate(CumulativeCount = cumsum(Count)) %>%
+  ungroup()%>%
+  mutate(
+    Year_clean=as.numeric(Year_clean)
+  )
+
+# Plot
+ggplot(summary_cumulative, aes(x = Year_clean, y = Count, group = Layman_group, fill= Layman_group)) +
+  geom_stream(color = "white", size = 0.1, alpha = 0.9,type = "ridge", bw=1) +
+  scale_fill_viridis_d(name = "Taxa",option = "D") +
+  theme_minimal(base_size = 13) +
+  labs(
+    title = "",
+    x= "",
+    y = "Number of Observations") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = c(0.85, 1.10),  # Position legend inside plot (x, y from bottom-left)
+    legend.justification = c("right", "top"),  # Anchor the legend box
+    legend.background = element_blank(),   # transparent background
+    legend.box.background = element_blank(),  # remove outer box
+    legend.key = element_blank(),           # transparent boxes behind keys
+    legend.title = element_text(face = "bold"))
+
+ggsave(filename = "Figures/Fig5a-ObservationsByTaxaOverTime.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#####
+
+D19_Red <- D19 %>%
+  mutate(Year_clean = as.numeric(Year_clean))%>%
+  filter(Layman_group%in% c("Fish","Mussels","Clams","Seals/ Whales"))
+
+# Plot
+ggplot(D19_Red, aes(x = Year_clean, y = log(Total_PAH))) +
+  geom_point(alpha = 0.6, color = "darkblue", size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "firebrick", linewidth = 1) +
+  facet_wrap(~ Layman_group, scales = "free_y") +
+  labs(
+    title = "Log Total PAH Concentrations Over Time by Taxa Group",
+    x = "Year",
+    y = "Log(Total PAH (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+ggsave(filename = "Figures/Fig5b-LogMeasurementsover Time.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
 #Figure 6 - Sample Motivation by Total PAHs by taxa - comparative boxplots
 
 #Figure 7 - Number of samples for each taxa by region

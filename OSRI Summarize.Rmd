@@ -180,7 +180,23 @@ mutate(Study_name_clean = case_when(
   Study_name_clean == "Chukchi Sea Whelks, Harvey"~"Other Peer-reviewed Studies",
   
     TRUE~Study_name_clean))
-write_xlsx(D18, "OSRI_Totals_Full.xlsx")
+
+D19<-D18%>%
+mutate(Layman_group = case_when(
+    Common_name == "Seaweed" ~ "Seaweed",
+    Common_name == "Crab" ~ "Crabs/ Shrimp",
+    Common_name == "Randolph's Scallop" ~ "Mussels",
+    
+    TRUE~Layman_group))%>%
+mutate(Common_name = case_when(
+  Common_name == "mussel" ~ "Mussel",
+  TRUE~Common_name
+))%>%
+mutate(Species_standard = case_when(
+  Species_standard == "pinnipeds" ~ "seal",
+  TRUE~Species_standard))
+
+write_xlsx(D19, "OSRI_Totals_Full.xlsx")
 ```
 
 Troubleshooting
