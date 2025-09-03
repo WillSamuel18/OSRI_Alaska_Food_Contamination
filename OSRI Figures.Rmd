@@ -12,68 +12,22 @@ Order taxa and evt. regions
 
 library(viridis)
 library(ggstream)
-D17<-D16%>%
-  mutate(Layman_group = factor(Layman_group, levels = c("Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
+
+D19<-read_xlsx("OSRI_Totals_Full.xlsx")
+
+D19<-D19%>%#Reorder layman group to be more intuitive
+  mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
 ##Figure 1 - Data in Analysis- Ridge plot chart or area density chart with Time on x-axis and samples reported on y, colors are studies, hues are databases? Too much?
 #####
 
-
-D18<- D17 %>% 
-mutate(Study_name_clean = case_when(
-    Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "NorthSlope Subsistence Study",
-    Study_name == "LTEMP"~ "Prince William Sound Regional Citizens' Advisory Council Monitoring Program",
-    Study_name == "Kachemak Bay Bioeffects"~"NOAA Kachemak Bay Bioeffects",
-    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                                                                         
-Study_name == "Resurrection Bay Intercomparison Project" ~  "NOAA Resurrection Bay Project",                                                        
-Study_name == "Bristol Bay Study"  ~      "NOAA Bristol Bay Study",                                                                          
-Study_name == "NOAA Pribilofs Special Study 2000" ~        "NOAA Pribilofs Special Study",                                                         
-Study_name == "Mussel Watch:Alaska 2001"    ~    "NOAA Mussel Watch",                                                                   
-Study_name == "NOAA Metlakatla Annette Islands Biota 2002"  ~ "NOAA Metlakatla Annette Islands Biota Study",                                                      
-Study_name == "Mussel Watch:Alaska 2003"   ~    "NOAA Mussel Watch" ,                                                                    
-Study_name == "Mussel Watch:Alaska 2005" ~   "NOAA Mussel Watch" ,                                                                       
-Study_name == "Mussel Watch:Alaska 2007" ~    "NOAA Mussel Watch" ,                                                                      
-Study_name == "NOAA Southwest Alaska Nearshore Monitoring 2007" ~   "NOAA Southwest Alaska Nearshore Monitoring",                                                
-Study_name == "NOAA AKMAP Special Study 2007"   ~  "NOAA AKMAP Special Study",                                                                 
-Study_name == "NOAA Special Alaska Study 2007" ~    "NOAA AKMAP Special Study",                                                                
-Study_name == "Mussel Watch:Alaska 2008"   ~     "NOAA Mussel Watch" ,                                                                   
-Study_name == "Mussel Watch:Alaska 2009"   ~      "NOAA Mussel Watch" ,                                                                  
-Study_name == "NOAA North Pacific Research Board Study 2010"   ~      "NOAA North Pacific Research Board Study",                                              
-Study_name == "Western Mariner Preassessment Tissue"  ~    "NOAA Western Mariner Assessment",                                                         
-Study_name == "Shigenaka 2008, Exxon Valdez Intertidal monitoring"  ~ "Exxon Valdez Intertidal Study, Shigenaka",                                              
-Study_name == "Mussel Watch"  ~ "NOAA Mussel Watch",                                                                               
-Study_name == "Dr Wetzel, Mote Marine Database"  ~   "Mote Marine Laboratory",                                                               
-Study_name == "Stimmelmayr et al 2018"  ~   "Oil Fouling of Seals, Stimmelmayr",                                                                        
-Study_name == "Arnold 2006- Public Health Evaluation of Subsistence\r\r\r\nResources Collected During 2005\r\r\r\n"~"Public Health Evaluation of Subsistence Resources, Arnold",
-Study_name == "Harvey et al 2014 - COMIDA"    ~ "Chukchi Sea Whelks, Harvey",
-    TRUE~Study_name))%>%
-  mutate(Study_name_cleaner = case_when(
-    Study_name_clean == "NOAA Kachemak Bay Bioeffects"~"NOAA Regional Studies",
-    Study_name_clean == "NOAA Alaska Arctic Study"   ~    "NOAA Regional Studies",                                                                         
-Study_name_clean == "NOAA Resurrection Bay Project" ~  "NOAA Regional Studies",                                                        
-Study_name_clean == "NOAA Bristol Bay Study"  ~      "NOAA Regional Studies",                                                                          
-Study_name_clean == "NOAA Pribilofs Special Study" ~        "NOAA Regional Studies",                                                         
-Study_name_clean == "NOAA Metlakatla Annette Islands Biota Study"  ~ "NOAA Regional Studies",                                                      
-Study_name_clean == "NOAA Southwest Alaska Nearshore Monitoring" ~   "NOAA Regional Studies",                                                
-Study_name_clean == "NOAA AKMAP Special Study"   ~  "NOAA Regional Studies",                                                                 
-Study_name_clean == "NOAA Special Alaska Study" ~    "NOAA Regional Studies",                                                                
-Study_name_clean == "NOAA North Pacific Research Board Study"   ~      "NOAA Regional Studies", 
-Study_name_clean == "Exxon Valdez Intertidal Study, Shigenaka"~"Other Peer-reviewed Studies",
-Study_name_clean == "Oil Fouling of Seals, Stimmelmayr"~"Other Peer-reviewed Studies",
-Study_name_clean == "Chukchi Sea Whelks, Harvey"~"Other Peer-reviewed Studies",
-    TRUE~Study_name_clean))
-write_xlsx(D18, "OSRI_Totals_Full_Aug28.xlsx")
-
-# Step 1: Identify all possible combinations
-all_years <- unique(D18$Year_clean)
-all_studies <- unique(D18$Study_name_cleaner)
+all_years <- unique(D19$Year_clean)
+all_studies <- unique(D19$Study_name_cleaner)
 complete_grid <- expand.grid(Year_clean = all_years, Study_name_cleaner = all_studies)
 
-# Step 2: Summarise actual data
-summary_df <- D18 %>%
+summary_df <- D19 %>%
   group_by(Year_clean, Study_name_cleaner) %>%
   summarise(Count = n(), .groups = "drop")
 
-# Step 3: Merge with the complete grid and fill missing values with 0
 summary_df_complete <- complete_grid %>%
   left_join(summary_df, by = c("Year_clean", "Study_name_cleaner")) %>%
   mutate(Count = replace_na(Count, 0)) %>%
@@ -83,43 +37,457 @@ summary_cumulative <- summary_df_complete %>%
   group_by(Study_name_cleaner) %>%
   arrange(Year_clean) %>%
   mutate(CumulativeCount = cumsum(Count)) %>%
-  ungroup()
+  ungroup()%>%
+  mutate(
+    Year_clean=as.numeric(Year_clean)
+  )
 
 # Plot
 ggplot(summary_cumulative, aes(x = Year_clean, y = Count, group = Study_name_cleaner, fill= Study_name_cleaner)) +
   geom_stream(color = "white", size = 0.1, alpha = 0.9,type = "ridge", bw=1) +
   scale_fill_viridis_d(name = "Study",option = "D") +
-  theme_minimal(base_size = 14) +
+  theme_minimal(base_size = 13) +
   labs(
-    title = "Observations Over Time",
+    title = "",
     x= "",
-    y = "Number of Observations"
-  ) +
+    y = "Number of Observations") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = c(0.5, 0.05),  # Position legend inside plot (x, y from bottom-left)
+    legend.position = c(1.025, 1.10),  # Position legend inside plot (x, y from bottom-left)
     legend.justification = c("right", "top"),  # Anchor the legend box
-    legend.background = element_rect(fill = "white", color = "white", linewidth = 0.2),
+    legend.background = element_blank(),   # transparent background
+    legend.box.background = element_blank(),  # remove outer box
+    legend.key = element_blank(),           # transparent boxes behind keys
     legend.title = element_text(face = "bold"))
+
+ggsave(filename = "Figures/Fig1-ObservationsByStudyOverTime.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
 #####
+
 ##Figure 2a - Pie chart of taxa and observations with list of species under each label
-#2b- 
+STILL CANT GET LABEL POSITION RIGHT
+#####
+library(ggrepel)
+
+taxa_summary <- D19 %>%
+  group_by(Layman_group, Common_name) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(Layman_group) %>%
+  summarise(
+    TotalCount = sum(Count),
+    SpeciesList = paste(unique(Common_name), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(TotalCount)) %>%
+  mutate(
+    Fraction = TotalCount / sum(TotalCount),
+    ymax = cumsum(Fraction),
+    ymin = lag(ymax, default = 0),
+    label_pos = (ymax + ymin)/5,
+    Label = paste0(Layman_group, "\n(n=", TotalCount, ")")
+  )
+
+# Step 2: Create Plot
+ggplot(taxa_summary, aes(x = "", y = TotalCount, fill = Layman_group)) +
+  geom_bar(stat = "identity", position = "stack",width = 10) +
+  coord_polar(theta = "y", direction = 1) +
+  theme_void() +
+  scale_fill_viridis_d(name = "Taxonomic Group") +
+
+  # Internal pie labels
+  geom_text(
+    aes(x = label_pos, y = label_pos, label = Label),
+    color = "white",
+    size = 3,
+    fontface = "bold"
+  ) #+
+
+  # External species annotations
+  geom_label_repel(
+    aes(x = 1.8, y = label_pos, label = SpeciesList, fill = Layman_group),
+    size = 2.8,
+    box.padding = 0.3,
+    segment.size = 0.4,
+    segment.color = "gray60",
+    label.size = 0.2,
+    force = 1.5,
+    nudge_x = 0.5,
+    direction = "y",
+    max.overlaps = 200,
+    show.legend = FALSE
+  ) +
+
+  # Make sure labels fit
+  #xlim(0.5, 2.5) +
+  theme(legend.position = "none")
+
+ggsave(filename = "Figures/Fig2a-SpeciesObservationsBreakdown.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+#####
+#2b- Pie Chart Observations by Region
+NOT DONE
 
 #Figure 3 - Boxplots of Taxa and all observations Total PAHs
-ggplot(data=D17, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Layman_group`)) +
+
+#####
+ggplot(data=D19, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Layman_group`)) +
   geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
   geom_jitter(aes(color = `Layman_group`), 
               width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
-  labs(title = "PAH concentrations measured in marine organisms", x = "", y = "log(Total PAHs (ng/g))") +
+  labs(title = "Log PAH concentrations measured in marine organisms", x = "", y = "log(Total PAHs (ng/g))") +
   theme_minimal() +
   theme(
     legend.position = "none",  # Removes the legend
     axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
   )
 
-#Figure 4 - Panel break down of Fish, inverts, and marine mammal by species_standard
+ggsave(filename = "Figures/Fig3-LogMeasurementsByTaxa.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # 
+  height = 5.5,                         # 
+  units = "in",
+  dpi=300)
+
+###Non Log version
+ggplot(data=D19, aes(x = `Layman_group`, y = `Total_PAH`, color = `Layman_group`)) +
+  geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
+  geom_jitter(aes(color = `Layman_group`), 
+              width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
+  labs(title = "PAH concentrations measured in marine organisms", x = "", y = "Total PAHs (ng/g)") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",  # Removes the legend
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
+  )
+
+ggsave(filename = "Figures/Fig3-MeasurementsByTaxa.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#####
+#Figure 4 - Panel break down of Results in Fish, inverts, and marine mammal by species_standard
+library(dplyr)
+library(ggplot2)
+library(forcats)
+##Fish
+#####
+custom_order <- c("salmon", "anadromous/freshwater fish", "forage fish", "flatfish", "cod", "other fish")
+
+D19_fish <- D19 %>%
+  filter(Layman_group == "Fish") %>%
+  mutate(
+    logPAH = log(Total_PAH),
+    Species_standard = factor(Species_standard, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, logPAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_fish, aes(x = Common_name, y = logPAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = "Log PAH concentrations measured in Fish",
+    x = "",
+    y = "log(Total PAHs (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4a-LogMeasurementsinFish.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 10,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#Non Log Version
+D19_fish <- D19 %>%
+  filter(Layman_group == "Fish") %>%
+  mutate(
+    PAH = Total_PAH,
+    Species_standard = factor(Species_standard, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, PAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_fish, aes(x = Common_name, y = PAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = "PAH concentrations measured in Fish",
+    x = "",
+    y = "Total PAHs (ng/g)"
+  ) +
+  theme_minimal() +
+  ylim(0, 1500) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4a-ClippedMeasurementsinFish.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 10,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+#####
+
+##Inverts
+#####
+custom_order <- c("Snails","Urchins/Starfish","Octopus","Clams","Mussels","Crabs/ Shrimp")
+
+D19_inverts <- D19 %>%
+  filter(Layman_group %in% c("Mussels","Crabs/ Shrimp","Urchins/Starfish","Octopus","Snails","Clams")) %>%
+  mutate(
+    logPAH = log(Total_PAH),
+    Layman_group = factor(Layman_group, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Layman_group, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, logPAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_inverts,  aes(x = Common_name, y = logPAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Layman_group, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " Log PAH concentrations measured in Invertebrates",
+    x = "",
+    y = "log(Total PAHs (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4b-LogMeasurementsinInverts.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+D19_inverts <- D19 %>%
+  filter(Layman_group %in% c("Mussels","Crabs/ Shrimp","Urchins/Starfish","Octopus","Snails","Clams")) %>%
+  mutate(
+    PAH = Total_PAH,
+    Layman_group = factor(Layman_group, levels = custom_order)  # Custom facet order
+  ) %>%
+  group_by(Layman_group, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, PAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_inverts,  aes(x = Common_name, y = PAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Layman_group, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " PAH concentrations measured in Invertebrates",
+    x = "",
+    y = "Total PAHs (ng/g)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4b-MeasurementsinInverts.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+#####
+## Marine Mammals
+#####
+
+D19_mm <- D19 %>%
+  filter(Layman_group =="Seals/ Whales") %>%
+  mutate(
+    logPAH = log(Total_PAH),
+    Species_standard = factor(Species_standard)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, logPAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_mm,  aes(x = Common_name, y = logPAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " Log PAH concentrations measured in Marine Mammals",
+    x = "",
+    y = "log(Total PAHs (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4c-LogMeasurementsinMarineMammals.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#NonLog
+D19_mm <- D19 %>%
+  filter(Layman_group =="Seals/ Whales") %>%
+  mutate(
+    PAH = Total_PAH,
+    Species_standard = factor(Species_standard)  # Custom facet order
+  ) %>%
+  group_by(Species_standard, Common_name) %>%
+  mutate(Common_name = fct_reorder(Common_name, PAH, .fun = median, .desc = TRUE)) %>%
+  ungroup()
+
+
+ggplot(D19_mm,  aes(x = Common_name, y = PAH, color = Common_name)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.2, size = 1, alpha = 0.5) +
+  facet_wrap(~Species_standard, scales = "free_x"
+             , nrow = 1, labeller = label_wrap_gen(width = 15) ) +
+  labs(
+    title = " PAH concentrations measured in Marine Mammals",
+    x = "",
+    y = "Total PAHs (ng/g)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text = element_text( size = 9)
+  )
+ggsave(filename = "Figures/Fig4c-MeasurementsinMarineMammals.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#####
 
 #Figure 5- Time and total PAHs, paneled by taxa - point and line
+##Counts of taxa
+#####
+all_years <- unique(D19$Year_clean)
+all_taxa <- unique(D19$Layman_group)
+complete_grid <- expand.grid(Year_clean = all_years, Layman_group = all_taxa)
 
+summary_df1 <- D19 %>%
+  group_by(Year_clean, Layman_group) %>%
+  summarise(Count = n(), .groups = "drop")
+
+summary_df_complete <- complete_grid %>%
+  left_join(summary_df1, by = c("Year_clean", "Layman_group")) %>%
+  mutate(Count = replace_na(Count, 0)) %>%
+  arrange(Year_clean, Layman_group)
+
+summary_cumulative <- summary_df_complete %>%
+  group_by(Layman_group) %>%
+  arrange(Year_clean) %>%
+  mutate(CumulativeCount = cumsum(Count)) %>%
+  ungroup()%>%
+  mutate(
+    Year_clean=as.numeric(Year_clean)
+  )
+
+# Plot
+ggplot(summary_cumulative, aes(x = Year_clean, y = Count, group = Layman_group, fill= Layman_group)) +
+  geom_stream(color = "white", size = 0.1, alpha = 0.9,type = "ridge", bw=1) +
+  scale_fill_viridis_d(name = "Taxa",option = "D") +
+  theme_minimal(base_size = 13) +
+  labs(
+    title = "",
+    x= "",
+    y = "Number of Observations") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = c(0.85, 1.10),  # Position legend inside plot (x, y from bottom-left)
+    legend.justification = c("right", "top"),  # Anchor the legend box
+    legend.background = element_blank(),   # transparent background
+    legend.box.background = element_blank(),  # remove outer box
+    legend.key = element_blank(),           # transparent boxes behind keys
+    legend.title = element_text(face = "bold"))
+
+ggsave(filename = "Figures/Fig5a-ObservationsByTaxaOverTime.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+
+#####
+
+D19_Red <- D19 %>%
+  mutate(Year_clean = as.numeric(Year_clean))%>%
+  filter(Layman_group%in% c("Fish","Mussels","Clams","Seals/ Whales"))
+
+# Plot
+ggplot(D19_Red, aes(x = Year_clean, y = log(Total_PAH))) +
+  geom_point(alpha = 0.6, color = "darkblue", size = 1.5) +
+  geom_smooth(method = "lm", se = FALSE, color = "firebrick", linewidth = 1) +
+  facet_wrap(~ Layman_group, scales = "free_y") +
+  labs(
+    title = "Log Total PAH Concentrations Over Time by Taxa Group",
+    x = "Year",
+    y = "Log(Total PAH (ng/g))"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+ggsave(filename = "Figures/Fig5b-LogMeasurementsover Time.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 4.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
 #Figure 6 - Sample Motivation by Total PAHs by taxa - comparative boxplots
 
 #Figure 7 - Number of samples for each taxa by region

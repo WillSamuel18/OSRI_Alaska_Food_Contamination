@@ -50,8 +50,7 @@ unique(D0$Layman_group)# resolve NA and Other and should be good, maybe Snails, 
 D1 <- D0 %>%
   mutate(`Collection_date` = as.Date(`Collection_date`))  # Ensure Date is in Date format
 ```
-Things to fix
-ADD IN LTEMP DATA
+
 ```{r}
 file_path <- "data/LTEMPDataForOSRI.csv"
 D0<- read_csv(file_path)
@@ -258,28 +257,75 @@ D7<-D6%>%
     Parameter_standardized == "Indeno(1,2,3-cd)pyrene" ~ "Indeno(1,2,3-c,d)pyrene",
     TRUE ~ Parameter_standardized))%>%
   select(!`Year_clean+K:AL`)
-write_xlsx(D7, "FullOSRIData_WDups_AllYears_Aug27.xlsx")
+
+
+##Add in Missing Years
+D8a <- D8 %>%
+  mutate(
+    Year = case_when(
+      Data_source == "Ma" ~ "2014",
+      OSRI_sampleID == "138921" ~ "2003",  # Wetzel Cook Inlet
+      Source_sampleID == "CIB-09-0478" ~ "2009",
+      OSRI_sampleID == "138943" ~ "2003",
+      OSRI_sampleID == "138944" ~ "2003",
+      OSRI_sampleID == "139128" ~ "2014",  # Stimmelmayr Utqia??vik
+      OSRI_sampleID == "139136" ~ "2014",
+      OSRI_sampleID == "139141" ~ "2014",
+      OSRI_sampleID == "139145" ~ "2014",
+      OSRI_sampleID == "139152" ~ "2014",
+      TRUE ~ as.character(Year)   
+    ),
+    
+    Lat = case_when(
+      Source_siteID == "Utqia??vik" ~ "71.3230°",
+      TRUE ~ as.character(Lat)     
+    ),
+    
+    Long = case_when(
+      Source_siteID == "Utqia??vik" ~ "-156.6114",
+      TRUE ~ as.character(Long)    
+    ),
+    
+    Year = case_when(
+      Year== "38504"~ "2000",
+      Year== "38473"~ "2001",
+      Year== "38412"~ "2001",
+      Year== "36404"~ "2001",
+      Year== "36312"~ "2001",
+      Year== "36281"~ "2005",
+      Year== "34455"~ "2005",
+      TRUE ~ as.character(Year)    
+    ),
+
+    Year_clean = Year
+  )
 
 ##FIND DUPLICATES
 char_col <- "Study_name"  # the main character column
 paired_cols <- c("Data_source","Year", "Species_standard")
 
 # Print unique combinations (character column + 5 others)
-unique_pairs <- D8 %>%
+unique_pairs <- D9 %>%
   distinct(across(all_of(c(char_col, paired_cols)))) %>%
   print(n = Inf)  # show all rows
 library(writexl)
 write_xlsx(unique_pairs, path = file.path("exports", "unique_StudyYearTaxa2.xlsx"))
 
-D8<-D7%>%
-  filter(!Study_name%in%c("Prince William Sound Regional Citizens Advisory Council","NOAA Prince William Sound RCAC 1993-2007","NOAA Resurrection Bay Intercomparison Project 2009", "Special Alaska Study","Pribilofs Special Study","AKMAP Special Study","Special Alaska Study","North Pacific Research Board Alaska Study"),
+missing_rows <- D8a %>%
+  filter(is.na(Year_clean))
+
+write_xlsx(D8a, "FullOSRIData_WDups_AllYears.xlsx")
+
+D8a<-read_xlsx("FullOSRIData_WDups_AllYears.xlsx")
+
+D9<-D8a%>%
+  filter(!Study_name%in%c("Prince William Sound Regional Citizens Advisory Council","NOAA Prince William Sound RCAC 1993-2007","NOAA Resurrection Bay Intercomparison Project 2009", "Special Alaska Study","Pribilofs Special Study","AKMAP Special Study","North Pacific Research Board Alaska Study", "NOAA Southwest Alaska Nearshore Monitoring 2007"),
          Year_clean>1999,
          !(Data_source == "NCCOS" & Study_name == "Mussel Watch"),
          !Parameter=="Pahs, Total For Washington State (17 Chems; Db Calc)",
          Parameter_standardized%in%c(PAH60Tot))
 
-
-write_xlsx(D8, "CleanPAH_OSRI_Data>1999_Aug27.xlsx")
+write_xlsx(D9, "CleanPAH_OSRI_Data>1999.xlsx")
 ```
 
 PAH60 Selection Vectors
@@ -465,39 +511,4 @@ library(writexl)
 write_xlsx(unique_pairs, path = file.path("exports", "unique_species_combinations_D6.xlsx"))
 
 
-```
-
-
-
-Plot some Data
-```{r}
-#values over Species standard, 
-a<-ggplot(D0, aes(x = `Layman_group`, y = log(`Value_standardized`), color = `Layman_group`)) +
-  geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
-  geom_jitter(aes(color = `Layman_group`), 
-              width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
-  labs(title = "All Hydrocarbon data across taxa", x = "", y = "PAH ng/g") +
-  theme_minimal() +
-  theme(
-    legend.position = "none",  # Removes the legend
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
-  )
-
-a
-b<-ggplot(data=(D0%>%filter(Long<-140)), aes(x = Lat, y = filter(Long<-140))) +
-  geom_point() +  # Add jittered points
-  labs(title = "", x = "", y = "") +
-  theme_minimal() +
-  theme(
-    legend.position = "none",  # Removes the legend
-    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
-  )
-
-b
-
-#Double check Nationwide dataset
-ERM<-D1%>%
-  filter(`Data_source`=="ERM")
-summary(Nat)
-unique(Nat$Parameter_standardized)
 ```
