@@ -5,7 +5,7 @@ date: "2025-08-28"
 editor_options: 
   chunk_output_type: console
 ---
-
+Set Up
 ```{r setup, include=FALSE}
 
 library(viridis)
@@ -15,10 +15,11 @@ D19<-read_xlsx("OSRI_Totals_Full.xlsx")
 
 D19<-D19%>%#Reorder layman group to be more intuitive
   mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
+```
 
-##Figure 1 - Data in Analysis- Ridge plot chart or area density chart with Time on x-axis and samples reported on y, colors are studies, hues are databases? Too much?
-#####
 
+Figure 1 - Data in Analysis- Stacked Area Chart with Study Observations over Time
+```{r setup, include=FALSE}
 all_years <- unique(D19$Year_clean)
 all_studies <- unique(D19$Study_name_cleaner)
 complete_grid <- expand.grid(Year_clean = all_years, Study_name_cleaner = all_studies)
@@ -65,11 +66,11 @@ ggsave(filename = "Figures/Fig1-ObservationsByStudyOverTime.png",    # output fi
   height = 5.5,                         # full height of standard paper
   units = "in",
   dpi=300)
-#####
+```
 
 ##Figure 2a - Pie chart of taxa and observations with list of species under each label
 
-#####
+```{r setup, include=FALSE}
 library(ggrepel)
 
 taxa_summary <- D19 %>%

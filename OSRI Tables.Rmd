@@ -4,14 +4,10 @@ output: html_document
 date: "2025-09-03"
 ---
 
-```{r setup, include=FALSE}
-
-```
-
 ## Tables
 
-
-```{r cars}
+```{r}
+## Full Summary Table, to be combined with Region Table below
 summary_table <- D19 %>%
   group_by(Data_source,Study_name_clean,Layman_group,  Sample_motivation, Sum_Method) %>%
   summarise(
@@ -21,11 +17,16 @@ summary_table <- D19 %>%
       " - ",
       format(max(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y")
     ),
+    Max_Total_PAH = max(Total_PAH, na.rm = TRUE),
+    Min_Total_PAH = min(Total_PAH, na.rm = TRUE),
+    Mean_Total_PAH = mean(Total_PAH, na.rm = TRUE),
+    Median_Total_PAH = median(Total_PAH, na.rm = TRUE),
     .groups = "drop"
   ) %>%
   arrange(Layman_group, Data_source)
 write_xlsx(summary_table, "OSRI_Table1.xlsx")
 
+#Table 1 with regions defined (different data set)
 summary_table <- D20 %>%
   group_by(Data_source,Study_name_clean,Layman_group,  Sample_motivation, Sum_Method,Region) %>%
   summarise(
@@ -39,14 +40,27 @@ summary_table <- D20 %>%
   ) %>%
   arrange(Layman_group, Data_source)
 write_xlsx(summary_table, "OSRI_Table1region.xlsx")
+
+#Condensed Version of Table 1
+summary_table_condensed <- D19 %>%
+  group_by(Data_source,Study_name_clean, Sample_motivation, Sum_Method) %>%
+  summarise(
+    Layman_groups = paste(unique(Layman_group), collapse = ", "),
+    Observations = n(),
+    Date_range = paste0(
+      format(min(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y"),
+      " - ",
+      format(max(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y")
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(Data_source, Sample_motivation)
+write_xlsx(summary_table_condensed, "Tables/OSRI_Table1condensed.xlsx")
 ```
+Data Quality
 
-## Including Plots
+```{r}
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
