@@ -5,9 +5,7 @@ date: "2025-08-28"
 editor_options: 
   chunk_output_type: console
 ---
-To Do
-Get Awesome color palette
-Order taxa and evt. regions
+
 ```{r setup, include=FALSE}
 
 library(viridis)
@@ -17,6 +15,7 @@ D19<-read_xlsx("OSRI_Totals_Full.xlsx")
 
 D19<-D19%>%#Reorder layman group to be more intuitive
   mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
+
 ##Figure 1 - Data in Analysis- Ridge plot chart or area density chart with Time on x-axis and samples reported on y, colors are studies, hues are databases? Too much?
 #####
 
@@ -69,7 +68,7 @@ ggsave(filename = "Figures/Fig1-ObservationsByStudyOverTime.png",    # output fi
 #####
 
 ##Figure 2a - Pie chart of taxa and observations with list of species under each label
-STILL CANT GET LABEL POSITION RIGHT
+
 #####
 library(ggrepel)
 
@@ -90,14 +89,15 @@ taxa_summary <- D19 %>%
     label_pos = (ymax + ymin)/5,
     Label = paste0(Layman_group, "\n(n=", TotalCount, ")")
   )
-
+write_xlsx(taxa_summary, "taxa_summary_Figure2.xlsx")
 # Step 2: Create Plot
 ggplot(taxa_summary, aes(x = "", y = TotalCount, fill = Layman_group)) +
   geom_bar(stat = "identity", position = "stack",width = 10) +
   coord_polar(theta = "y", direction = 1) +
   theme_void() +
-  scale_fill_viridis_d(name = "Taxonomic Group") +
-
+  scale_fill_viridis_d(name = "Taxonomic Group") 
+#Silly Labels that never worked
+#####
   # Internal pie labels
   geom_text(
     aes(x = label_pos, y = label_pos, label = Label),
@@ -133,8 +133,47 @@ ggsave(filename = "Figures/Fig2a-SpeciesObservationsBreakdown.png",    # output 
   units = "in",
   dpi=300)
 #####
-#2b- Pie Chart Observations by Region
-NOT DONE
+
+#2b- Stacked Barchart by Observations by Region
+  
+#####
+missing_rows <- D19 %>%
+  filter(is.na(Lat)) # Yes, some stations are missing location Data
+  
+D20<-read_csv("OSRI_Totals_region.csv")
+D20<-D20%>%#Reorder layman group to be more intuitive
+  mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))%>%#Reorder region to be more intuitive
+  mutate(Region = factor(Region, levels= c("SEAK","SCAK","Aleutian","West","North")))
+
+taxa_summary1 <- D20 %>%
+  group_by(Layman_group, Common_name, Region) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(Layman_group, Region) %>%
+  summarise(
+    TotalCount = sum(Count),
+    SpeciesList = paste(unique(Common_name), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(TotalCount))
+write_xlsx(taxa_summary1, "taxa_summary_Figure2b_Region.xlsx")
+
+ggplot(taxa_summary1, aes(x = Region, y = TotalCount, fill = Layman_group)) +
+  geom_bar(stat = "identity", position = "stack") +
+   labs(
+    title = "",
+    x= "Region",
+    y = "Number of Observations") +
+  theme_minimal() +
+  scale_fill_viridis_d(name = "Taxonomic Group") 
+
+ggsave(filename = "Figures/Fig2b-SpeciesObservationsByRegion.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
+#####
 
 #Figure 3 - Boxplots of Taxa and all observations Total PAHs
 
@@ -179,10 +218,12 @@ ggsave(filename = "Figures/Fig3-MeasurementsByTaxa.png",    # output file name
   dpi=300)
 
 #####
+
 #Figure 4 - Panel break down of Results in Fish, inverts, and marine mammal by species_standard
 library(dplyr)
 library(ggplot2)
 library(forcats)
+
 ##Fish
 #####
 custom_order <- c("salmon", "anadromous/freshwater fish", "forage fish", "flatfish", "cod", "other fish")
@@ -334,6 +375,7 @@ ggsave(filename = "Figures/Fig4b-MeasurementsinInverts.png",    # output file na
   units = "in",
   dpi=300)
 #####
+
 ## Marine Mammals
 #####
 
@@ -411,6 +453,7 @@ ggsave(filename = "Figures/Fig4c-MeasurementsinMarineMammals.png",    # output f
 #####
 
 #Figure 5- Time and total PAHs, paneled by taxa - point and line
+
 ##Counts of taxa
 #####
 all_years <- unique(D19$Year_clean)
@@ -488,17 +531,128 @@ ggsave(filename = "Figures/Fig5b-LogMeasurementsover Time.png",    # output file
   height = 4.5,                         # full height of standard paper
   units = "in",
   dpi=300)
+#####
+
 #Figure 6 - Sample Motivation by Total PAHs by taxa - comparative boxplots
+#####
+D19a<- D19 %>%
+  filter(Layman_group%in% c("Seaweed","Octopus","Crabs/ Shrimp"))
 
-#Figure 7 - Number of samples for each taxa by region
+a<-ggplot(data=D19a, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Sample_motivation`)) +
+  geom_point(aes(color = `Sample_motivation` ),position = position_jitterdodge(dodge.width = 0.75,), 
+              width = 0.2, height = 0, size = 1, alpha = 0.3) +  # Add jittered points
+  geom_boxplot(outlier.shape = NA, fill=NA) +  # Removes the outlier markers from the boxplot
+  labs(title = "", x = "", y = "log(Total PAHs (ng/g))") +
+  ylim(0,11.5)+
+  scale_color_viridis_d() +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none")
 
-#Figure 8 - Mussels over time and region, line and point plots
+D19b<- D19 %>%
+  filter(Layman_group%in% c("Snails","Urchins/ Starfish","Fish"))
 
-#Figure 9 - Data Quality - # of observations reporting lab flags, detection limits, Number of observation BDL, reporting tissue type, pct moisture
+b<-ggplot(data=D19b, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Sample_motivation`)) +
+  geom_point(aes(color = `Sample_motivation` ),position = position_jitterdodge(dodge.width = 0.75,), 
+              width = 0.2, height = 0, size = 1, alpha = 0.3) +  # Add jittered points
+  geom_boxplot(outlier.shape = NA, fill=NA) +  # Removes the outlier markers from the boxplot
+  labs(title = "", x = "", y = "") +
+    ylim(0,11.5)+
+  scale_color_viridis_d() +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "none",
+    axis.text.y = element_blank())
 
-#Figure 10 - By taxa number of observations reporting wet vs dry and provided or calculated Total PAH levels, range of PAH number and distribution going into Total_PAH calculations
+D19c<- D19 %>%
+  filter(Layman_group%in% c("Clams","Mussels","Seals/ Whales"))
 
-#Figure 11 - Subsistence gaps, by region marine subsistence resources harvested compared to numbers of observations
+c<-ggplot(data=D19c, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Sample_motivation`)) +
+  geom_point(aes(color = `Sample_motivation` ),position = position_jitterdodge(dodge.width = 0.75,), 
+              width = 0.2, height = 0, size = 1, alpha = 0.3) +  # Add jittered points
+  geom_boxplot(outlier.shape = NA, fill=NA) +  # Removes the outlier markers from the boxplot
+  labs(title = "", x = "", y = "") +
+    ylim(0,11.5)+
+  scale_color_viridis_d(name = "Study Motivation") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.y = element_blank(),
+    legend.position = "right")
 
+ggarrange(a,b,c,widths= c(0.35,0.55,1.7), align = "h",nrow = 1)
+
+ggsave(filename = "Figures/Fig6-LogMeasurementsBySampleMotivation.png",    # output file name
+  plot = last_plot(),                   # 
+  device = "png",
+  width = 10.5,                          # 
+  height = 5.5,                         # 
+  units = "in",
+  dpi=300)
+
+#####
+
+#Figure 7 - Study by Results
+#####
+study_order <- D19 %>%
+  group_by(Study_name_clean) %>%
+  summarise(median_PAH = median(log(Total_PAH), na.rm = TRUE)) %>%
+  arrange(median_PAH) %>%
+  pull(Study_name_clean)
+
+# Step 2: Set Study_name_clean as an ordered factor
+D19 <- D19 %>%
+  mutate(Study_name_clean = factor(Study_name_clean, levels = study_order),
+         Layman_group = factor(Layman_group))
+
+# Step 3: Plot
+ggplot(data = D19, aes(x = Study_name_clean, y = log(Total_PAH))) +
+  # Jittered points, colored by Taxa group
+  geom_jitter(
+    aes(color = Layman_group),
+    width = 0.2, height = 0,
+    size = 1.2, alpha = 0.6
+  ) +
+  # Boxplot with uniform fill color for each Study (fill used for color)
+  geom_boxplot(fill=NA,
+    outlier.shape = NA,
+    width = 0.6,
+    color = "darkgrey",
+    alpha = 0.3
+  ) +
+  # Flip to horizontal
+  coord_flip() +
+
+  # Color scales
+  scale_color_viridis_d(name = "Taxa Group", option = "D") +
+  scale_fill_viridis_d(guide = "none", option = "C") +  # different viridis palette for box fill
+
+  # Labels
+  labs(
+    title = "Log PAH Levels in Marine Organisms by Study",
+    x = "",
+    y = "log(Total PAHs [ng/g])"
+  ) +
+
+  # Theme
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    legend.position = "right",
+    legend.title = element_text(face = "bold"),
+    legend.text = element_text(size = 9)
+  ) +
+  ylim(0, 11.5)
+
+ggsave(filename = "Figures/Fig7-LogMeasurementsByStudy.png",    # output file name
+  plot = last_plot(),                   # 
+  device = "png",
+  width = 8.5,                          # 
+  height = 6.5,                         # 
+  units = "in",
+  dpi=300)
+#####
 ```
 

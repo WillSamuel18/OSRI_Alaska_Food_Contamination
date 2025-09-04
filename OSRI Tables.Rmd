@@ -1,0 +1,52 @@
+---
+title: "OSRI Tables"
+output: html_document
+date: "2025-09-03"
+---
+
+```{r setup, include=FALSE}
+
+```
+
+## Tables
+
+
+```{r cars}
+summary_table <- D19 %>%
+  group_by(Data_source,Study_name_clean,Layman_group,  Sample_motivation, Sum_Method) %>%
+  summarise(
+    Observations = n(),
+    Date_range = paste0(
+      format(min(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y"),
+      " - ",
+      format(max(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y")
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(Layman_group, Data_source)
+write_xlsx(summary_table, "OSRI_Table1.xlsx")
+
+summary_table <- D20 %>%
+  group_by(Data_source,Study_name_clean,Layman_group,  Sample_motivation, Sum_Method,Region) %>%
+  summarise(
+    Observations = n(),
+    Date_range = paste0(
+      format(min(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y"),
+      " - ",
+      format(max(as.Date(Year_clean, format = "%Y"), na.rm = TRUE), "%Y")
+    ),
+    .groups = "drop"
+  ) %>%
+  arrange(Layman_group, Data_source)
+write_xlsx(summary_table, "OSRI_Table1region.xlsx")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

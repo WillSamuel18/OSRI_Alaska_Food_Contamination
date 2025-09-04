@@ -128,12 +128,47 @@ missing_rows <- D16 %>%
 D17<-D16%>%#Reorder layman group to be more intuitive
   mutate(Layman_group = factor(Layman_group, levels = c("Seaweed","Snails","Urchins/ Starfish","Octopus","Clams", "Mussels","Crabs/ Shrimp","Fish","Seals/ Whales")))
 
-D18<- D17 %>% # Cleaning up study names in new column for better grouping and visusalizations
-mutate(Study_name_clean = case_when(
+D18<- D17 %>%
+mutate(Sample_motivation = case_when(
+  Study_name == "Arnold 2006- Public Health Evaluation of Subsistence\r\r\r\nResources Collected During 2005\r\r\r\n" ~ "Post-oil spill assessment",
+  Study_name == "Dr Wetzel, Mote Marine Database" ~ "Background biomonitoring",
+  Source_sampleID == "HOT M001"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M002"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M003"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M004"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M005"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M006"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M007"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M008"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M009"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M010"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M011"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M012"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M013"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M014"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M015"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M016"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M017"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M018"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M019"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M020"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M021"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M022"~ "Post-oil spill assessment",  
+  Source_sampleID == "HOT M023"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M024"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M025"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M026"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M027"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M028"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M029"~ "Post-oil spill assessment",
+  Source_sampleID == "HOT M030"~ "Post-oil spill assessment",
+  TRUE~Sample_motivation))%>%
+mutate(Study_name_clean = case_when(  # Cleaning up study names in new column for better grouping and visusalizations
     Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "North Slope Subsistence Study",
     Study_name == "LTEMP"~ "Prince William Sound Regional Citizens' Advisory Council Monitoring",
     Study_name == "Kachemak Bay Bioeffects"~"NOAA Kachemak Bay Bioeffects",
-    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                         Study_name ==  "Selendang" ~ "Seledang AYU Post Spill Monitoring",
+    Study_name == "Alaska Arctic Study"   ~    "NOAA Alaska Arctic Study",                         
+    Study_name ==  "Selendang" ~ "Seledang AYU Post Spill Monitoring",
     Study_name == "Resurrection Bay Intercomparison Project" ~  "NOAA Resurrection Bay Project",
     Study_name == "Bristol Bay Study"  ~      "NOAA Bristol Bay Study",
     Study_name == "Alaska NPS Mussel Watch"  ~ "Alaska NPS Mussel Watch",
