@@ -24,7 +24,7 @@ summary_table <- D19 %>%
     .groups = "drop"
   ) %>%
   arrange(Layman_group, Data_source)
-write_xlsx(summary_table, "OSRI_Table1.xlsx")
+write_xlsx(summary_table, "Tables/OSRI_Table1.xlsx")
 
 #Table 1 with regions defined (different data set)
 summary_table <- D20 %>%

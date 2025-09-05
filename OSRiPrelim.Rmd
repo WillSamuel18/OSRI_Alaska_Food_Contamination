@@ -21,7 +21,7 @@ library(writexl)
 
 Import OSRI Data from Will July 14
 ```{r}
-file_path <- "data/OSRI_data_D1.xlsx"
+file_path <- "OSRI_data_D1.xlsx"
 D0<- read_xlsx(file_path)
 
 glimpse(D0) ##Inspect the data
@@ -323,7 +323,21 @@ D9<-D8a%>%
          Year_clean>1999,
          !(Data_source == "NCCOS" & Study_name == "Mussel Watch"),
          !Parameter=="Pahs, Total For Washington State (17 Chems; Db Calc)",
-         Parameter_standardized%in%c(PAH60Tot))
+         Parameter_standardized%in%c(PAH60Tot))%>%
+  mutate(Value_standardized=Value)%>%
+  mutate(
+    Value_standardized = if_else(
+      Study_name == "Dr Wetzel, Mote Marine Database",
+      Value_standardized * 1000,
+      Value_standardized
+    ))%>%
+  mutate(
+    Value_standardized = if_else(
+      Study_name == "Shigenaka 2008, Exxon Valdez Intertidal monitoring",
+      Value_standardized * 1000,
+      Value_standardized
+    )
+  )
 
 write_xlsx(D9, "CleanPAH_OSRI_Data>1999.xlsx")
 ```

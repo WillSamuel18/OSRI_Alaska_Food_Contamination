@@ -90,7 +90,7 @@ taxa_summary <- D19 %>%
     label_pos = (ymax + ymin)/5,
     Label = paste0(Layman_group, "\n(n=", TotalCount, ")")
   )
-write_xlsx(taxa_summary, "taxa_summary_Figure2.xlsx")
+write_xlsx(taxa_summary, "Tables/taxa_summary_Figure2.xlsx")
 # Step 2: Create Plot
 ggplot(taxa_summary, aes(x = "", y = TotalCount, fill = Layman_group)) +
   geom_bar(stat = "identity", position = "stack",width = 10) +
@@ -125,7 +125,7 @@ ggplot(taxa_summary, aes(x = "", y = TotalCount, fill = Layman_group)) +
   # Make sure labels fit
   #xlim(0.5, 2.5) +
   theme(legend.position = "none")
-
+#####
 ggsave(filename = "Figures/Fig2a-SpeciesObservationsBreakdown.png",    # output file name
   plot = last_plot(),                   # or specify your plot object like `my_plot`
   device = "png",
@@ -218,6 +218,26 @@ ggsave(filename = "Figures/Fig3-MeasurementsByTaxa.png",    # output file name
   units = "in",
   dpi=300)
 
+##Clipped Version
+ggplot(data=D19, aes(x = `Layman_group`, y = `Total_PAH`, color = `Layman_group`)) +
+  geom_boxplot(outlier.shape = NA) +  # Removes the outlier markers from the boxplot
+  geom_jitter(aes(color = `Layman_group`), 
+              width = 0.2, height = 0, size = 1, alpha = 0.5) +  # Add jittered points
+  labs(title = "PAH concentrations measured in marine organisms", x = "", y = "Total PAHs (ng/g)") +
+  theme_minimal() +
+  ylim(0,250)+
+  theme(
+    legend.position = "none",  # Removes the legend
+    axis.text.x = element_text(angle = 45, hjust = 1)  # Rotate x-axis text
+  )
+
+ggsave(filename = "Figures/Fig3-Clipped250MeasurementsByTaxa.png",    # output file name
+  plot = last_plot(),                   # or specify your plot object like `my_plot`
+  device = "png",
+  width = 8.5,                          # half of standard 11-inch paper width
+  height = 5.5,                         # full height of standard paper
+  units = "in",
+  dpi=300)
 #####
 
 #Figure 4 - Panel break down of Results in Fish, inverts, and marine mammal by species_standard
@@ -287,13 +307,13 @@ ggplot(D19_fish, aes(x = Common_name, y = PAH, color = Common_name)) +
     y = "Total PAHs (ng/g)"
   ) +
   theme_minimal() +
-  ylim(0, 1500) +
+  ylim(0, 150) +
   theme(
     legend.position = "none",
     axis.text.x = element_text(angle = 45, hjust = 1),
     strip.text = element_text( size = 9)
   )
-ggsave(filename = "Figures/Fig4a-ClippedMeasurementsinFish.png",    # output file name
+ggsave(filename = "Figures/Fig4a-Clipped150MeasurementsinFish.png",    # output file name
   plot = last_plot(),                   # or specify your plot object like `my_plot`
   device = "png",
   width = 10,                          # half of standard 11-inch paper width
@@ -506,6 +526,8 @@ ggsave(filename = "Figures/Fig5a-ObservationsByTaxaOverTime.png",    # output fi
 
 #####
 
+## Figure 5- Time trends in concentrations over time
+#####
 D19_Red <- D19 %>%
   mutate(Year_clean = as.numeric(Year_clean))%>%
   filter(Layman_group%in% c("Fish","Mussels","Clams","Seals/ Whales"))
@@ -560,7 +582,7 @@ b<-ggplot(data=D19b, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Samp
   geom_boxplot(outlier.shape = NA, fill=NA) +  # Removes the outlier markers from the boxplot
   labs(title = "", x = "", y = "") +
     ylim(0,11.5)+
-  scale_color_viridis_d() +
+  scale_color_manual(values = c("#440154", "#35b779")) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1),
@@ -571,7 +593,7 @@ D19c<- D19 %>%
   filter(Layman_group%in% c("Clams","Mussels","Seals/ Whales"))
 
 c<-ggplot(data=D19c, aes(x = `Layman_group`, y = log(`Total_PAH`), color = `Sample_motivation`)) +
-  geom_point(aes(color = `Sample_motivation` ),position = position_jitterdodge(dodge.width = 0.75,), 
+  geom_point(aes(color = `Sample_motivation` ),position = position_jitterdodge(dodge.width = 0.75,jitter.width = 0.2), 
               width = 0.2, height = 0, size = 1, alpha = 0.3) +  # Add jittered points
   geom_boxplot(outlier.shape = NA, fill=NA) +  # Removes the outlier markers from the boxplot
   labs(title = "", x = "", y = "") +
@@ -628,7 +650,6 @@ ggplot(data = D19, aes(x = Study_name_clean, y = log(Total_PAH))) +
 
   # Color scales
   scale_color_viridis_d(name = "Taxa Group", option = "D") +
-  scale_fill_viridis_d(guide = "none", option = "C") +  # different viridis palette for box fill
 
   # Labels
   labs(
@@ -645,7 +666,7 @@ ggplot(data = D19, aes(x = Study_name_clean, y = log(Total_PAH))) +
     legend.title = element_text(face = "bold"),
     legend.text = element_text(size = 9)
   ) +
-  ylim(0, 11.5)
+  ylim(-1, 11.5)
 
 ggsave(filename = "Figures/Fig7-LogMeasurementsByStudy.png",    # output file name
   plot = last_plot(),                   # 

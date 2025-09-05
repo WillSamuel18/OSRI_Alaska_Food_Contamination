@@ -30,6 +30,8 @@ Totals_clean <- Totals[!is.na(Totals$Value_standardized) & Totals$Value_standard
 ##remove those that have IDs already in the Totals_clean dataset
 D10 <- D9[!(D9$Source_sampleID %in% Totals_clean$Source_sampleID), ] #40,980obs.
 
+#Check Quality
+###### 
 length(unique(D10$Source_sampleID)) #1,096 atleast this many more observations
 sum(grepl("Naphthalene", D9$Parameter_standardized)) #This a weird one and may just be calling out all instances, not perfect case
 
@@ -38,7 +40,7 @@ ggplot(Totals_clean, aes(x = Study_name, y = Value_standardized)) +
   geom_boxplot() +
   theme_minimal()+
   theme (axis.text.x = element_text(angle = 45, hjust = 1))
-
+#####
 
 D10_summarized <- D10 %>% # Make Total PAH calculations and Count of number of PAHs included in Total
   group_by(Source_sampleID) %>%
@@ -69,6 +71,9 @@ D15 <- D14 %>% # To reorder columns
   select( Data_source, Study_name, Year_clean, Total_PAH, Lat, Long, Common_name, Scientific_name, Species_standard, Taxonomic_group, Layman_group, Sample_motivation,
   Source_sampleID, SumPAHCount, Units_standardized, Basis_standardized, Sum_Method,  Tissue_type_standardized_grouped, Detection_limit_standardized, Reporting_limit_standardized, Qualifier_code, Moisture_pct, Lab_ID, Notes)
 
+##More Quality Control
+
+#####
 #Clean up the biological information, fill in years, Tissue type, sample motivation
 char_col <- "Common_name"  # the main character column
 paired_cols <- c("Scientific_name", "Species_standard", "Taxonomic_group", "Layman_group","Study_name")
@@ -79,11 +84,13 @@ unique_pairs <- D16 %>%
 write_xlsx(unique_pairs, path = file.path("exports", "unique_species_combinations_D16.xlsx"))
 
 #issue with species = I Lost 23 species over the course of summarizing and merging!!!! Looks like there were cut when I cut off the 90s data
+#####
 
 D16<- D15 %>% 
 mutate(Common_name = case_when(
     Common_name == "Spot" ~ "Spot Shrimp",
     Common_name == "Mediteranean Mussel"~ "Blue Mussel",
+    Common_name == "Kokanee"~ "Sockeye Salmon",
     TRUE~Common_name))%>%
   mutate(Scientific_name = case_when(
     Scientific_name == "Leiostomus xanthurus" ~ "Pandalus platyceros",
@@ -135,33 +142,33 @@ mutate(Sample_motivation = case_when(
   Source_sampleID == "HOT M001"~ "Post-oil spill assessment",
   Source_sampleID == "HOT M002"~ "Post-oil spill assessment",
   Source_sampleID == "HOT M003"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M004"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M005"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M006"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M007"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M008"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M009"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M010"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M011"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M012"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M013"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M014"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M015"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M016"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M017"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M018"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M019"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M020"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M021"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M022"~ "Post-oil spill assessment",  
-  Source_sampleID == "HOT M023"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M024"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M025"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M026"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M027"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M028"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M029"~ "Post-oil spill assessment",
-  Source_sampleID == "HOT M030"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM004"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM005"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM006"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM007"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM008"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM009"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM010"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM011"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM012"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM013"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM014"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM015"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM016"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM017"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM018"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM019"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM020"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM021"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM022"~ "Post-oil spill assessment",  
+  Source_sampleID == "HOTM023"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM024"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM025"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM026"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM027"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM028"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM029"~ "Post-oil spill assessment",
+  Source_sampleID == "HOTM030"~ "Post-oil spill assessment",
   TRUE~Sample_motivation))%>%
 mutate(Study_name_clean = case_when(  # Cleaning up study names in new column for better grouping and visusalizations
     Study_name == "ERM NorthSlope Subsistence Study 2014 2015" ~ "North Slope Subsistence Study",
