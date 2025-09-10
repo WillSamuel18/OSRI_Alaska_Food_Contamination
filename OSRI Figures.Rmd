@@ -678,3 +678,186 @@ ggsave(filename = "Figures/Fig7-LogMeasurementsByStudy.png",    # output file na
 #####
 ```
 
+Figure 8
+
+Data gaps by regions
+scaled to number pie charts for each region for harvest and samples, similar to Wills pie charts on Figure 1 but with size scaling, also explore the idea of having a complimentary table here
+#Make a Table on Sampling effort verse Recorded Harvest by Region
+```{r}
+obs_df <- D20 %>% # Make the Observations data ready to compare to harvest data
+  mutate(Taxa= case_when(
+    Layman_group=="Seaweed"~"Plants", 
+    Layman_group=="Snails"~"Invertebrate", 
+    Layman_group=="Urchins/ Starfish"~"Invertebrate", 
+    Layman_group=="Octopus"~"Invertebrate", 
+    Layman_group=="Clams"~"Invertebrate", 
+    Layman_group=="Mussels"~"Invertebrate", 
+    Layman_group=="Crabs/ Shrimp"~"Invertebrate", 
+    Layman_group=="Fish"~"Fish", 
+    Layman_group=="Seals/ Whales"~ "Marine Mammals"
+  ))%>%
+  group_by(Taxa,Region) %>%
+  summarise(
+    value = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(Taxa, Region)
+subs<- read_csv("subsistence_summary_by_community_coastal.csv") # load harvest data summarized by Will
+
+subs1<-subs%>%
+  mutate(Region= case_when(
+    is.na(Region) ~ "West",
+    TRUE~Region))%>%
+  group_by(Region)%>%
+  summarise(
+    Invertebrate = sum(MarineInverts_kg, na.rm = TRUE),
+    Fish = sum(Fish_kg, na.rm = TRUE),
+    `Marine Mammals` = sum(MarineMammals_kg, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+harv_df<-subs1%>%
+  pivot_longer(
+    cols = c(Invertebrate, Fish, `Marine Mammals`), 
+    names_to = "Taxa",           
+    values_to = "value"           
+ )
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(scales)
+library(stringr)
+library(ggforce)
+
+
+# Add type column to each table
+obs_df <- obs_df %>% mutate(type = "Observations")
+harv_df <- harv_df %>% mutate(type = "Harvest")
+
+# Rename the value column consistently
+colnames(obs_df)[which(!colnames(obs_df) %in% c("Region", "Taxa", "type"))] <- "value"
+colnames(harv_df)[which(!colnames(harv_df) %in% c("Region", "Taxa", "type"))] <- "value"
+
+# Combine the two
+combined_df <- bind_rows(obs_df, harv_df)
+
+# Check for and remove any rows with missing key data
+pie_data <- combined_df %>%
+  filter(!is.na(Region), !is.na(Taxa), !is.na(value)) %>%
+  group_by(Region, type, Taxa) %>%
+  summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
+  group_by(Region, type) %>%
+  mutate(
+    Total = sum(value),
+    Fraction = value / Total,
+    label = paste0(round(Fraction * 100), "%"),
+    ypos = cumsum(Fraction) - 0.5 * Fraction
+  ) %>%
+  ungroup()
+
+pie_data <- pie_data %>% filter(!is.na(Fraction) & Total > 0)
+pie_data<-pie_data%>%#Reorder regionto be more intuitive
+  mutate(Region = factor(Region, levels = c("SEAK", "SCAK","Aleutian","West","North")))
+## try it with pies scaled to total counts/ kgs
+
+# Prepare pie segments per group
+pie_data_summary <- pie_data %>%
+  group_by(Region, type, Taxa) %>%
+  summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
+  group_by(Region, type) %>%
+  mutate(
+    total = sum(value),
+    fraction = value / total,
+    start = cumsum(lag(fraction, default = 0)) * 2 * pi,
+    end = cumsum(fraction) * 2 * pi,
+    middle = (start + end) / 2
+  ) %>%
+  ungroup()
+
+# Step 2: Normalize radius within each `type`
+# Compute the radius relative to max within each `type` (so pies in Harvest are scaled within Harvest group)
+radius_scale <- pie_data_summary %>%
+  group_by(type, Region) %>%
+  summarise(total = unique(total), .groups = "drop") %>%
+  group_by(type) %>%
+  mutate(radius = sqrt(total) / max(sqrt(total)) * 2)  # scale max radius to 2 units
+
+# Join radius back
+pie_data_summary <- pie_data_summary %>%
+  left_join(radius_scale, by = c("type", "Region"))
+
+pie_data_summary<-pie_data_summary%>%#Reorder regionto be more intuitive
+  mutate(Taxa = factor(Taxa, levels = c("Invertebrate", "Fish","Marine Mammals")))
+pie_data_summary<-pie_data_summary%>%#Reorder regionto be more intuitive
+  mutate(Region1 = case_when(
+    Region=="SEAK"~ "Southeast",
+    Region=="SCAK"~ "Southcentral",
+    Region=="West"~ "Western",
+    Region=="North"~ "Northern",
+    TRUE~ Region))
+pie_data_summary<-pie_data_summary%>%#Reorder regionto be more intuitive
+  mutate(Region1 = factor(Region1, levels = c("Southeast",
+"Southcentral", "Aleutian",
+"Western",
+"Northern")))
+
+write_xlsx(pie_data_summary,"Tables/PieCountsHarvestbyTaxa&Region.xlsx")
+
+# Create the labels and wrap long ones
+labels <- c("Observations (scaled by number of observations)", "Reported 2008 Harvest (scaled by kg)")
+wrapped_labels <- str_wrap(labels, width = 25)
+
+# Step 3: Plot
+ggplot(pie_data_summary) +
+  geom_arc_bar(
+    aes(
+      x0 = as.numeric(factor(Region1)) * 4,
+      y0 = ifelse(type == "Observations", 4, 0),
+      r0 = 0,
+      r = radius,
+      start = start,
+      end = end,
+      fill = Taxa
+    ),
+    color = "white",
+    size = 0.3
+  ) +
+  coord_fixed() +
+  scale_fill_viridis_d(name = "Taxa") +
+  theme_void() +
+  theme(legend.position = "top") +
+  annotate("text",
+           x = unique(as.numeric(factor(pie_data_summary$Region1))) * 4,
+           y = -2.5, label = unique(pie_data_summary$Region1), size = 3.5,fontface = "bold")+
+  annotate("text",
+           x = 1.5,
+           y = 4.6, 
+           label = str_wrap("Observations (scaled by count)", width = 18), 
+           size = 3.5,
+           angle = 90,  # Rotate 90 degrees
+           hjust = 0.5,
+           fontface = "bold")+
+  annotate("text",
+           x = 1.5,
+           y = 0, 
+           label = str_wrap("Reported 2008 Harvest (scaled by kg)", width = 25), 
+           size = 3.5,
+           angle = 90,  # Rotate 90 degree
+           hjust = 0.5,
+    fontface = "bold")
+
+ggsave(filename = "Figures/Fig8-Observations&HarvestComparisonPies.png",    # output file name
+  plot = last_plot(),                   # 
+  device = "png",
+  width = 8.5,                          # 
+  height = 6.5,                         # 
+  units = "in",
+  dpi=300)
+
+```
+
+
+Notes for Data gaps Tesselation
+I would like a full coastal tesselation that highlights where significant knowledge gaps are. I dont necesarily want it to be taxa specific ( looking to "flatten" out all these nuiances) I would like to have a gradient color scale that expands on where high harvest -low harvest and high - low sampling are displayed on the same color scheme, something like a white-blue scale for Harvest and a white to red scale for Sampling all with transparency such that place with relative high for both are purple and those with low for both are white and those with skews are blue or red depending on which direction. Harvest based on total kgs of marine resources harvests regardless of taxa group, sampling effort is number of observations recorded for that area regardless of taxa group
+

@@ -57,6 +57,53 @@ summary_table_condensed <- D19 %>%
   arrange(Data_source, Sample_motivation)
 write_xlsx(summary_table_condensed, "Tables/OSRI_Table1condensed.xlsx")
 ```
+
+#Make a Table on Sampling effort verse Recorded Harvest by Region
+```{r}
+summary_table1 <- D20 %>% # Make the Observations data ready to compare to harvest data
+  mutate(Taxa= case_when(
+    Layman_group=="Seaweed"~"Plants", 
+    Layman_group=="Snails"~"Invertebrate", 
+    Layman_group=="Urchins/ Starfish"~"Invertebrate", 
+    Layman_group=="Octopus"~"Invertebrate", 
+    Layman_group=="Clams"~"Invertebrate", 
+    Layman_group=="Mussels"~"Invertebrate", 
+    Layman_group=="Crabs/ Shrimp"~"Invertebrate", 
+    Layman_group=="Fish"~"Fish", 
+    Layman_group=="Seals/ Whales"~ "Marine Mammals"
+  ))%>%
+  group_by(Taxa,Region) %>%
+  summarise(
+    Observations = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(Taxa, Region)
+subs<- read_csv("subsistence_summary_by_community_coastal.csv") # load harvest data summarized by Will
+
+subs1<-subs%>%
+  mutate(Region= case_when(
+    is.na(Region) ~ "West",
+    TRUE~Region))%>%
+  group_by(Region)%>%
+  summarise(
+    Invertebrate = sum(MarineInverts_kg, na.rm = TRUE),
+    Fish = sum(Fish_kg, na.rm = TRUE),
+    `Marine Mammals` = sum(MarineMammals_kg, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+subs2<-subs1%>%
+  pivot_longer(
+    cols = c(Invertebrate, Fish, `Marine Mammals`), 
+    names_to = "Taxa",           
+    values_to = "Kilos"           
+ )
+
+joined_df <- full_join(subs2, summary_table1, by = c("Region", "Taxa"))
+
+
+```
+
 Data Quality
 
 ```{r}
